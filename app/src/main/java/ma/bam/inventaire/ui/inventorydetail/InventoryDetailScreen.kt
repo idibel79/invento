@@ -50,7 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import ma.bam.inventaire.data.local.entity.StockArticleWithBarcodes
+import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.domain.EcartCalculator
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
 import ma.bam.inventaire.ui.theme.NotScannedGray
@@ -67,7 +67,7 @@ fun InventoryDetailScreen(
     val session by viewModel.session.collectAsState()
     val articles by viewModel.visibleArticles.collectAsState()
     val filter by viewModel.filter.collectAsState()
-    var editingArticle by remember { mutableStateOf<StockArticleWithBarcodes?>(null) }
+    var editingArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.exportEvents.collect { event ->
@@ -132,7 +132,7 @@ fun InventoryDetailScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(articles, key = { it.article.id }) { item ->
+                items(articles, key = { it.id }) { item ->
                     ArticleRow(
                         item = item,
                         onEdit = { editingArticle = item }
@@ -147,9 +147,9 @@ fun InventoryDetailScreen(
             article = article,
             onDismiss = { editingArticle = null },
             onConfirm = { quantite ->
-                val ecart = EcartCalculator.compute(article.article.quantiteTheorique, quantite)
+                val ecart = EcartCalculator.compute(article.quantiteTheorique, quantite)
                 viewModel.updateQuantity(
-                    articleId = article.article.id,
+                    articleId = article.id,
                     quantiteReelle = quantite,
                     ecartValide = !EcartCalculator.hasEcart(ecart)
                 )
@@ -161,10 +161,10 @@ fun InventoryDetailScreen(
 
 @Composable
 private fun ArticleRow(
-    item: StockArticleWithBarcodes,
+    item: StockArticleEntity,
     onEdit: () -> Unit
 ) {
-    val article = item.article
+    val article = item
     val hasEcart = EcartCalculator.hasEcart(article.ecart)
     val notScanned = article.quantiteReelle == null
     val statusColor = when {

@@ -15,7 +15,7 @@ interface ApiService {
 
 data class RemoteStockArticle(
     val codeArticle: String,
-    val codesBarres: List<String>,
+    val codeBarre: String,
     val reference: String,
     val designation: String,
     val description: String,

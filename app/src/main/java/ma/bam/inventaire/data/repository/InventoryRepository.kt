@@ -2,7 +2,7 @@ package ma.bam.inventaire.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import ma.bam.inventaire.data.local.entity.InventorySessionEntity
-import ma.bam.inventaire.data.local.entity.StockArticleWithBarcodes
+import ma.bam.inventaire.data.local.entity.StockArticleEntity
 
 /**
  * Source de vérité pour les sessions d'inventaire et leurs articles.
@@ -15,11 +15,11 @@ interface InventoryRepository {
 
     fun observeSession(sessionId: String): Flow<InventorySessionEntity?>
 
-    fun observeArticles(sessionId: String): Flow<List<StockArticleWithBarcodes>>
+    fun observeArticles(sessionId: String): Flow<List<StockArticleEntity>>
 
     suspend fun createSession(fileName: String, articles: List<ImportedArticle>): InventorySessionEntity
 
-    suspend fun findArticleByBarcode(sessionId: String, codeBarre: String): StockArticleWithBarcodes?
+    suspend fun findArticleByBarcode(sessionId: String, codeBarre: String): StockArticleEntity?
 
     suspend fun recordScan(articleId: Long, quantiteReelle: Double, ecartValide: Boolean)
 
@@ -41,6 +41,7 @@ data class SessionCounters(
 /** Article tel que décodé depuis le fichier Excel importé, avant persistance. */
 data class ImportedArticle(
     val codeArticle: String,
+    val codeBarre: String,
     val reference: String,
     val designation: String,
     val description: String,
@@ -49,6 +50,5 @@ data class ImportedArticle(
     val quantiteTheorique: Double,
     val unite: String,
     val prixUnitaire: Double,
-    val dateImport: Long,
-    val codesBarres: List<String>
+    val dateImport: Long
 )

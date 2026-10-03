@@ -15,13 +15,14 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("sessionId"), Index("codeArticle")]
+    indices = [Index("sessionId"), Index("codeArticle"), Index("codeBarre")]
 )
 data class StockArticleEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val sessionId: String,
     val codeArticle: String,
+    val codeBarre: String,
     val reference: String,
     val designation: String,
     val description: String,

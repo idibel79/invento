@@ -15,16 +15,4 @@ class ExcelColumnMapperTest {
         assertEquals(2, map[ExcelColumnMapper.DESIGNATION])
         assertEquals(3, map[ExcelColumnMapper.QUANTITE_THEORIQUE])
     }
-
-    @Test
-    fun `splitBarcodes gere plusieurs separateurs`() {
-        val result = ExcelColumnMapper.splitBarcodes("123456 , 789012;345678")
-        assertEquals(listOf("123456", "789012", "345678"), result)
-    }
-
-    @Test
-    fun `splitBarcodes valeur unique`() {
-        val result = ExcelColumnMapper.splitBarcodes("123456")
-        assertEquals(listOf("123456"), result)
-    }
 }

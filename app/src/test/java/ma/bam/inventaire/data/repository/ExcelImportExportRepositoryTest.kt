@@ -16,31 +16,31 @@ class ExcelImportExportRepositoryTest {
             ByteArrayInputStream(SampleInventoryFixture.buildSampleWorkbookBytes())
         )
 
-        // ART-001, ART-002 (fusionné), ART-003, ART-004 -> 4 articles ; la ligne vide est ignorée
+        // ART-001, ART-002 (première occurrence), ART-003, ART-004 -> 4 articles ;
+        // la ligne vide est ignorée, la seconde ligne ART-002 est en erreur (doublon)
         assertEquals(4, result.articles.size)
-        assertTrue("aucune ligne ne devrait être en erreur", result.erreurs.isEmpty())
+        assertEquals(1, result.erreurs.size)
     }
 
     @Test
-    fun `lignes partageant le meme code_article sont fusionnees avec leurs codes-barres`() {
+    fun `un code_article deja vu avec un autre code_barre est signale en erreur`() {
         val result = repository.importTheoreticalStock(
             ByteArrayInputStream(SampleInventoryFixture.buildSampleWorkbookBytes())
         )
 
         val art002 = result.articles.single { it.codeArticle == "ART-002" }
-        assertEquals(setOf("6111234500025", "6111234500032"), art002.codesBarres.toSet())
-        assertEquals("Timbres ordinaires", art002.designation)
-        assertEquals(300.0, art002.quantiteTheorique, 0.0001)
+        assertEquals("6111234500025", art002.codeBarre)
+        assertTrue(result.erreurs.single().contains("ART-002"))
     }
 
     @Test
-    fun `une cellule code_barre avec plusieurs valeurs est eclatee`() {
+    fun `chaque article importe a un seul code_barre`() {
         val result = repository.importTheoreticalStock(
             ByteArrayInputStream(SampleInventoryFixture.buildSampleWorkbookBytes())
         )
 
         val art003 = result.articles.single { it.codeArticle == "ART-003" }
-        assertEquals(listOf("6111234500049", "6111234500056"), art003.codesBarres)
+        assertEquals("6111234500049", art003.codeBarre)
     }
 
     @Test
@@ -64,28 +64,24 @@ class ExcelImportExportRepositoryTest {
             statut = ma.bam.inventaire.data.local.entity.InventoryStatus.EN_COURS,
             nomFichierSource = "inventaire_exemple.xlsx"
         )
-        val article = ma.bam.inventaire.data.local.entity.StockArticleWithBarcodes(
-            article = ma.bam.inventaire.data.local.entity.StockArticleEntity(
-                id = 1L,
-                sessionId = session.id,
-                codeArticle = "ART-001",
-                reference = "REF-ENV-A4",
-                designation = "Enveloppes A4 blanches",
-                description = "Boîte de 500 enveloppes A4 90g",
-                categorie = "Fournitures bureau",
-                emplacement = "Dépôt A - Rayon 3",
-                quantiteTheorique = 120.0,
-                unite = "boite",
-                prixUnitaire = 45.50,
-                dateImport = 1759420800000L,
-                quantiteReelle = 118.0,
-                ecart = -2.0,
-                ecartValide = true,
-                dateScan = 1759420900000L
-            ),
-            barcodes = listOf(
-                ma.bam.inventaire.data.local.entity.ArticleBarcodeEntity(1, 1L, "6111234500018")
-            )
+        val article = ma.bam.inventaire.data.local.entity.StockArticleEntity(
+            id = 1L,
+            sessionId = session.id,
+            codeArticle = "ART-001",
+            codeBarre = "6111234500018",
+            reference = "REF-ENV-A4",
+            designation = "Enveloppes A4 blanches",
+            description = "Boîte de 500 enveloppes A4 90g",
+            categorie = "Fournitures bureau",
+            emplacement = "Dépôt A - Rayon 3",
+            quantiteTheorique = 120.0,
+            unite = "boite",
+            prixUnitaire = 45.50,
+            dateImport = 1759420800000L,
+            quantiteReelle = 118.0,
+            ecart = -2.0,
+            ecartValide = true,
+            dateScan = 1759420900000L
         )
 
         val outputStream = java.io.ByteArrayOutputStream()
@@ -97,6 +93,8 @@ class ExcelImportExportRepositoryTest {
 
         assertEquals("code_article", header[3])
         assertEquals("ART-001", dataRow[3])
+        assertEquals("code_barre", header[4])
+        assertEquals("6111234500018", dataRow[4])
         assertEquals("quantite_reelle", header[11])
         assertEquals(118.0, dataRow[11].toDouble(), 0.0001)
         assertEquals("ecart", header[12])

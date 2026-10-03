@@ -1,14 +1,11 @@
 package ma.bam.inventaire.data.repository
 
 import kotlinx.coroutines.flow.Flow
-import ma.bam.inventaire.data.local.dao.ArticleBarcodeDao
 import ma.bam.inventaire.data.local.dao.InventorySessionDao
 import ma.bam.inventaire.data.local.dao.StockArticleDao
-import ma.bam.inventaire.data.local.entity.ArticleBarcodeEntity
 import ma.bam.inventaire.data.local.entity.InventorySessionEntity
 import ma.bam.inventaire.data.local.entity.InventoryStatus
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
-import ma.bam.inventaire.data.local.entity.StockArticleWithBarcodes
 import ma.bam.inventaire.domain.EcartCalculator
 import ma.bam.inventaire.util.SessionNumberGenerator
 import java.util.UUID
@@ -18,8 +15,7 @@ import javax.inject.Singleton
 @Singleton
 class InventoryRepositoryImpl @Inject constructor(
     private val sessionDao: InventorySessionDao,
-    private val articleDao: StockArticleDao,
-    private val barcodeDao: ArticleBarcodeDao
+    private val articleDao: StockArticleDao
 ) : InventoryRepository {
 
     override fun observeSessions(): Flow<List<InventorySessionEntity>> = sessionDao.observeAll()
@@ -27,7 +23,7 @@ class InventoryRepositoryImpl @Inject constructor(
     override fun observeSession(sessionId: String): Flow<InventorySessionEntity?> =
         sessionDao.observeById(sessionId)
 
-    override fun observeArticles(sessionId: String): Flow<List<StockArticleWithBarcodes>> =
+    override fun observeArticles(sessionId: String): Flow<List<StockArticleEntity>> =
         articleDao.observeBySession(sessionId)
 
     override suspend fun createSession(
@@ -46,11 +42,12 @@ class InventoryRepositoryImpl @Inject constructor(
         )
         sessionDao.insert(session)
 
-        articles.forEach { imported ->
-            val articleId = articleDao.insert(
+        articleDao.insertAll(
+            articles.map { imported ->
                 StockArticleEntity(
                     sessionId = session.id,
                     codeArticle = imported.codeArticle,
+                    codeBarre = imported.codeBarre,
                     reference = imported.reference,
                     designation = imported.designation,
                     description = imported.description,
@@ -61,22 +58,15 @@ class InventoryRepositoryImpl @Inject constructor(
                     prixUnitaire = imported.prixUnitaire,
                     dateImport = imported.dateImport
                 )
-            )
-            if (imported.codesBarres.isNotEmpty()) {
-                barcodeDao.insertAll(
-                    imported.codesBarres.map { codeBarre ->
-                        ArticleBarcodeEntity(stockArticleId = articleId, codeBarre = codeBarre)
-                    }
-                )
             }
-        }
+        )
         return session
     }
 
     override suspend fun findArticleByBarcode(
         sessionId: String,
         codeBarre: String
-    ): StockArticleWithBarcodes? = articleDao.findByBarcode(sessionId, codeBarre)
+    ): StockArticleEntity? = articleDao.findByBarcode(sessionId, codeBarre)
 
     override suspend fun recordScan(articleId: Long, quantiteReelle: Double, ecartValide: Boolean) {
         updateQuantity(articleId, quantiteReelle, ecartValide)

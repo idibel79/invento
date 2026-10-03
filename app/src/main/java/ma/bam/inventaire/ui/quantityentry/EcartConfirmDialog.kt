@@ -9,11 +9,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import ma.bam.inventaire.data.local.entity.StockArticleWithBarcodes
+import ma.bam.inventaire.data.local.entity.StockArticleEntity
 
 @Composable
 fun EcartConfirmDialog(
-    article: StockArticleWithBarcodes,
+    article: StockArticleEntity,
     quantiteReelle: Double,
     ecart: Double,
     onDismiss: () -> Unit,
@@ -25,11 +25,11 @@ fun EcartConfirmDialog(
         title = { Text("Écart détecté") },
         text = {
             Column {
-                Text(article.article.designation.ifBlank { article.article.codeArticle })
-                Text("Quantité théorique : ${article.article.quantiteTheorique} ${article.article.unite}")
-                Text("Quantité réelle : $quantiteReelle ${article.article.unite}")
+                Text(article.designation.ifBlank { article.codeArticle })
+                Text("Quantité théorique : ${article.quantiteTheorique} ${article.unite}")
+                Text("Quantité réelle : $quantiteReelle ${article.unite}")
                 Text(
-                    text = "Écart : ${if (ecart > 0) "+" else ""}$ecart ${article.article.unite}",
+                    text = "Écart : ${if (ecart > 0) "+" else ""}$ecart ${article.unite}",
                     color = MaterialTheme.colorScheme.error
                 )
             }

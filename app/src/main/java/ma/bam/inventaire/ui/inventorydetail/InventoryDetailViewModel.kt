@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ma.bam.inventaire.data.local.entity.InventorySessionEntity
-import ma.bam.inventaire.data.local.entity.StockArticleWithBarcodes
+import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.data.repository.ExcelImportExportRepository
 import ma.bam.inventaire.data.repository.InventoryRepository
 import java.io.File
@@ -50,14 +50,14 @@ class InventoryDetailViewModel @Inject constructor(
     val session: StateFlow<InventorySessionEntity?> = repository.observeSession(sessionId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    private val allArticles: StateFlow<List<StockArticleWithBarcodes>> = repository.observeArticles(sessionId)
+    private val allArticles: StateFlow<List<StockArticleEntity>> = repository.observeArticles(sessionId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val visibleArticles: StateFlow<List<StockArticleWithBarcodes>> = combine(allArticles, _filter) { articles, filter ->
+    val visibleArticles: StateFlow<List<StockArticleEntity>> = combine(allArticles, _filter) { articles, filter ->
         when (filter) {
             ArticleFilter.TOUS -> articles
-            ArticleFilter.ECARTS -> articles.filter { it.article.ecart != null && it.article.ecart != 0.0 }
-            ArticleFilter.NON_SCANNES -> articles.filter { it.article.quantiteReelle == null }
+            ArticleFilter.ECARTS -> articles.filter { it.ecart != null && it.ecart != 0.0 }
+            ArticleFilter.NON_SCANNES -> articles.filter { it.quantiteReelle == null }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 

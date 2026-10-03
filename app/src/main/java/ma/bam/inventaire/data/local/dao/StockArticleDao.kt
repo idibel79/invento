@@ -3,11 +3,9 @@ package ma.bam.inventaire.data.local.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
-import ma.bam.inventaire.data.local.entity.StockArticleWithBarcodes
 
 @Dao
 interface StockArticleDao {
@@ -24,20 +22,11 @@ interface StockArticleDao {
     @Query("SELECT * FROM stock_article WHERE id = :id")
     suspend fun getById(id: Long): StockArticleEntity?
 
-    @Transaction
     @Query("SELECT * FROM stock_article WHERE sessionId = :sessionId ORDER BY codeArticle COLLATE NOCASE ASC")
-    fun observeBySession(sessionId: String): Flow<List<StockArticleWithBarcodes>>
+    fun observeBySession(sessionId: String): Flow<List<StockArticleEntity>>
 
-    @Transaction
-    @Query(
-        """
-        SELECT stock_article.* FROM stock_article
-        INNER JOIN article_barcode ON article_barcode.stockArticleId = stock_article.id
-        WHERE stock_article.sessionId = :sessionId AND article_barcode.codeBarre = :codeBarre
-        LIMIT 1
-        """
-    )
-    suspend fun findByBarcode(sessionId: String, codeBarre: String): StockArticleWithBarcodes?
+    @Query("SELECT * FROM stock_article WHERE sessionId = :sessionId AND codeBarre = :codeBarre LIMIT 1")
+    suspend fun findByBarcode(sessionId: String, codeBarre: String): StockArticleEntity?
 
     @Query("SELECT COUNT(*) FROM stock_article WHERE sessionId = :sessionId")
     suspend fun countForSession(sessionId: String): Int

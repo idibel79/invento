@@ -12,8 +12,9 @@ import java.io.File
  *
  * Le jeu de données couvre volontairement :
  *  - un article simple à code-barres unique (ART-001)
- *  - un article réparti sur deux lignes avec deux codes-barres différents (ART-002)
- *  - un article dont la cellule code_barre contient plusieurs valeurs séparées par une virgule (ART-003)
+ *  - un code_article dupliqué sur deux lignes avec deux codes-barres différents, qui doit être
+ *    signalé en erreur à l'import (un seul code_barre autorisé par article) (ART-002)
+ *  - un article simple à code-barres unique (ART-003)
  *  - un article avec quantité théorique et prix unitaire manquants, donc à défaut 0 (ART-004)
  *  - une ligne vide (sans code_article) qui doit être ignorée silencieusement à l'import
  */
@@ -41,7 +42,7 @@ object SampleInventoryFixture {
             "300", "carnet", "12.00", "2026-10-01"
         ),
         listOf(
-            "ART-003", "6111234500049,6111234500056", "REF-CART-COL", "Cartons colis M",
+            "ART-003", "6111234500049", "REF-CART-COL", "Cartons colis M",
             "Carton d'expédition format M", "Emballage", "Dépôt B - Rayon 2",
             "85", "unite", "8.75", "2026-10-01"
         ),

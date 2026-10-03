@@ -44,10 +44,4 @@ object ExcelColumnMapper {
             .replace(Regex("[ûü]"), "u")
             .replace(Regex("[^a-z0-9]+"), "_")
             .trim('_')
-
-    /** Sépare une cellule code-barres pouvant contenir plusieurs valeurs (virgule / point-virgule). */
-    fun splitBarcodes(rawValue: String): List<String> =
-        rawValue.split(",", ";")
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
 }

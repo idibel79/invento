@@ -17,27 +17,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import ma.bam.inventaire.data.local.entity.StockArticleWithBarcodes
+import ma.bam.inventaire.data.local.entity.StockArticleEntity
 
 @Composable
 fun QuantityEntryDialog(
-    article: StockArticleWithBarcodes,
+    article: StockArticleEntity,
     onDismiss: () -> Unit,
     onConfirm: (Double) -> Unit
 ) {
     var text by remember {
-        mutableStateOf(article.article.quantiteReelle?.toString().orEmpty())
+        mutableStateOf(article.quantiteReelle?.toString().orEmpty())
     }
     val quantite = text.replace(",", ".").toDoubleOrNull()
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(article.article.designation.ifBlank { article.article.codeArticle }) },
+        title = { Text(article.designation.ifBlank { article.codeArticle }) },
         text = {
             Column {
-                Text("Code article : ${article.article.codeArticle}")
-                Text("Emplacement : ${article.article.emplacement}")
-                Text("Quantité théorique : ${article.article.quantiteTheorique} ${article.article.unite}")
+                Text("Code article : ${article.codeArticle}")
+                Text("Emplacement : ${article.emplacement}")
+                Text("Quantité théorique : ${article.quantiteTheorique} ${article.unite}")
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
                     value = text,

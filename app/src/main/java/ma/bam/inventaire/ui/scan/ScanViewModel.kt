@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ma.bam.inventaire.data.local.entity.StockArticleWithBarcodes
+import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.data.repository.InventoryRepository
 import ma.bam.inventaire.data.repository.SessionCounters
 import ma.bam.inventaire.domain.EcartCalculator
@@ -17,9 +17,9 @@ import javax.inject.Inject
 
 sealed interface ScanDialogState {
     data object None : ScanDialogState
-    data class QuantityEntry(val article: StockArticleWithBarcodes) : ScanDialogState
+    data class QuantityEntry(val article: StockArticleEntity) : ScanDialogState
     data class EcartConfirm(
-        val article: StockArticleWithBarcodes,
+        val article: StockArticleEntity,
         val quantiteReelle: Double,
         val ecart: Double
     ) : ScanDialogState
@@ -62,19 +62,19 @@ class ScanViewModel @Inject constructor(
         }
     }
 
-    fun confirmQuantity(article: StockArticleWithBarcodes, quantiteReelle: Double) {
-        val ecart = EcartCalculator.compute(article.article.quantiteTheorique, quantiteReelle)
+    fun confirmQuantity(article: StockArticleEntity, quantiteReelle: Double) {
+        val ecart = EcartCalculator.compute(article.quantiteTheorique, quantiteReelle)
         if (EcartCalculator.hasEcart(ecart)) {
             _uiState.value = _uiState.value.copy(
                 dialog = ScanDialogState.EcartConfirm(article, quantiteReelle, ecart)
             )
         } else {
-            saveQuantity(article.article.id, quantiteReelle, ecartValide = true)
+            saveQuantity(article.id, quantiteReelle, ecartValide = true)
         }
     }
 
-    fun validateEcart(article: StockArticleWithBarcodes, quantiteReelle: Double) {
-        saveQuantity(article.article.id, quantiteReelle, ecartValide = true)
+    fun validateEcart(article: StockArticleEntity, quantiteReelle: Double) {
+        saveQuantity(article.id, quantiteReelle, ecartValide = true)
     }
 
     fun dismissDialog() {
