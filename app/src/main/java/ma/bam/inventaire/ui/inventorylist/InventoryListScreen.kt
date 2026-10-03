@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.ui.theme.EcartRed
@@ -172,7 +173,10 @@ fun InventorySessionCard(
                     .height(6.dp)
                     .clip(RoundedCornerShape(3.dp)),
                 color = statusColor,
-                trackColor = statusColor.copy(alpha = 0.15f)
+                trackColor = statusColor.copy(alpha = 0.15f),
+                strokeCap = StrokeCap.Butt,
+                gapSize = 0.dp,
+                drawStopIndicator = {}
             )
 
             Spacer(modifier = Modifier.height(10.dp))
