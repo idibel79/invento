@@ -47,25 +47,38 @@ class InventoryDetailViewModel @Inject constructor(
     private val _filter = MutableStateFlow(ArticleFilter.TOUS)
     val filter: StateFlow<ArticleFilter> = _filter.asStateFlow()
 
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
     val session: StateFlow<InventorySessionEntity?> = repository.observeSession(sessionId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     private val allArticles: StateFlow<List<StockArticleEntity>> = repository.observeArticles(sessionId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val visibleArticles: StateFlow<List<StockArticleEntity>> = combine(allArticles, _filter) { articles, filter ->
-        when (filter) {
-            ArticleFilter.TOUS -> articles
-            ArticleFilter.ECARTS -> articles.filter { it.ecart != null && it.ecart != 0.0 }
-            ArticleFilter.NON_SCANNES -> articles.filter { it.quantiteReelle == null }
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val visibleArticles: StateFlow<List<StockArticleEntity>> =
+        combine(allArticles, _filter, _searchQuery) { articles, filter, query ->
+            val filtered = when (filter) {
+                ArticleFilter.TOUS -> articles
+                ArticleFilter.ECARTS -> articles.filter { it.ecart != null && it.ecart != 0.0 }
+                ArticleFilter.NON_SCANNES -> articles.filter { it.quantiteReelle == null }
+            }
+            if (query.isBlank()) {
+                filtered
+            } else {
+                filtered.filter { it.codeBarre.contains(query, ignoreCase = true) }
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _exportEvents = Channel<ExportEvent>(Channel.BUFFERED)
     val exportEvents = _exportEvents.receiveAsFlow()
 
     fun setFilter(filter: ArticleFilter) {
         _filter.value = filter
+    }
+
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
     }
 
     fun updateQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean) {
