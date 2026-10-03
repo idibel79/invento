@@ -1,0 +1,54 @@
+package ma.bam.inventaire.data.repository
+
+import kotlinx.coroutines.flow.Flow
+import ma.bam.inventaire.data.local.entity.InventorySessionEntity
+import ma.bam.inventaire.data.local.entity.StockArticleWithBarcodes
+
+/**
+ * Source de vérité pour les sessions d'inventaire et leurs articles.
+ * Aujourd'hui adossée à Room (SQLite local) ; l'implémentation pourra être
+ * remplacée/complétée par un accès réseau au SI existant sans changer l'UI.
+ */
+interface InventoryRepository {
+
+    fun observeSessions(): Flow<List<InventorySessionEntity>>
+
+    fun observeSession(sessionId: String): Flow<InventorySessionEntity?>
+
+    fun observeArticles(sessionId: String): Flow<List<StockArticleWithBarcodes>>
+
+    suspend fun createSession(fileName: String, articles: List<ImportedArticle>): InventorySessionEntity
+
+    suspend fun findArticleByBarcode(sessionId: String, codeBarre: String): StockArticleWithBarcodes?
+
+    suspend fun recordScan(articleId: Long, quantiteReelle: Double, ecartValide: Boolean)
+
+    suspend fun updateQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean)
+
+    suspend fun finalizeSession(sessionId: String)
+
+    suspend fun deleteSession(sessionId: String)
+
+    suspend fun getSessionCounters(sessionId: String): SessionCounters
+}
+
+data class SessionCounters(
+    val total: Int,
+    val scanned: Int,
+    val pendingEcarts: Int
+)
+
+/** Article tel que décodé depuis le fichier Excel importé, avant persistance. */
+data class ImportedArticle(
+    val codeArticle: String,
+    val reference: String,
+    val designation: String,
+    val description: String,
+    val categorie: String,
+    val emplacement: String,
+    val quantiteTheorique: Double,
+    val unite: String,
+    val prixUnitaire: Double,
+    val dateImport: Long,
+    val codesBarres: List<String>
+)
