@@ -10,7 +10,6 @@ import androidx.navigation.navArgument
 import ma.bam.inventaire.ui.home.HomeScreen
 import ma.bam.inventaire.ui.importinventory.ImportScreen
 import ma.bam.inventaire.ui.inventorydetail.InventoryDetailScreen
-import ma.bam.inventaire.ui.inventorylist.InventoryListScreen
 import ma.bam.inventaire.ui.scan.ScanScreen
 
 @Composable
@@ -19,7 +18,9 @@ fun InventaireNavGraph(navController: NavHostController = rememberNavController(
         composable(Routes.HOME) {
             HomeScreen(
                 onStartInventory = { navController.navigate(Routes.IMPORT) },
-                onViewInventories = { navController.navigate(Routes.INVENTORY_LIST) }
+                onOpenSession = { sessionId ->
+                    navController.navigate(Routes.inventoryDetail(sessionId))
+                }
             )
         }
         composable(Routes.IMPORT) {
@@ -40,14 +41,6 @@ fun InventaireNavGraph(navController: NavHostController = rememberNavController(
                 onBack = { navController.popBackStack() },
                 onFinished = {
                     navController.popBackStack(Routes.HOME, inclusive = false)
-                }
-            )
-        }
-        composable(Routes.INVENTORY_LIST) {
-            InventoryListScreen(
-                onBack = { navController.popBackStack() },
-                onOpenSession = { sessionId ->
-                    navController.navigate(Routes.inventoryDetail(sessionId))
                 }
             )
         }
