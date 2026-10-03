@@ -210,9 +210,11 @@ private fun ArticleRow(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    "${article.codeArticle} · ${article.emplacement}",
+                    "${article.codeArticle} · ${article.codeBarre} · ${article.emplacement}",
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
