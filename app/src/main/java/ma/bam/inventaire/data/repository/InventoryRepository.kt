@@ -19,7 +19,8 @@ interface InventoryRepository {
 
     suspend fun createSession(fileName: String, articles: List<ImportedArticle>): InventorySessionEntity
 
-    suspend fun findArticleByBarcode(sessionId: String, codeBarre: String): StockArticleEntity?
+    /** Recherche un article par code-barres scanné ou par code_article saisi manuellement. */
+    suspend fun findArticleByCode(sessionId: String, code: String): StockArticleEntity?
 
     suspend fun recordScan(articleId: Long, quantiteReelle: Double, ecartValide: Boolean)
 

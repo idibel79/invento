@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.ui.theme.EcartRed
 import ma.bam.inventaire.ui.theme.InProgressBlue
+import ma.bam.inventaire.ui.theme.NotScannedGray
 import ma.bam.inventaire.ui.theme.SuccessGreen
 
 /**
@@ -118,7 +120,12 @@ fun InventorySessionCard(
     onClick: () -> Unit
 ) {
     val allScanned = item.counters.total > 0 && item.counters.scanned >= item.counters.total
-    val statusColor = if (allScanned) SuccessGreen else InProgressBlue
+    val notStarted = item.counters.scanned == 0
+    val statusColor = when {
+        allScanned -> SuccessGreen
+        notStarted -> NotScannedGray
+        else -> InProgressBlue
+    }
     val progress = if (item.counters.total > 0) {
         item.counters.scanned.toFloat() / item.counters.total.toFloat()
     } else {
@@ -142,7 +149,11 @@ fun InventorySessionCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = if (allScanned) Icons.Filled.CheckCircle else Icons.Filled.Sync,
+                        imageVector = when {
+                            allScanned -> Icons.Filled.CheckCircle
+                            notStarted -> Icons.Filled.Schedule
+                            else -> Icons.Filled.Sync
+                        },
                         contentDescription = null,
                         tint = statusColor
                     )
@@ -161,7 +172,14 @@ fun InventorySessionCard(
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                StatusChip(finalized = allScanned, color = statusColor)
+                StatusChip(
+                    label = when {
+                        allScanned -> "Finalisé"
+                        notStarted -> "En attente"
+                        else -> "En cours"
+                    },
+                    color = statusColor
+                )
             }
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -229,7 +247,7 @@ fun InventorySessionCard(
 }
 
 @Composable
-private fun StatusChip(finalized: Boolean, color: Color) {
+private fun StatusChip(label: String, color: Color) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
@@ -237,7 +255,7 @@ private fun StatusChip(finalized: Boolean, color: Color) {
             .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(
-            text = if (finalized) "Finalisé" else "En cours",
+            text = label,
             style = MaterialTheme.typography.labelSmall,
             color = color,
             fontWeight = FontWeight.Medium

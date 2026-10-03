@@ -51,7 +51,7 @@ class ScanViewModel @Inject constructor(
     fun onCodeDetected(code: String) {
         if (_uiState.value.dialog != ScanDialogState.None) return // un dialog est déjà ouvert
         viewModelScope.launch {
-            val found = repository.findArticleByBarcode(sessionId, code)
+            val found = repository.findArticleByCode(sessionId, code)
             if (found == null) {
                 feedbackUtil.onScanError()
                 _uiState.value = _uiState.value.copy(dialog = ScanDialogState.UnknownArticle(code))

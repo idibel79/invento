@@ -63,10 +63,10 @@ class InventoryRepositoryImpl @Inject constructor(
         return session
     }
 
-    override suspend fun findArticleByBarcode(
+    override suspend fun findArticleByCode(
         sessionId: String,
-        codeBarre: String
-    ): StockArticleEntity? = articleDao.findByBarcode(sessionId, codeBarre)
+        code: String
+    ): StockArticleEntity? = articleDao.findByCode(sessionId, code)
 
     override suspend fun recordScan(articleId: Long, quantiteReelle: Double, ecartValide: Boolean) {
         updateQuantity(articleId, quantiteReelle, ecartValide)
