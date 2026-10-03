@@ -63,7 +63,7 @@ fun HomeScreen(
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "Gestion d'inventaire physique",
+                text = "Gestion d'inventaires",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -90,7 +90,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.weight(1f))
 
             Text(
-                text = "Barid Al-Maghrib · v${BuildConfig.VERSION_NAME}",
+                text = "v${BuildConfig.VERSION_NAME}",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
