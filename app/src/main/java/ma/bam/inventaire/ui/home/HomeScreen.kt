@@ -195,7 +195,7 @@ fun HomeScreen(
             title = { SingleLineAutoSizeText("Clôturer cet inventaire ?", style = MaterialTheme.typography.titleMedium) },
             text = {
                 Text(
-                    "Les quantités de l'inventaire ${item.session.numero} seront verrouillées : plus aucune modification ne sera possible.",
+                    "L'inventaire ${item.session.numero} sera verrouillé : plus aucune modification ne sera possible.",
                     textAlign = TextAlign.Justify,
                     modifier = Modifier.fillMaxWidth()
                 )

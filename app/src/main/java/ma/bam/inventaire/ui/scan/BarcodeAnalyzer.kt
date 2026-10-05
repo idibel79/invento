@@ -88,7 +88,8 @@ class BarcodeAnalyzer(
     }
 
     companion object {
-        /** Demi-largeur (en fraction de la dimension totale) de la bande acceptée autour du trait de visée. */
-        private const val SCAN_LINE_TOLERANCE_FRACTION = 0.12f
+        /** Demi-largeur (en fraction de la dimension totale) de la bande acceptée autour du trait de visée.
+         * Volontairement étroite : seul un code-barres réellement aligné sur le trait rouge doit être lu. */
+        private const val SCAN_LINE_TOLERANCE_FRACTION = 0.035f
     }
 }
