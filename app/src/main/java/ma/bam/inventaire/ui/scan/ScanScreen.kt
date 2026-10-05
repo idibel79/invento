@@ -213,7 +213,7 @@ fun ScanScreen(
                     tint = BamGreen
                 )
             },
-            title = { Text("Terminer cet inventaire ?") },
+            title = { Text("Terminer cet inventaire ?", maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis) },
             text = {
                 Text(
                     "${uiState.counters.scanned} / ${uiState.counters.total} articles scannés. " +

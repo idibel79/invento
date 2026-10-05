@@ -28,7 +28,7 @@ fun EcartConfirmDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
-        title = { Text("Écart détecté") },
+        title = { Text("Écart détecté", maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis) },
         text = {
             Column {
                 Text(
