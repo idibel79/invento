@@ -309,7 +309,7 @@ private fun ArticleInfoRow(icon: ImageVector, text: String) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(13.dp),
+            modifier = Modifier.size(17.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
@@ -321,7 +321,7 @@ private fun ArticleInfoRow(painter: Painter, text: String) {
         Icon(
             painter = painter,
             contentDescription = null,
-            modifier = Modifier.size(13.dp),
+            modifier = Modifier.size(17.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
