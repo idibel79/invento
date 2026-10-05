@@ -438,7 +438,7 @@ private fun ArticleInfoRow(text: String, icon: @Composable () -> Unit) {
  * progressivement vers la couleur de fond) pour signaler qu'il continue au-delà
  * de la zone visible, côté gauche et/ou droite selon la position de scroll.
  */
-private fun Modifier.fadingEdge(scrollState: ScrollState, edgeWidth: androidx.compose.ui.unit.Dp = 18.dp): Modifier =
+private fun Modifier.fadingEdge(scrollState: ScrollState, edgeWidth: androidx.compose.ui.unit.Dp = 40.dp): Modifier =
     this
         .graphicsLayer { alpha = 0.99f }
         .drawWithContent {
