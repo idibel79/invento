@@ -50,7 +50,10 @@ fun InventaireNavGraph(navController: NavHostController = rememberNavController(
             route = Routes.INVENTORY_DETAIL,
             arguments = listOf(navArgument("sessionId") { type = NavType.StringType })
         ) {
-            InventoryDetailScreen(onBack = { navController.popBackStack() })
+            InventoryDetailScreen(
+                onBack = { navController.popBackStack() },
+                onScan = { sessionId -> navController.navigate(Routes.scan(sessionId)) }
+            )
         }
     }
 }
