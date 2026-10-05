@@ -136,7 +136,7 @@ fun InventoryDetailScreen(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_barcode_scan),
                         contentDescription = "Scanner un article",
-                        modifier = Modifier.size(28.dp),
+                        modifier = Modifier.size(34.dp),
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
