@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,10 +24,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import ma.bam.inventaire.R
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.ui.components.SingleLineAutoSizeText
 import ma.bam.inventaire.util.formatQuantity
@@ -55,7 +57,7 @@ fun QuantityEntryDialog(
         },
         text = {
             Column {
-                InfoRow(icon = Icons.Filled.Tag, text = article.codeArticle)
+                InfoRow(painter = painterResource(id = R.drawable.ic_pid_cross), text = article.codeArticle)
                 InfoRow(icon = Icons.Filled.Place, text = article.emplacement)
                 Text(
                     "Quantité théorique : ${formatQuantity(article.quantiteTheorique)}",
@@ -89,17 +91,36 @@ fun QuantityEntryDialog(
 
 @Composable
 private fun InfoRow(icon: ImageVector, text: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    InfoRow(text = text) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(16.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+@Composable
+private fun InfoRow(painter: Painter, text: String) {
+    InfoRow(text = text) {
+        Icon(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier.size(16.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun InfoRow(text: String, icon: @Composable () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        icon()
         Text(
             text,
             style = MaterialTheme.typography.bodyMedium,

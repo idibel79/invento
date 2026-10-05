@@ -42,7 +42,6 @@ import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Tag
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -263,7 +262,10 @@ private fun ArticleRow(
                     modifier = Modifier.horizontalScroll(rememberScrollState())
                 )
                 Spacer(modifier = Modifier.height(2.dp))
-                ArticleInfoRow(icon = Icons.Filled.Tag, text = article.codeArticle)
+                ArticleInfoRow(
+                    painter = painterResource(id = R.drawable.ic_pid_cross),
+                    text = article.codeArticle
+                )
                 val codesBarres = listOf(article.codeBarre1, article.codeBarre2).filter { it.isNotBlank() }
                 if (codesBarres.isNotEmpty()) {
                     ArticleInfoRow(
