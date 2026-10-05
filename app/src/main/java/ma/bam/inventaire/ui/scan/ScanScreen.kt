@@ -51,7 +51,7 @@ import ma.bam.inventaire.ui.quantityentry.UnknownArticleDialog
 @Composable
 fun ScanScreen(
     onBack: () -> Unit,
-    onFinished: () -> Unit,
+    onFinished: (sessionId: String) -> Unit,
     viewModel: ScanViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -68,7 +68,7 @@ fun ScanScreen(
     }
 
     LaunchedEffect(uiState.finalized) {
-        if (uiState.finalized) onFinished()
+        if (uiState.finalized) onFinished(viewModel.sessionId)
     }
 
     LaunchedEffect(manualMode) {

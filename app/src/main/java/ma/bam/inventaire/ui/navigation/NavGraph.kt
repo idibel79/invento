@@ -39,8 +39,10 @@ fun InventaireNavGraph(navController: NavHostController = rememberNavController(
         ) {
             ScanScreen(
                 onBack = { navController.popBackStack() },
-                onFinished = {
-                    navController.popBackStack(Routes.HOME, inclusive = false)
+                onFinished = { sessionId ->
+                    navController.navigate(Routes.inventoryDetail(sessionId)) {
+                        popUpTo(Routes.HOME)
+                    }
                 }
             )
         }
