@@ -44,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.R
-import ma.bam.inventaire.data.local.entity.InventoryStatus
 import ma.bam.inventaire.ui.theme.EcartRed
 import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.ui.theme.NotScannedGray
@@ -88,7 +87,7 @@ fun SwipeableSessionCard(
     SwipeToDismissBox(
         state = dismissState,
         modifier = modifier,
-        enableDismissFromStartToEnd = item.session.statut != InventoryStatus.FINALISE,
+        enableDismissFromStartToEnd = !item.session.verrouille,
         enableDismissFromEndToStart = true,
         backgroundContent = {
             when (dismissState.dismissDirection) {
@@ -164,7 +163,7 @@ fun InventorySessionCard(
     onClick: () -> Unit,
     onLockClick: () -> Unit = {}
 ) {
-    val closed = item.session.statut == InventoryStatus.FINALISE
+    val closed = item.session.verrouille
     val allScanned = item.counters.total > 0 && item.counters.scanned >= item.counters.total
     val notStarted = item.counters.scanned == 0
     val statusColor = when {

@@ -35,7 +35,7 @@ class InventoryListViewModel @Inject constructor(
 
     fun closeSession(sessionId: String) {
         viewModelScope.launch {
-            repository.finalizeSession(sessionId)
+            repository.closeSession(sessionId)
         }
     }
 

@@ -55,7 +55,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ma.bam.inventaire.R
-import ma.bam.inventaire.data.local.entity.InventoryStatus
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.domain.EcartCalculator
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
@@ -76,7 +75,7 @@ fun InventoryDetailScreen(
     val filter by viewModel.filter.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     var editingArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
-    val locked = session?.statut == InventoryStatus.FINALISE
+    val locked = session?.verrouille == true
 
     LaunchedEffect(Unit) {
         viewModel.exportEvents.collect { event ->

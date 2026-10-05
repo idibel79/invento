@@ -26,9 +26,13 @@ interface InventoryRepository {
 
     suspend fun updateQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean)
 
+    /** Marque la session comme finalisée (fin du comptage) — indépendant du verrouillage. */
     suspend fun finalizeSession(sessionId: String)
 
-    /** Repasse une session finalisée en cours, pour autoriser à nouveau les modifications. */
+    /** Verrouille la session : plus aucune modification des quantités n'est permise. */
+    suspend fun closeSession(sessionId: String)
+
+    /** Lève le verrouillage posé par [closeSession], pour autoriser à nouveau les modifications. */
     suspend fun reopenSession(sessionId: String)
 
     suspend fun deleteSession(sessionId: String)

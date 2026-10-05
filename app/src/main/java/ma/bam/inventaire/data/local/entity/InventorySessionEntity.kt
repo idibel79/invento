@@ -11,5 +11,8 @@ data class InventorySessionEntity(
     val dateCreation: Long,
     val dateFinalisation: Long?,
     val statut: InventoryStatus,
-    val nomFichierSource: String
+    val nomFichierSource: String,
+    /** Verrouillage manuel (swipe + confirmation), indépendant de [statut] : empêche toute
+     * modification des quantités tant qu'il n'est pas levé via "Reprendre les modifications". */
+    val verrouille: Boolean = false
 )

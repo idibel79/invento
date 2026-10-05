@@ -95,14 +95,14 @@ class InventoryRepositoryImpl @Inject constructor(
         )
     }
 
+    override suspend fun closeSession(sessionId: String) {
+        val session = sessionDao.getById(sessionId) ?: return
+        sessionDao.update(session.copy(verrouille = true))
+    }
+
     override suspend fun reopenSession(sessionId: String) {
         val session = sessionDao.getById(sessionId) ?: return
-        sessionDao.update(
-            session.copy(
-                statut = InventoryStatus.EN_COURS,
-                dateFinalisation = null
-            )
-        )
+        sessionDao.update(session.copy(verrouille = false))
     }
 
     override suspend fun deleteSession(sessionId: String) {
