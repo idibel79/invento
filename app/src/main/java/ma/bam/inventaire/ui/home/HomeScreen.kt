@@ -40,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ma.bam.inventaire.BuildConfig
@@ -194,7 +195,9 @@ fun HomeScreen(
             title = { SingleLineAutoSizeText("Clôturer cet inventaire ?", style = MaterialTheme.typography.titleMedium) },
             text = {
                 Text(
-                    "Les quantités de l'inventaire ${item.session.numero} seront verrouillées : plus aucune modification ne sera possible tant qu'il n'aura pas été rouvert."
+                    "Les quantités de l'inventaire ${item.session.numero} seront verrouillées : plus aucune modification ne sera possible.",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
             },
             confirmButton = {

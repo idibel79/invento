@@ -35,6 +35,7 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
@@ -248,61 +249,75 @@ fun InventorySessionCard(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_barcode_scan),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        "${item.counters.scanned}/${item.counters.total} articles",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                if (item.counters.pendingEcarts > 0) {
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50))
+                            .background(EcartRed.copy(alpha = 0.12f))
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_barcode_scan),
+                            imageVector = Icons.Filled.ErrorOutline,
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            modifier = Modifier.size(14.dp),
+                            tint = EcartRed
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            "${item.counters.scanned}/${item.counters.total} articles",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            "${item.counters.pendingEcarts} écart${if (item.counters.pendingEcarts > 1) "s" else ""}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = EcartRed,
+                            fontWeight = FontWeight.Medium
                         )
                     }
-                    if (item.counters.pendingEcarts > 0) {
-                        Row(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .background(EcartRed.copy(alpha = 0.12f))
-                                .padding(horizontal = 8.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.ErrorOutline,
-                                contentDescription = null,
-                                modifier = Modifier.size(14.dp),
-                                tint = EcartRed
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                "${item.counters.pendingEcarts} écart${if (item.counters.pendingEcarts > 1) "s" else ""}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = EcartRed,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
                 }
-                if (closed) {
-                    Icon(
-                        imageVector = Icons.Filled.Lock,
-                        contentDescription = "Inventaire clôturé",
-                        tint = SuccessGreen,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(18.dp)
-                            .clickable(onClick = onLockClick)
-                    )
-                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Toujours rendue (invisible si non clôturé) pour que toutes les cartes aient la
+            // même hauteur, qu'elles soient clôturées ou non.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .alpha(if (closed) 1f else 0f)
+                    .let { if (closed) it.clickable(onClick = onLockClick) else it },
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Lock,
+                    contentDescription = if (closed) "Inventaire clôturé" else null,
+                    tint = SuccessGreen,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    "Inventaire clôturé",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = SuccessGreen,
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
     }
