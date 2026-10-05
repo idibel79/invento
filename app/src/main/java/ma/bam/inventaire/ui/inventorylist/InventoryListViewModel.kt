@@ -32,4 +32,16 @@ class InventoryListViewModel @Inject constructor(
             repository.deleteSession(sessionId)
         }
     }
+
+    fun closeSession(sessionId: String) {
+        viewModelScope.launch {
+            repository.finalizeSession(sessionId)
+        }
+    }
+
+    fun reopenSession(sessionId: String) {
+        viewModelScope.launch {
+            repository.reopenSession(sessionId)
+        }
+    }
 }

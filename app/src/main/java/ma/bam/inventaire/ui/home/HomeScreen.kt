@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -60,6 +61,8 @@ fun HomeScreen(
     val sessions by viewModel.sessions.collectAsState()
     val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRANCE) }
     var pendingDelete by remember { mutableStateOf<SessionListItem?>(null) }
+    var pendingClose by remember { mutableStateOf<SessionListItem?>(null) }
+    var pendingReopen by remember { mutableStateOf<SessionListItem?>(null) }
 
     Scaffold { padding ->
         Column(
@@ -136,6 +139,8 @@ fun HomeScreen(
                             dateLabel = dateFormat.format(Date(item.session.dateCreation)),
                             onClick = { onOpenSession(item.session.id) },
                             onRequestDelete = { pendingDelete = item },
+                            onRequestClose = { pendingClose = item },
+                            onLockClick = { pendingReopen = item },
                             modifier = Modifier.animateItem()
                         )
                     }
@@ -170,6 +175,66 @@ fun HomeScreen(
             },
             dismissButton = {
                 TextButton(onClick = { pendingDelete = null }) { Text("Annuler") }
+            }
+        )
+    }
+
+    pendingClose?.let { item ->
+        AlertDialog(
+            onDismissRequest = { pendingClose = null },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.WarningAmber,
+                    contentDescription = null,
+                    tint = BamGreen
+                )
+            },
+            title = { Text("Clôturer cet inventaire ?") },
+            text = {
+                Text(
+                    "L'inventaire ${item.session.numero} sera verrouillé : les quantités des articles ne pourront plus être modifiées tant qu'il n'aura pas été rouvert."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.closeSession(item.session.id)
+                    pendingClose = null
+                }) {
+                    Text("Clôturer", color = BamGreen, fontWeight = FontWeight.SemiBold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingClose = null }) { Text("Annuler") }
+            }
+        )
+    }
+
+    pendingReopen?.let { item ->
+        AlertDialog(
+            onDismissRequest = { pendingReopen = null },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.LockOpen,
+                    contentDescription = null,
+                    tint = BamGreen
+                )
+            },
+            title = { Text("Reprendre les modifications ?") },
+            text = {
+                Text(
+                    "L'inventaire ${item.session.numero} sera déverrouillé et ses articles pourront à nouveau être modifiés."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.reopenSession(item.session.id)
+                    pendingReopen = null
+                }) {
+                    Text("Reprendre", color = BamGreen, fontWeight = FontWeight.SemiBold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingReopen = null }) { Text("Annuler") }
             }
         )
     }

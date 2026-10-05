@@ -55,6 +55,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ma.bam.inventaire.R
+import ma.bam.inventaire.data.local.entity.InventoryStatus
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.domain.EcartCalculator
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
@@ -75,6 +76,7 @@ fun InventoryDetailScreen(
     val filter by viewModel.filter.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
     var editingArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
+    val locked = session?.statut == InventoryStatus.FINALISE
 
     LaunchedEffect(Unit) {
         viewModel.exportEvents.collect { event ->
@@ -132,12 +134,12 @@ fun InventoryDetailScreen(
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                IconButton(onClick = { onScan(viewModel.sessionId) }) {
+                IconButton(onClick = { onScan(viewModel.sessionId) }, enabled = !locked) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_barcode_scan),
                         contentDescription = "Scanner un article",
                         modifier = Modifier.size(34.dp),
-                        tint = MaterialTheme.colorScheme.onSurface
+                        tint = if (locked) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -173,6 +175,7 @@ fun InventoryDetailScreen(
                 items(articles, key = { it.id }) { item ->
                     ArticleRow(
                         item = item,
+                        locked = locked,
                         onEdit = { editingArticle = item }
                     )
                 }
@@ -200,6 +203,7 @@ fun InventoryDetailScreen(
 @Composable
 private fun ArticleRow(
     item: StockArticleEntity,
+    locked: Boolean,
     onEdit: () -> Unit
 ) {
     val article = item
@@ -214,7 +218,7 @@ private fun ArticleRow(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .let { if (notScanned) it.clickable(onClick = onEdit) else it },
+            .let { if (notScanned && !locked) it.clickable(onClick = onEdit) else it },
         shape = RoundedCornerShape(14.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
@@ -287,7 +291,7 @@ private fun ArticleRow(
                     }
                 }
             }
-            if (!notScanned) {
+            if (!notScanned && !locked) {
                 IconButton(onClick = onEdit) {
                     Icon(
                         imageVector = Icons.Filled.Edit,

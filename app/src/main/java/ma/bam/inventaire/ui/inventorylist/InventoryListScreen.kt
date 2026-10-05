@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Card
@@ -43,14 +44,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.R
+import ma.bam.inventaire.data.local.entity.InventoryStatus
 import ma.bam.inventaire.ui.theme.EcartRed
 import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.ui.theme.NotScannedGray
 import ma.bam.inventaire.ui.theme.SuccessGreen
 
 /**
- * Carte de session d'inventaire avec swipe-to-delete (vers la gauche). Réutilisée par
- * [ma.bam.inventaire.ui.home.HomeScreen] pour afficher la liste des inventaires.
+ * Carte de session d'inventaire avec swipe-to-delete (vers la gauche, rouge) et
+ * swipe-to-close (vers la droite, vert). Réutilisée par [ma.bam.inventaire.ui.home.HomeScreen]
+ * pour afficher la liste des inventaires.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,20 +62,24 @@ fun SwipeableSessionCard(
     dateLabel: String,
     onClick: () -> Unit,
     onRequestDelete: () -> Unit,
+    onRequestClose: () -> Unit,
+    onLockClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { value ->
-            if (value == SwipeToDismissBoxValue.EndToStart) {
-                onRequestDelete()
+            when (value) {
+                SwipeToDismissBoxValue.EndToStart -> onRequestDelete()
+                SwipeToDismissBoxValue.StartToEnd -> onRequestClose()
+                SwipeToDismissBoxValue.Settled -> Unit
             }
             false
         },
-        // Il faut swiper presque jusqu'au bout (90% de la largeur) pour déclencher la
-        // suppression, pas juste un petit glissement.
+        // Il faut swiper presque jusqu'au bout (90% de la largeur), dans un sens ou l'autre,
+        // pour déclencher une action : pas juste un petit glissement.
         positionalThreshold = { totalDistance -> totalDistance * 0.9f }
     )
-    val progress = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+    val progress = if (dismissState.dismissDirection != SwipeToDismissBoxValue.Settled) {
         dismissState.progress.coerceIn(0f, 1f)
     } else {
         0f
@@ -81,40 +88,72 @@ fun SwipeableSessionCard(
     SwipeToDismissBox(
         state = dismissState,
         modifier = modifier,
-        enableDismissFromStartToEnd = false,
+        enableDismissFromStartToEnd = item.session.statut != InventoryStatus.FINALISE,
         enableDismissFromEndToStart = true,
         backgroundContent = {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(EcartRed.copy(alpha = 0.5f + 0.5f * progress)),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = "Supprimer",
-                        tint = Color.White,
-                        modifier = Modifier
-                            .size(24.dp)
-                            .scale(0.85f + 0.15f * progress)
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        "Supprimer",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+            when (dismissState.dismissDirection) {
+                SwipeToDismissBoxValue.EndToStart -> SwipeActionBackground(
+                    alignment = Alignment.CenterEnd,
+                    color = EcartRed,
+                    progress = progress,
+                    icon = Icons.Filled.Delete,
+                    label = "Supprimer"
+                )
+                SwipeToDismissBoxValue.StartToEnd -> SwipeActionBackground(
+                    alignment = Alignment.CenterStart,
+                    color = SuccessGreen,
+                    progress = progress,
+                    icon = Icons.Filled.Lock,
+                    label = "Clôturer"
+                )
+                SwipeToDismissBoxValue.Settled -> Unit
             }
         }
     ) {
-        InventorySessionCard(item = item, dateLabel = dateLabel, onClick = onClick)
+        InventorySessionCard(
+            item = item,
+            dateLabel = dateLabel,
+            onClick = onClick,
+            onLockClick = onLockClick
+        )
+    }
+}
+
+@Composable
+private fun SwipeActionBackground(
+    alignment: Alignment,
+    color: Color,
+    progress: Float,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clip(RoundedCornerShape(16.dp))
+            .background(color.copy(alpha = 0.5f + 0.5f * progress)),
+        contentAlignment = alignment
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = Color.White,
+                modifier = Modifier
+                    .size(24.dp)
+                    .scale(0.85f + 0.15f * progress)
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                label,
+                style = MaterialTheme.typography.labelSmall,
+                color = Color.White,
+                fontWeight = FontWeight.Medium
+            )
+        }
     }
 }
 
@@ -122,8 +161,10 @@ fun SwipeableSessionCard(
 fun InventorySessionCard(
     item: SessionListItem,
     dateLabel: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLockClick: () -> Unit = {}
 ) {
+    val closed = item.session.statut == InventoryStatus.FINALISE
     val allScanned = item.counters.total > 0 && item.counters.scanned >= item.counters.total
     val notStarted = item.counters.scanned == 0
     val statusColor = when {
@@ -246,6 +287,34 @@ fun InventorySessionCard(
                             "${item.counters.pendingEcarts} écart${if (item.counters.pendingEcarts > 1) "s" else ""}",
                             style = MaterialTheme.typography.labelSmall,
                             color = EcartRed,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+
+            if (closed) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(50))
+                            .clickable(onClick = onLockClick)
+                            .background(SuccessGreen.copy(alpha = 0.12f))
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Lock,
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = SuccessGreen
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            "Inventaire clôturé",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = SuccessGreen,
                             fontWeight = FontWeight.Medium
                         )
                     }

@@ -28,6 +28,9 @@ interface InventoryRepository {
 
     suspend fun finalizeSession(sessionId: String)
 
+    /** Repasse une session finalisée en cours, pour autoriser à nouveau les modifications. */
+    suspend fun reopenSession(sessionId: String)
+
     suspend fun deleteSession(sessionId: String)
 
     suspend fun getSessionCounters(sessionId: String): SessionCounters
