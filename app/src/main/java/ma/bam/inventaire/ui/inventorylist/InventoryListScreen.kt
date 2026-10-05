@@ -67,7 +67,10 @@ fun SwipeableSessionCard(
                 onRequestDelete()
             }
             false
-        }
+        },
+        // Il faut swiper presque jusqu'au bout (90% de la largeur) pour déclencher la
+        // suppression, pas juste un petit glissement.
+        positionalThreshold = { totalDistance -> totalDistance * 0.9f }
     )
     val progress = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
         dismissState.progress.coerceIn(0f, 1f)
