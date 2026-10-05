@@ -4,6 +4,8 @@ import org.xml.sax.Attributes
 import org.xml.sax.InputSource
 import org.xml.sax.helpers.DefaultHandler
 import java.io.ByteArrayInputStream
+import java.nio.ByteBuffer
+import java.nio.charset.CodingErrorAction
 import java.util.zip.ZipInputStream
 import javax.xml.parsers.SAXParserFactory
 
@@ -109,11 +111,33 @@ object XlsxReader {
             override fun endElement(uri: String?, localName: String?, qName: String) {
                 when (qName.substringAfterLast(':')) {
                     "t" -> inText = false
-                    "si" -> { strings.add(current.toString()); inSi = false }
+                    "si" -> { strings.add(repairMojibake(current.toString())); inSi = false }
                 }
             }
         })
         return strings
+    }
+
+    /**
+     * Certains exports (ex: Sobrus) encodent leur texte en UTF-8 deux fois de suite : les octets
+     * UTF-8 d'origine sont une première fois mal décodés en Latin-1/CP1252, puis le résultat
+     * (déjà corrompu, ex. "Catégorie" -> "CatÃ©gorie") est ré-encodé en UTF-8 pour l'écriture du
+     * fichier. On ne peut pas le corriger à la lecture du flux (le XML est un UTF-8 valide), donc
+     * on inverse l'opération ici : on réinterprète les caractères du texte lu comme des octets
+     * Latin-1, puis on les redécode en UTF-8. Si le résultat n'est pas un UTF-8 valide (texte déjà
+     * correct, non corrompu), on garde le texte original.
+     */
+    private fun repairMojibake(text: String): String {
+        if (text.isEmpty() || text.any { it.code > 0xFF }) return text
+        return try {
+            val bytes = text.toByteArray(Charsets.ISO_8859_1)
+            val decoder = Charsets.UTF_8.newDecoder()
+                .onMalformedInput(CodingErrorAction.REPORT)
+                .onUnmappableCharacter(CodingErrorAction.REPORT)
+            decoder.decode(ByteBuffer.wrap(bytes)).toString()
+        } catch (e: Exception) {
+            text
+        }
     }
 
     private fun parseSheet(xml: ByteArray, sharedStrings: List<String>): List<List<String>> {
@@ -153,7 +177,7 @@ object XlsxReader {
                     "c" -> {
                         val text = when (cellType) {
                             "s" -> valueBuffer.toString().trim().toIntOrNull()?.let { sharedStrings.getOrNull(it) } ?: ""
-                            "inlineStr" -> inlineTextBuffer.toString()
+                            "inlineStr" -> repairMojibake(inlineTextBuffer.toString())
                             else -> valueBuffer.toString()
                         }
                         while (currentRow.size <= cellColIndex) currentRow.add("")

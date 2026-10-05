@@ -25,8 +25,15 @@ interface StockArticleDao {
     @Query("SELECT * FROM stock_article WHERE sessionId = :sessionId ORDER BY codeArticle COLLATE NOCASE ASC")
     fun observeBySession(sessionId: String): Flow<List<StockArticleEntity>>
 
-    /** Recherche par code-barres scanné ou par code_article saisi manuellement. */
-    @Query("SELECT * FROM stock_article WHERE sessionId = :sessionId AND (codeBarre = :code OR codeArticle = :code) LIMIT 1")
+    /** Recherche par l'un des deux codes-barres scannés ou par code_article saisi manuellement. */
+    @Query(
+        """
+        SELECT * FROM stock_article
+        WHERE sessionId = :sessionId
+          AND (codeBarre1 = :code OR codeBarre2 = :code OR codeArticle = :code)
+        LIMIT 1
+        """
+    )
     suspend fun findByCode(sessionId: String, code: String): StockArticleEntity?
 
     @Query("SELECT COUNT(*) FROM stock_article WHERE sessionId = :sessionId")

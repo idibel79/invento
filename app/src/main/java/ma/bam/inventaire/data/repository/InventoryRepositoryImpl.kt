@@ -47,14 +47,16 @@ class InventoryRepositoryImpl @Inject constructor(
                 StockArticleEntity(
                     sessionId = session.id,
                     codeArticle = imported.codeArticle,
-                    codeBarre = imported.codeBarre,
-                    reference = imported.reference,
                     designation = imported.designation,
-                    description = imported.description,
                     categorie = imported.categorie,
+                    tva = imported.tva,
                     emplacement = imported.emplacement,
                     quantiteTheorique = imported.quantiteTheorique,
-                    unite = imported.unite,
+                    datePeremption = imported.datePeremption,
+                    stockMin = imported.stockMin,
+                    stockMax = imported.stockMax,
+                    codeBarre1 = imported.codeBarre1,
+                    codeBarre2 = imported.codeBarre2,
                     prixUnitaire = imported.prixUnitaire,
                     dateImport = imported.dateImport
                 )

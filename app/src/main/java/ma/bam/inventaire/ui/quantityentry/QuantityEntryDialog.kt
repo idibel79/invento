@@ -58,7 +58,7 @@ fun QuantityEntryDialog(
                 InfoRow(icon = Icons.Filled.Tag, text = article.codeArticle)
                 InfoRow(icon = Icons.Filled.Place, text = article.emplacement)
                 Text(
-                    "Quantité théorique : ${formatQuantity(article.quantiteTheorique)} ${article.unite}",
+                    "Quantité théorique : ${formatQuantity(article.quantiteTheorique)}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

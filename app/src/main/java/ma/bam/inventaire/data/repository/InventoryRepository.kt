@@ -46,17 +46,19 @@ data class SessionCounters(
     val pendingEcarts: Int
 )
 
-/** Article tel que décodé depuis le fichier Excel importé, avant persistance. */
+/** Article tel que décodé depuis le fichier Excel importé (export Sobrus), avant persistance. */
 data class ImportedArticle(
     val codeArticle: String,
-    val codeBarre: String,
-    val reference: String,
     val designation: String,
-    val description: String,
     val categorie: String,
+    val tva: String,
     val emplacement: String,
     val quantiteTheorique: Double,
-    val unite: String,
+    val datePeremption: String,
+    val stockMin: Double,
+    val stockMax: Double,
+    val codeBarre1: String,
+    val codeBarre2: String,
     val prixUnitaire: Double,
     val dateImport: Long
 )

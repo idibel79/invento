@@ -38,11 +38,11 @@ fun EcartConfirmDialog(
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text("Quantité théorique : ${formatQuantity(article.quantiteTheorique)} ${article.unite}")
-                Text("Quantité réelle saisie : ${formatQuantity(quantiteReelle)} ${article.unite}")
+                Text("Quantité théorique : ${formatQuantity(article.quantiteTheorique)}")
+                Text("Quantité réelle saisie : ${formatQuantity(quantiteReelle)}")
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Écart : ${formatQuantity(ecart, showSign = true)} ${article.unite}",
+                    text = "Écart : ${formatQuantity(ecart, showSign = true)}",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.error

@@ -3,25 +3,25 @@ package ma.bam.inventaire.util
 /**
  * Normalise les en-têtes de colonnes du fichier Excel importé (insensible à la casse,
  * aux accents et aux espaces) vers les clés métier attendues.
+ *
+ * Colonnes attendues (export Sobrus - Stocks) : PID, Produit, Catégorie, TVA, PPV, PPH, Zone,
+ * Stock, Date de péremption, Stock min, Stock max, Code barre 1, Code barre 2. PPH n'est pas
+ * utilisé par l'app (PPV sert de prix unitaire).
  */
 object ExcelColumnMapper {
 
-    const val CODE_ARTICLE = "code_article"
-    const val CODE_BARRE = "code_barre"
-    const val REFERENCE = "reference"
-    const val DESIGNATION = "designation"
-    const val DESCRIPTION = "description"
+    const val PID = "pid"
+    const val PRODUIT = "produit"
     const val CATEGORIE = "categorie"
-    const val EMPLACEMENT = "emplacement"
-    const val QUANTITE_THEORIQUE = "quantite_theorique"
-    const val UNITE = "unite"
-    const val PRIX_UNITAIRE = "prix_unitaire"
-    const val DATE_IMPORT = "date_import"
-
-    val EXPECTED_COLUMNS = listOf(
-        CODE_ARTICLE, CODE_BARRE, REFERENCE, DESIGNATION, DESCRIPTION, CATEGORIE,
-        EMPLACEMENT, QUANTITE_THEORIQUE, UNITE, PRIX_UNITAIRE, DATE_IMPORT
-    )
+    const val TVA = "tva"
+    const val PPV = "ppv"
+    const val ZONE = "zone"
+    const val STOCK = "stock"
+    const val DATE_PEREMPTION = "date_de_peremption"
+    const val STOCK_MIN = "stock_min"
+    const val STOCK_MAX = "stock_max"
+    const val CODE_BARRE_1 = "code_barre_1"
+    const val CODE_BARRE_2 = "code_barre_2"
 
     /** Construit la map {clé normalisée -> index de colonne} à partir de la ligne d'en-tête. */
     fun mapHeaders(headerRow: List<String?>): Map<String, Int> {

@@ -259,13 +259,16 @@ private fun ArticleRow(
                     maxLines = 1,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
-                Text(
-                    article.codeBarre,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                )
+                val codesBarres = listOf(article.codeBarre1, article.codeBarre2).filter { it.isNotBlank() }
+                if (codesBarres.isNotEmpty()) {
+                    Text(
+                        codesBarres.joinToString(" / "),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    )
+                }
                 Text(
                     article.emplacement,
                     style = MaterialTheme.typography.labelMedium,

@@ -66,7 +66,10 @@ class InventoryDetailViewModel @Inject constructor(
             if (query.isBlank()) {
                 filtered
             } else {
-                filtered.filter { it.codeBarre.contains(query, ignoreCase = true) }
+                filtered.filter {
+                    it.codeBarre1.contains(query, ignoreCase = true) ||
+                        it.codeBarre2.contains(query, ignoreCase = true)
+                }
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 

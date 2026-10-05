@@ -17,34 +17,35 @@ class ExcelImportExportRepositoryTest {
         )
 
         // ART-001, ART-002 (première occurrence), ART-003, ART-004 -> 4 articles ;
-        // la ligne vide est ignorée, la seconde ligne ART-002 est en erreur (doublon)
+        // la ligne vide est ignorée, la seconde ligne ART-002 est en erreur (PID en double)
         assertEquals(4, result.articles.size)
         assertEquals(1, result.erreurs.size)
     }
 
     @Test
-    fun `un code_article deja vu avec un autre code_barre est signale en erreur`() {
+    fun `un PID deja vu est signale en erreur, premiere occurrence conservee`() {
         val result = repository.importTheoreticalStock(
             ByteArrayInputStream(SampleInventoryFixture.buildSampleWorkbookBytes())
         )
 
         val art002 = result.articles.single { it.codeArticle == "ART-002" }
-        assertEquals("6111234500025", art002.codeBarre)
+        assertEquals("6111234500025", art002.codeBarre1)
         assertTrue(result.erreurs.single().contains("ART-002"))
     }
 
     @Test
-    fun `chaque article importe a un seul code_barre`() {
+    fun `un article peut avoir deux codes-barres`() {
         val result = repository.importTheoreticalStock(
             ByteArrayInputStream(SampleInventoryFixture.buildSampleWorkbookBytes())
         )
 
         val art003 = result.articles.single { it.codeArticle == "ART-003" }
-        assertEquals("6111234500049", art003.codeBarre)
+        assertEquals("6111234500049", art003.codeBarre1)
+        assertEquals("6111234500056", art003.codeBarre2)
     }
 
     @Test
-    fun `quantite et prix manquants sont ramenes a zero sans erreur`() {
+    fun `stock et prix manquants sont ramenes a zero sans erreur`() {
         val result = repository.importTheoreticalStock(
             ByteArrayInputStream(SampleInventoryFixture.buildSampleWorkbookBytes())
         )
@@ -68,14 +69,16 @@ class ExcelImportExportRepositoryTest {
             id = 1L,
             sessionId = session.id,
             codeArticle = "ART-001",
-            codeBarre = "6111234500018",
-            reference = "REF-ENV-A4",
             designation = "Enveloppes A4 blanches",
-            description = "Boîte de 500 enveloppes A4 90g",
             categorie = "Fournitures bureau",
+            tva = "TVA (20.00%)",
             emplacement = "Dépôt A - Rayon 3",
             quantiteTheorique = 120.0,
-            unite = "boite",
+            datePeremption = "",
+            stockMin = 10.0,
+            stockMax = 200.0,
+            codeBarre1 = "6111234500018",
+            codeBarre2 = "",
             prixUnitaire = 45.50,
             dateImport = 1759420800000L,
             quantiteReelle = 118.0,
@@ -91,13 +94,13 @@ class ExcelImportExportRepositoryTest {
         val header = rows[0]
         val dataRow = rows[1]
 
-        assertEquals("code_article", header[3])
+        assertEquals("pid", header[3])
         assertEquals("ART-001", dataRow[3])
-        assertEquals("code_barre", header[4])
-        assertEquals("6111234500018", dataRow[4])
-        assertEquals("quantite_reelle", header[11])
-        assertEquals(118.0, dataRow[11].toDouble(), 0.0001)
-        assertEquals("ecart", header[12])
-        assertEquals(-2.0, dataRow[12].toDouble(), 0.0001)
+        assertEquals("code_barre_1", header[12])
+        assertEquals("6111234500018", dataRow[12])
+        assertEquals("quantite_reelle", header[15])
+        assertEquals(118.0, dataRow[15].toDouble(), 0.0001)
+        assertEquals("ecart", header[16])
+        assertEquals(-2.0, dataRow[16].toDouble(), 0.0001)
     }
 }

@@ -19,9 +19,9 @@ data class ImportResult(
 class ExcelImportExportRepository @Inject constructor() {
 
     /**
-     * Lit le fichier Excel théorique. Chaque code_article doit correspondre à un seul
-     * code_barre : une ligne qui réutilise un code_article déjà vu est ignorée et signalée
-     * en erreur (la première occurrence est conservée).
+     * Lit le fichier Excel théorique (export Sobrus - Stocks). Chaque code_article (PID) doit
+     * être unique : une ligne qui réutilise un PID déjà vu est ignorée et signalée en erreur
+     * (la première occurrence est conservée).
      */
     fun importTheoreticalStock(inputStream: InputStream): ImportResult {
         val erreurs = mutableListOf<String>()
@@ -39,8 +39,8 @@ class ExcelImportExportRepository @Inject constructor() {
                 val article = parseRow(cellTexts, headers) ?: return@forEachIndexed // ligne vide
                 if (byCodeArticle.containsKey(article.codeArticle)) {
                     erreurs.add(
-                        "Ligne $rowNumber ignorée : code_article '${article.codeArticle}' déjà présent " +
-                            "(un seul code_barre autorisé par article, première occurrence conservée)."
+                        "Ligne $rowNumber ignorée : PID '${article.codeArticle}' déjà présent " +
+                            "(première occurrence conservée)."
                     )
                 } else {
                     byCodeArticle[article.codeArticle] = article
@@ -59,20 +59,22 @@ class ExcelImportExportRepository @Inject constructor() {
             return cells.getOrNull(index)?.trim().orEmpty()
         }
 
-        val codeArticle = value(ExcelColumnMapper.CODE_ARTICLE)
+        val codeArticle = value(ExcelColumnMapper.PID)
         if (codeArticle.isBlank()) return null
 
         return ImportedArticle(
             codeArticle = codeArticle,
-            codeBarre = value(ExcelColumnMapper.CODE_BARRE),
-            reference = value(ExcelColumnMapper.REFERENCE),
-            designation = value(ExcelColumnMapper.DESIGNATION),
-            description = value(ExcelColumnMapper.DESCRIPTION),
+            designation = value(ExcelColumnMapper.PRODUIT),
             categorie = value(ExcelColumnMapper.CATEGORIE),
-            emplacement = value(ExcelColumnMapper.EMPLACEMENT),
-            quantiteTheorique = value(ExcelColumnMapper.QUANTITE_THEORIQUE).toDoubleOrNull() ?: 0.0,
-            unite = value(ExcelColumnMapper.UNITE),
-            prixUnitaire = value(ExcelColumnMapper.PRIX_UNITAIRE).toDoubleOrNull() ?: 0.0,
+            tva = value(ExcelColumnMapper.TVA),
+            emplacement = value(ExcelColumnMapper.ZONE),
+            quantiteTheorique = value(ExcelColumnMapper.STOCK).toDoubleOrNull() ?: 0.0,
+            datePeremption = value(ExcelColumnMapper.DATE_PEREMPTION),
+            stockMin = value(ExcelColumnMapper.STOCK_MIN).toDoubleOrNull() ?: 0.0,
+            stockMax = value(ExcelColumnMapper.STOCK_MAX).toDoubleOrNull() ?: 0.0,
+            codeBarre1 = value(ExcelColumnMapper.CODE_BARRE_1),
+            codeBarre2 = value(ExcelColumnMapper.CODE_BARRE_2),
+            prixUnitaire = value(ExcelColumnMapper.PPV).toDoubleOrNull() ?: 0.0,
             dateImport = System.currentTimeMillis()
         )
     }
@@ -83,9 +85,9 @@ class ExcelImportExportRepository @Inject constructor() {
         sessions: List<Pair<InventorySessionEntity, List<StockArticleEntity>>>
     ) {
         val header = listOf(
-            "numero_inventaire", "date_inventaire", "statut", "code_article", "code_barre",
-            "reference", "designation", "description", "categorie", "emplacement",
-            "quantite_theorique", "quantite_reelle", "ecart", "ecart_valide", "unite", "prix_unitaire"
+            "numero_inventaire", "date_inventaire", "statut", "pid", "produit", "categorie",
+            "tva", "zone", "stock", "date_de_peremption", "stock_min", "stock_max",
+            "code_barre_1", "code_barre_2", "ppv", "quantite_reelle", "ecart", "ecart_valide"
         )
 
         val rows = mutableListOf<List<Any?>>(header)
@@ -97,18 +99,20 @@ class ExcelImportExportRepository @Inject constructor() {
                         session.dateCreation.toString(),
                         session.statut.name,
                         article.codeArticle,
-                        article.codeBarre,
-                        article.reference,
                         article.designation,
-                        article.description,
                         article.categorie,
+                        article.tva,
                         article.emplacement,
                         article.quantiteTheorique,
+                        article.datePeremption,
+                        article.stockMin,
+                        article.stockMax,
+                        article.codeBarre1,
+                        article.codeBarre2,
+                        article.prixUnitaire,
                         article.quantiteReelle,
                         article.ecart,
-                        if (article.ecartValide) "OUI" else "NON",
-                        article.unite,
-                        article.prixUnitaire
+                        if (article.ecartValide) "OUI" else "NON"
                     )
                 )
             }
