@@ -37,8 +37,10 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Tag
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -49,6 +51,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -247,38 +251,24 @@ private fun ArticleRow(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     article.designation.ifBlank { article.codeArticle },
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
-                Text(
-                    article.codeArticle,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                )
+                Spacer(modifier = Modifier.height(2.dp))
+                ArticleInfoRow(icon = Icons.Filled.Tag, text = article.codeArticle)
                 val codesBarres = listOf(article.codeBarre1, article.codeBarre2).filter { it.isNotBlank() }
                 if (codesBarres.isNotEmpty()) {
-                    Text(
-                        codesBarres.joinToString(" / "),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    ArticleInfoRow(
+                        painter = painterResource(id = R.drawable.ic_barcode_scan),
+                        text = codesBarres.joinToString(" / ")
                     )
                 }
-                Text(
-                    article.emplacement,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                )
+                ArticleInfoRow(icon = Icons.Filled.Place, text = article.emplacement)
                 Spacer(modifier = Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    QuantityPill(label = "Théo", value = formatQuantity(article.quantiteTheorique))
+                    QuantityPill(label = "Stock", value = formatQuantity(article.quantiteTheorique))
                     QuantityPill(
                         label = "Réel",
                         value = article.quantiteReelle?.let { formatQuantity(it) } ?: "-",
@@ -302,6 +292,47 @@ private fun ArticleRow(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ArticleInfoRow(icon: ImageVector, text: String) {
+    ArticleInfoRow(text = text) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(13.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun ArticleInfoRow(painter: Painter, text: String) {
+    ArticleInfoRow(text = text) {
+        Icon(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier.size(13.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun ArticleInfoRow(text: String, icon: @Composable () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        icon()
+        Text(
+            text,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+        )
     }
 }
 
