@@ -164,7 +164,7 @@ fun InventorySessionCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         item.session.numero,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
