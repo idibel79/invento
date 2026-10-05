@@ -23,7 +23,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -133,10 +132,12 @@ fun InventoryDetailScreen(
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                FilledIconButton(onClick = { onScan(viewModel.sessionId) }) {
+                IconButton(onClick = { onScan(viewModel.sessionId) }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_barcode_scan),
-                        contentDescription = "Scanner un article"
+                        contentDescription = "Scanner un article",
+                        modifier = Modifier.size(28.dp),
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
