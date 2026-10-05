@@ -3,7 +3,9 @@ package ma.bam.inventaire.ui.inventorydetail
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -62,6 +64,7 @@ import ma.bam.inventaire.R
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.domain.EcartCalculator
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
+import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.ui.theme.NotScannedGray
 import ma.bam.inventaire.ui.theme.SuccessGreen
 import ma.bam.inventaire.util.formatQuantity
@@ -253,8 +256,11 @@ private fun ArticleRow(
                     article.designation.ifBlank { article.codeArticle },
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
+                    color = InProgressBlue,
                     maxLines = 1,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    softWrap = false,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Clip,
+                    modifier = Modifier.horizontalScroll(rememberScrollState())
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 ArticleInfoRow(icon = Icons.Filled.Tag, text = article.codeArticle)
