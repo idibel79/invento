@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Card
@@ -35,7 +36,6 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
@@ -295,29 +295,28 @@ fun InventorySessionCard(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Toujours rendue (invisible si non clôturé) pour que toutes les cartes aient la
-            // même hauteur, qu'elles soient clôturées ou non.
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .alpha(if (closed) 1f else 0f)
                     .let { if (closed) it.clickable(onClick = onLockClick) else it },
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Lock,
-                    contentDescription = if (closed) "Inventaire clôturé" else null,
-                    tint = SuccessGreen,
+                    imageVector = if (closed) Icons.Filled.Lock else Icons.Filled.LockOpen,
+                    contentDescription = if (closed) "Inventaire clôturé, toucher pour déclôturer" else "Inventaire non clôturé",
+                    tint = if (closed) SuccessGreen else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(16.dp)
                 )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    "Inventaire clôturé",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = SuccessGreen,
-                    fontWeight = FontWeight.Medium
-                )
+                if (closed) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        "Inventaire clôturé",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = SuccessGreen,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
     }
