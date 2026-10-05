@@ -319,8 +319,8 @@ private fun ArticleRow(
                     softWrap = false,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Clip,
                     modifier = Modifier
-                        .horizontalScroll(titleScrollState)
                         .fadingEdge(titleScrollState)
+                        .horizontalScroll(titleScrollState)
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 ArticleInfoRow(
@@ -358,8 +358,8 @@ private fun ArticleRow(
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         modifier = Modifier
-                            .horizontalScroll(pillsScrollState)
                             .fadingEdge(pillsScrollState)
+                            .horizontalScroll(pillsScrollState)
                     ) {
                         QuantityPill(label = "Système :", value = formatQuantity(article.quantiteTheorique))
                         QuantityPill(
