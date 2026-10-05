@@ -60,7 +60,7 @@ import ma.bam.inventaire.domain.EcartCalculator
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
 import ma.bam.inventaire.ui.theme.NotScannedGray
 import ma.bam.inventaire.ui.theme.SuccessGreen
-import java.util.Locale
+import ma.bam.inventaire.util.formatQuantity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -324,15 +324,4 @@ private fun QuantityPill(
             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
         )
     }
-}
-
-/** Arrondit à 2 décimales et affiche un entier sans décimales inutiles (évite les artefacts flottants type -2.9999999999999996). */
-private fun formatQuantity(value: Double, showSign: Boolean = false): String {
-    val rounded = kotlin.math.round(value * 100) / 100.0
-    val text = if (rounded == rounded.toLong().toDouble()) {
-        rounded.toLong().toString()
-    } else {
-        String.format(Locale.FRANCE, "%.2f", rounded)
-    }
-    return if (showSign && rounded > 0) "+$text" else text
 }

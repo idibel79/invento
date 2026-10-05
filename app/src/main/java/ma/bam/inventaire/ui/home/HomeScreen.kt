@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
@@ -184,7 +185,7 @@ fun HomeScreen(
             onDismissRequest = { pendingClose = null },
             icon = {
                 Icon(
-                    imageVector = Icons.Filled.WarningAmber,
+                    imageVector = Icons.Filled.Lock,
                     contentDescription = null,
                     tint = BamGreen
                 )
@@ -192,7 +193,7 @@ fun HomeScreen(
             title = { Text("Clôturer cet inventaire ?") },
             text = {
                 Text(
-                    "L'inventaire ${item.session.numero} sera verrouillé : les quantités des articles ne pourront plus être modifiées tant qu'il n'aura pas été rouvert."
+                    "Les quantités de l'inventaire ${item.session.numero} seront verrouillées : plus aucune modification ne sera possible tant qu'il n'aura pas été rouvert."
                 )
             },
             confirmButton = {
