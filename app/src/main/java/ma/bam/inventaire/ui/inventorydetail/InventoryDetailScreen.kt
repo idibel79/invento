@@ -24,6 +24,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -35,10 +37,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
@@ -80,7 +84,10 @@ fun InventoryDetailScreen(
     val articles by viewModel.visibleArticles.collectAsState()
     val filter by viewModel.filter.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
+    val positionFilter by viewModel.positionFilter.collectAsState()
+    val availablePositions by viewModel.availablePositions.collectAsState()
     var editingArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
+    var showPositionMenu by remember { mutableStateOf(false) }
     val locked = session?.verrouille == true
 
     LaunchedEffect(Unit) {
@@ -155,6 +162,43 @@ fun InventoryDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                Box {
+                    IconButton(onClick = { showPositionMenu = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.FilterAlt,
+                            contentDescription = "Filtrer par position",
+                            tint = if (positionFilter != null) InProgressBlue else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    DropdownMenu(expanded = showPositionMenu, onDismissRequest = { showPositionMenu = false }) {
+                        DropdownMenuItem(
+                            text = { Text("Toutes les positions") },
+                            onClick = {
+                                viewModel.setPositionFilter(null)
+                                showPositionMenu = false
+                            },
+                            leadingIcon = {
+                                if (positionFilter == null) {
+                                    Icon(Icons.Filled.Check, contentDescription = null)
+                                }
+                            }
+                        )
+                        availablePositions.forEach { position ->
+                            DropdownMenuItem(
+                                text = { Text(position) },
+                                onClick = {
+                                    viewModel.setPositionFilter(position)
+                                    showPositionMenu = false
+                                },
+                                leadingIcon = {
+                                    if (positionFilter == position) {
+                                        Icon(Icons.Filled.Check, contentDescription = null)
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
                 FilterChip(
                     selected = filter == ArticleFilter.TOUS,
                     onClick = { viewModel.setFilter(ArticleFilter.TOUS) },

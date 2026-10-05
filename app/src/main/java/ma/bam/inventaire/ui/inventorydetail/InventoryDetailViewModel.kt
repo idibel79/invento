@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -50,28 +51,38 @@ class InventoryDetailViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
+    /** Position (emplacement) sélectionnée, ou null = toutes les positions. */
+    private val _positionFilter = MutableStateFlow<String?>(null)
+    val positionFilter: StateFlow<String?> = _positionFilter.asStateFlow()
+
     val session: StateFlow<InventorySessionEntity?> = repository.observeSession(sessionId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     private val allArticles: StateFlow<List<StockArticleEntity>> = repository.observeArticles(sessionId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val availablePositions: StateFlow<List<String>> = allArticles
+        .map { articles -> articles.map { it.emplacement }.filter { it.isNotBlank() }.distinct().sorted() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     val visibleArticles: StateFlow<List<StockArticleEntity>> =
-        combine(allArticles, _filter, _searchQuery) { articles, filter, query ->
-            val filtered = when (filter) {
+        combine(allArticles, _filter, _searchQuery, _positionFilter) { articles, filter, query, position ->
+            var filtered = when (filter) {
                 ArticleFilter.TOUS -> articles
                 ArticleFilter.SCANNES -> articles.filter { it.quantiteReelle != null }
                 ArticleFilter.ECARTS -> articles.filter { it.ecart != null && it.ecart != 0.0 }
                 ArticleFilter.NON_SCANNES -> articles.filter { it.quantiteReelle == null }
             }
-            if (query.isBlank()) {
-                filtered
-            } else {
-                filtered.filter {
+            if (position != null) {
+                filtered = filtered.filter { it.emplacement == position }
+            }
+            if (query.isNotBlank()) {
+                filtered = filtered.filter {
                     it.codeBarre1.contains(query, ignoreCase = true) ||
                         it.codeBarre2.contains(query, ignoreCase = true)
                 }
             }
+            filtered
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _exportEvents = Channel<ExportEvent>(Channel.BUFFERED)
@@ -83,6 +94,10 @@ class InventoryDetailViewModel @Inject constructor(
 
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
+    }
+
+    fun setPositionFilter(position: String?) {
+        _positionFilter.value = position
     }
 
     fun updateQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean) {
