@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -158,8 +159,8 @@ fun InventoryDetailScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Box {
@@ -170,18 +171,26 @@ fun InventoryDetailScreen(
                             tint = if (positionFilter != null) InProgressBlue else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    DropdownMenu(expanded = showPositionMenu, onDismissRequest = { showPositionMenu = false }) {
+                    DropdownMenu(
+                        expanded = showPositionMenu,
+                        onDismissRequest = { showPositionMenu = false },
+                        modifier = Modifier.heightIn(max = 320.dp)
+                    ) {
+                        Text(
+                            "Filtrer par position",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                        Divider()
                         DropdownMenuItem(
                             text = { Text("Toutes les positions") },
                             onClick = {
                                 viewModel.setPositionFilter(null)
                                 showPositionMenu = false
                             },
-                            leadingIcon = {
-                                if (positionFilter == null) {
-                                    Icon(Icons.Filled.Check, contentDescription = null)
-                                }
-                            }
+                            leadingIcon = { PositionCheckSlot(selected = positionFilter == null) }
                         )
                         availablePositions.forEach { position ->
                             DropdownMenuItem(
@@ -190,35 +199,37 @@ fun InventoryDetailScreen(
                                     viewModel.setPositionFilter(position)
                                     showPositionMenu = false
                                 },
-                                leadingIcon = {
-                                    if (positionFilter == position) {
-                                        Icon(Icons.Filled.Check, contentDescription = null)
-                                    }
-                                }
+                                leadingIcon = { PositionCheckSlot(selected = positionFilter == position) }
                             )
                         }
+                        Spacer(modifier = Modifier.height(4.dp))
                     }
                 }
-                FilterChip(
-                    selected = filter == ArticleFilter.TOUS,
-                    onClick = { viewModel.setFilter(ArticleFilter.TOUS) },
-                    label = { Text("Tous") }
-                )
-                FilterChip(
-                    selected = filter == ArticleFilter.SCANNES,
-                    onClick = { viewModel.setFilter(ArticleFilter.SCANNES) },
-                    label = { Text("Scannés") }
-                )
-                FilterChip(
-                    selected = filter == ArticleFilter.ECARTS,
-                    onClick = { viewModel.setFilter(ArticleFilter.ECARTS) },
-                    label = { Text("Écarts") }
-                )
-                FilterChip(
-                    selected = filter == ArticleFilter.NON_SCANNES,
-                    onClick = { viewModel.setFilter(ArticleFilter.NON_SCANNES) },
-                    label = { Text("Non scannés") }
-                )
+                Row(
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    FilterChip(
+                        selected = filter == ArticleFilter.TOUS,
+                        onClick = { viewModel.setFilter(ArticleFilter.TOUS) },
+                        label = { Text("Tous") }
+                    )
+                    FilterChip(
+                        selected = filter == ArticleFilter.SCANNES,
+                        onClick = { viewModel.setFilter(ArticleFilter.SCANNES) },
+                        label = { Text("Scannés") }
+                    )
+                    FilterChip(
+                        selected = filter == ArticleFilter.ECARTS,
+                        onClick = { viewModel.setFilter(ArticleFilter.ECARTS) },
+                        label = { Text("Écarts") }
+                    )
+                    FilterChip(
+                        selected = filter == ArticleFilter.NON_SCANNES,
+                        onClick = { viewModel.setFilter(ArticleFilter.NON_SCANNES) },
+                        label = { Text("Non scannés") }
+                    )
+                }
             }
             Divider()
 
@@ -252,6 +263,16 @@ fun InventoryDetailScreen(
                 editingArticle = null
             }
         )
+    }
+}
+
+/** Coche si sélectionné, sinon un espace de même taille pour garder le texte des items alignés. */
+@Composable
+private fun PositionCheckSlot(selected: Boolean) {
+    if (selected) {
+        Icon(Icons.Filled.Check, contentDescription = null, tint = InProgressBlue)
+    } else {
+        Spacer(modifier = Modifier.size(24.dp))
     }
 }
 
