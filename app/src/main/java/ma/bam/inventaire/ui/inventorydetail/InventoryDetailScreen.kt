@@ -377,12 +377,20 @@ private fun ArticleRow(
                     }
                 }
             }
-            if (!notScanned && !locked) {
-                IconButton(onClick = onEdit) {
-                    Icon(
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = "Modifier la quantité"
-                    )
+            // Taille réservée en permanence (même quand le stylo n'est pas affiché) pour que
+            // la largeur du titre et de la rangée Système / Inventaire / Écart soit identique
+            // sur toutes les cartes, qu'elles aient un bouton de modification ou non.
+            Box(
+                modifier = Modifier.size(48.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (!notScanned && !locked) {
+                    IconButton(onClick = onEdit) {
+                        Icon(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = "Modifier la quantité"
+                        )
+                    }
                 }
             }
         }
