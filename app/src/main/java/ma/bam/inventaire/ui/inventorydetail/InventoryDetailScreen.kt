@@ -1,7 +1,6 @@
 package ma.bam.inventaire.ui.inventorydetail
 
 import android.content.Intent
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -58,11 +57,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -309,7 +303,6 @@ private fun ArticleRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                val titleScrollState = rememberScrollState()
                 Text(
                     article.designation.ifBlank { article.codeArticle },
                     style = MaterialTheme.typography.bodyMedium,
@@ -318,9 +311,7 @@ private fun ArticleRow(
                     maxLines = 1,
                     softWrap = false,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Clip,
-                    modifier = Modifier
-                        .horizontalScroll(titleScrollState)
-                        .fadingEdge(titleScrollState)
+                    modifier = Modifier.horizontalScroll(rememberScrollState())
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 ArticleInfoRow(
@@ -354,12 +345,9 @@ private fun ArticleRow(
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                     }
-                    val pillsScrollState = rememberScrollState()
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        modifier = Modifier
-                            .horizontalScroll(pillsScrollState)
-                            .fadingEdge(pillsScrollState)
+                        modifier = Modifier.horizontalScroll(rememberScrollState())
                     ) {
                         QuantityPill(label = "Système :", value = formatQuantity(article.quantiteTheorique))
                         QuantityPill(
@@ -429,39 +417,6 @@ private fun ArticleInfoRow(text: String, icon: @Composable () -> Unit) {
         )
     }
 }
-
-/**
- * Estompe les bords d'un contenu scrollable horizontalement (le fait disparaître
- * progressivement vers la couleur de fond) pour signaler qu'il continue au-delà
- * de la zone visible, côté gauche et/ou droite selon la position de scroll.
- */
-private fun Modifier.fadingEdge(scrollState: ScrollState, edgeWidth: androidx.compose.ui.unit.Dp = 18.dp): Modifier =
-    this
-        .graphicsLayer { alpha = 0.99f }
-        .drawWithContent {
-            drawContent()
-            val edgePx = edgeWidth.toPx().coerceAtMost(size.width / 2f)
-            if (scrollState.maxValue > 0 && scrollState.value < scrollState.maxValue) {
-                drawRect(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(Color.Black, Color.Transparent),
-                        startX = size.width - edgePx,
-                        endX = size.width
-                    ),
-                    blendMode = BlendMode.DstIn
-                )
-            }
-            if (scrollState.value > 0) {
-                drawRect(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(Color.Transparent, Color.Black),
-                        startX = 0f,
-                        endX = edgePx
-                    ),
-                    blendMode = BlendMode.DstIn
-                )
-            }
-        }
 
 @Composable
 private fun QuantityPill(
