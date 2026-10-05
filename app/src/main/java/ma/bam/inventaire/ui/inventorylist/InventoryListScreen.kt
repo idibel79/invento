@@ -306,7 +306,7 @@ fun InventorySessionCard(
                     imageVector = if (closed) Icons.Filled.Lock else Icons.Filled.LockOpen,
                     contentDescription = if (closed) "Inventaire clôturé, toucher pour déclôturer" else "Inventaire non clôturé",
                     tint = if (closed) SuccessGreen else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(20.dp)
                 )
                 if (closed) {
                     Spacer(modifier = Modifier.width(4.dp))
