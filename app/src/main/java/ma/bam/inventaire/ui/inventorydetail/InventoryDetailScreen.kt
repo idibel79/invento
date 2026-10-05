@@ -304,11 +304,8 @@ private fun ArticleRow(
         shape = RoundedCornerShape(14.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
+        Box(modifier = Modifier.padding(12.dp)) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 val titleScrollState = rememberScrollState()
                 Text(
                     article.designation.ifBlank { article.codeArticle },
@@ -377,20 +374,18 @@ private fun ArticleRow(
                     }
                 }
             }
-            // Taille réservée en permanence (même quand le stylo n'est pas affiché) pour que
-            // la largeur du titre et de la rangée Système / Inventaire / Écart soit identique
-            // sur toutes les cartes, qu'elles aient un bouton de modification ou non.
-            Box(
-                modifier = Modifier.size(48.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                if (!notScanned && !locked) {
-                    IconButton(onClick = onEdit) {
-                        Icon(
-                            imageVector = Icons.Filled.Edit,
-                            contentDescription = "Modifier la quantité"
-                        )
-                    }
+            // Flotte au-dessus du contenu sans lui retirer de largeur : le titre et la
+            // rangée Système / Inventaire / Écart gardent toujours la même largeur,
+            // avec ou sans stylo affiché.
+            if (!notScanned && !locked) {
+                IconButton(
+                    onClick = onEdit,
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Edit,
+                        contentDescription = "Modifier la quantité"
+                    )
                 }
             }
         }
