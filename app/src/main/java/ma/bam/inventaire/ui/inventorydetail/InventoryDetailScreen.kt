@@ -345,7 +345,10 @@ private fun ArticleRow(
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                     }
-                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.horizontalScroll(rememberScrollState())
+                    ) {
                         QuantityPill(label = "Système :", value = formatQuantity(article.quantiteTheorique))
                         QuantityPill(
                             label = "Inventaire :",
