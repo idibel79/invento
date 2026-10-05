@@ -38,7 +38,6 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
@@ -52,9 +51,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ma.bam.inventaire.R
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.domain.EcartCalculator
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
@@ -120,7 +121,7 @@ fun InventoryDetailScreen(
                     value = searchQuery,
                     onValueChange = viewModel::setSearchQuery,
                     modifier = Modifier.weight(1f),
-                    label = { Text("Rechercher par code-barres") },
+                    label = { Text("Code-barres") },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {
@@ -133,7 +134,10 @@ fun InventoryDetailScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 FilledIconButton(onClick = { onScan(viewModel.sessionId) }) {
-                    Icon(Icons.Default.QrCodeScanner, contentDescription = "Scanner un article")
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_barcode_scan),
+                        contentDescription = "Scanner un article"
+                    )
                 }
             }
             Row(
