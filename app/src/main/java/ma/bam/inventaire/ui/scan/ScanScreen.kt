@@ -219,7 +219,7 @@ fun ScanScreen(
                     "${uiState.counters.scanned} / ${uiState.counters.total} articles scannés. " +
                         if (uiState.counters.pendingEcarts > 0)
                             "${uiState.counters.pendingEcarts} écart(s) restent à valider."
-                        else "L'inventaire sera enregistré dans l'historique. Tu pourras continuer à le modifier ensuite."
+                        else "L'inventaire sera enregistré dans l'historique."
                 )
             },
             confirmButton = {
@@ -229,7 +229,7 @@ fun ScanScreen(
                 }) { Text("Oui, terminer", color = BamGreen, fontWeight = FontWeight.SemiBold) }
             },
             dismissButton = {
-                TextButton(onClick = { showFinalizeConfirm = false }) { Text("Continuer le scan") }
+                TextButton(onClick = { showFinalizeConfirm = false }) { Text("Continuer") }
             }
         )
     }

@@ -163,7 +163,7 @@ fun HomeScreen(
             title = { Text("Supprimer cet inventaire ?") },
             text = {
                 Text(
-                    "L'inventaire ${item.session.numero} et tous ses articles scannés seront définitivement supprimés. Cette action est irréversible."
+                    "L'inventaire ${item.session.numero} sera définitivement supprimé, avec tous ses articles. Cette action est irréversible."
                 )
             },
             confirmButton = {
