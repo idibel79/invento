@@ -346,9 +346,9 @@ private fun ArticleRow(
                         Spacer(modifier = Modifier.width(8.dp))
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        QuantityPill(label = "Stock", value = formatQuantity(article.quantiteTheorique))
+                        QuantityPill(label = "Système", value = formatQuantity(article.quantiteTheorique))
                         QuantityPill(
-                            label = "Réel",
+                            label = "Inventaire",
                             value = article.quantiteReelle?.let { formatQuantity(it) } ?: "-",
                             color = if (notScanned) NotScannedGray else null
                         )
