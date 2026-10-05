@@ -75,9 +75,9 @@ fun SwipeableSessionCard(
             }
             false
         },
-        // Il faut swiper presque jusqu'au bout (90% de la largeur), dans un sens ou l'autre,
-        // pour déclencher une action : pas juste un petit glissement.
-        positionalThreshold = { totalDistance -> totalDistance * 0.9f }
+        // Il faut swiper jusqu'à la moitié de la largeur, dans un sens ou l'autre,
+        // pour déclencher une action.
+        positionalThreshold = { totalDistance -> totalDistance * 0.5f }
     )
     val progress = if (dismissState.dismissDirection != SwipeToDismissBoxValue.Settled) {
         dismissState.progress.coerceIn(0f, 1f)
