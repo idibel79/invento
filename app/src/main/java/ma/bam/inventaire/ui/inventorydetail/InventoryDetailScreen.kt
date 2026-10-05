@@ -38,8 +38,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
@@ -52,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -233,54 +234,61 @@ private fun ArticleRow(
         shape = RoundedCornerShape(14.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (!notScanned) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(statusColor.copy(alpha = 0.15f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = if (hasEcart) Icons.Filled.ErrorOutline else Icons.Filled.CheckCircle,
-                        contentDescription = null,
-                        tint = statusColor,
-                        modifier = Modifier.size(20.dp)
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(verticalAlignment = Alignment.Top) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        article.designation.ifBlank { article.codeArticle },
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = InProgressBlue,
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Clip,
+                        modifier = Modifier.horizontalScroll(rememberScrollState())
                     )
-                }
-                Spacer(modifier = Modifier.width(12.dp))
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    article.designation.ifBlank { article.codeArticle },
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = InProgressBlue,
-                    maxLines = 1,
-                    softWrap = false,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Clip,
-                    modifier = Modifier.horizontalScroll(rememberScrollState())
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                ArticleInfoRow(
-                    painter = painterResource(id = R.drawable.ic_pid_cross),
-                    text = article.codeArticle
-                )
-                val codesBarres = listOf(article.codeBarre1, article.codeBarre2).filter { it.isNotBlank() }
-                if (codesBarres.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(2.dp))
                     ArticleInfoRow(
-                        painter = painterResource(id = R.drawable.ic_barcode_scan),
-                        text = codesBarres.joinToString(" / ")
+                        painter = painterResource(id = R.drawable.ic_pid_cross),
+                        text = article.codeArticle
                     )
+                    val codesBarres = listOf(article.codeBarre1, article.codeBarre2).filter { it.isNotBlank() }
+                    if (codesBarres.isNotEmpty()) {
+                        ArticleInfoRow(
+                            painter = painterResource(id = R.drawable.ic_barcode_scan),
+                            text = codesBarres.joinToString(" / ")
+                        )
+                    }
+                    ArticleInfoRow(icon = Icons.Filled.Place, text = article.emplacement)
                 }
-                ArticleInfoRow(icon = Icons.Filled.Place, text = article.emplacement)
-                Spacer(modifier = Modifier.height(6.dp))
+                if (!notScanned && !locked) {
+                    IconButton(onClick = onEdit) {
+                        Icon(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = "Modifier la quantité"
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (!notScanned) {
+                    Box(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(CircleShape)
+                            .background(if (hasEcart) statusColor else statusColor.copy(alpha = 0.15f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = if (hasEcart) Icons.Filled.PriorityHigh else Icons.Filled.CheckCircle,
+                            contentDescription = null,
+                            tint = if (hasEcart) Color.White else statusColor,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     QuantityPill(label = "Stock", value = formatQuantity(article.quantiteTheorique))
                     QuantityPill(
@@ -295,14 +303,6 @@ private fun ArticleRow(
                             color = statusColor
                         )
                     }
-                }
-            }
-            if (!notScanned && !locked) {
-                IconButton(onClick = onEdit) {
-                    Icon(
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = "Modifier la quantité"
-                    )
                 }
             }
         }
