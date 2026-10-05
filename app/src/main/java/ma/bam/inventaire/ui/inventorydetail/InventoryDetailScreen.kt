@@ -434,9 +434,9 @@ private fun ArticleInfoRow(text: String, icon: @Composable () -> Unit) {
 }
 
 /**
- * Estompe les bords d'un contenu scrollable horizontalement (le fait disparaître
+ * Estompe le bord droit d'un contenu scrollable horizontalement (le fait disparaître
  * progressivement vers la couleur de fond) pour signaler qu'il continue au-delà
- * de la zone visible, côté gauche et/ou droite selon la position de scroll.
+ * de la zone visible.
  */
 private fun Modifier.fadingEdge(scrollState: ScrollState, edgeWidth: androidx.compose.ui.unit.Dp = 40.dp): Modifier =
     this
@@ -450,16 +450,6 @@ private fun Modifier.fadingEdge(scrollState: ScrollState, edgeWidth: androidx.co
                         colors = listOf(Color.Black, Color.Transparent),
                         startX = size.width - edgePx,
                         endX = size.width
-                    ),
-                    blendMode = BlendMode.DstIn
-                )
-            }
-            if (scrollState.value > 0) {
-                drawRect(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(Color.Transparent, Color.Black),
-                        startX = 0f,
-                        endX = edgePx
                     ),
                     blendMode = BlendMode.DstIn
                 )
