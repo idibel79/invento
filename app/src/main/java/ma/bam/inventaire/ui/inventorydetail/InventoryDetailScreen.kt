@@ -151,6 +151,7 @@ fun InventoryDetailScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -158,6 +159,11 @@ fun InventoryDetailScreen(
                     selected = filter == ArticleFilter.TOUS,
                     onClick = { viewModel.setFilter(ArticleFilter.TOUS) },
                     label = { Text("Tous") }
+                )
+                FilterChip(
+                    selected = filter == ArticleFilter.SCANNES,
+                    onClick = { viewModel.setFilter(ArticleFilter.SCANNES) },
+                    label = { Text("Scannés") }
                 )
                 FilterChip(
                     selected = filter == ArticleFilter.ECARTS,

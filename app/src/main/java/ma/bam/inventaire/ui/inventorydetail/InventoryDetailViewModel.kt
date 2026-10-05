@@ -27,7 +27,7 @@ import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
 
-enum class ArticleFilter { TOUS, ECARTS, NON_SCANNES }
+enum class ArticleFilter { TOUS, SCANNES, ECARTS, NON_SCANNES }
 
 sealed interface ExportEvent {
     data class Ready(val uri: Uri) : ExportEvent
@@ -60,6 +60,7 @@ class InventoryDetailViewModel @Inject constructor(
         combine(allArticles, _filter, _searchQuery) { articles, filter, query ->
             val filtered = when (filter) {
                 ArticleFilter.TOUS -> articles
+                ArticleFilter.SCANNES -> articles.filter { it.quantiteReelle != null }
                 ArticleFilter.ECARTS -> articles.filter { it.ecart != null && it.ecart != 0.0 }
                 ArticleFilter.NON_SCANNES -> articles.filter { it.quantiteReelle == null }
             }
