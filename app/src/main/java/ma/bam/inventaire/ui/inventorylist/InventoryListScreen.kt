@@ -248,75 +248,60 @@ fun InventorySessionCard(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_barcode_scan),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            "${item.counters.scanned}/${item.counters.total} articles",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    if (item.counters.pendingEcarts > 0) {
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(EcartRed.copy(alpha = 0.12f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.ErrorOutline,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = EcartRed
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                "${item.counters.pendingEcarts} écart${if (item.counters.pendingEcarts > 1) "s" else ""}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = EcartRed,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+                if (closed) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_barcode_scan),
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        "${item.counters.scanned}/${item.counters.total} articles",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                if (item.counters.pendingEcarts > 0) {
-                    Row(
+                        imageVector = Icons.Filled.Lock,
+                        contentDescription = "Inventaire clôturé",
+                        tint = SuccessGreen,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(50))
-                            .background(EcartRed.copy(alpha = 0.12f))
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.ErrorOutline,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = EcartRed
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            "${item.counters.pendingEcarts} écart${if (item.counters.pendingEcarts > 1) "s" else ""}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = EcartRed,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
-            }
-
-            if (closed) {
-                Spacer(modifier = Modifier.height(10.dp))
-                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50))
+                            .align(Alignment.Center)
+                            .size(18.dp)
                             .clickable(onClick = onLockClick)
-                            .background(SuccessGreen.copy(alpha = 0.12f))
-                            .padding(horizontal = 12.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Lock,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = SuccessGreen
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            "Inventaire clôturé",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = SuccessGreen,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                    )
                 }
             }
         }
