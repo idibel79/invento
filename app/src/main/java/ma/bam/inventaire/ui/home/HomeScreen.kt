@@ -196,7 +196,7 @@ fun HomeScreen(
             text = {
                 Text(
                     "Les quantités de l'inventaire ${item.session.numero} seront verrouillées : plus aucune modification ne sera possible.",
-                    textAlign = TextAlign.Center,
+                    textAlign = TextAlign.Justify,
                     modifier = Modifier.fillMaxWidth()
                 )
             },

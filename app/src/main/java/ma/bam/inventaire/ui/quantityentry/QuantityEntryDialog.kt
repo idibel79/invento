@@ -1,5 +1,6 @@
 package ma.bam.inventaire.ui.quantityentry
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -29,10 +31,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.R
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
-import ma.bam.inventaire.ui.components.SingleLineAutoSizeText
+import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.util.formatQuantity
 
 @Composable
@@ -50,9 +53,15 @@ fun QuantityEntryDialog(
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Filled.Edit, contentDescription = null) },
         title = {
-            SingleLineAutoSizeText(
-                text = article.designation.ifBlank { article.codeArticle },
-                style = MaterialTheme.typography.titleMedium
+            Text(
+                article.designation.ifBlank { article.codeArticle },
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = InProgressBlue,
+                maxLines = 1,
+                softWrap = false,
+                overflow = TextOverflow.Clip,
+                modifier = Modifier.horizontalScroll(rememberScrollState())
             )
         },
         text = {
