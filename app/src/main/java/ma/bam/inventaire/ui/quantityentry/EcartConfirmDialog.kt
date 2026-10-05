@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
+import ma.bam.inventaire.ui.components.SingleLineAutoSizeText
 import ma.bam.inventaire.util.formatQuantity
 
 @Composable
@@ -28,7 +29,7 @@ fun EcartConfirmDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
-        title = { Text("Écart détecté", maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis) },
+        title = { SingleLineAutoSizeText("Écart détecté", style = MaterialTheme.typography.titleMedium) },
         text = {
             Column {
                 Text(

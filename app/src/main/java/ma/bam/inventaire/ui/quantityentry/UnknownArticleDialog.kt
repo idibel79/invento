@@ -9,7 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+import ma.bam.inventaire.ui.components.SingleLineAutoSizeText
 
 @Composable
 fun UnknownArticleDialog(
@@ -25,7 +25,7 @@ fun UnknownArticleDialog(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         },
-        title = { Text("Article non reconnu", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        title = { SingleLineAutoSizeText("Article non reconnu", style = MaterialTheme.typography.titleMedium) },
         text = {
             Text("Le code \"$code\" ne correspond à aucun article de cet inventaire. Vérifiez qu'il s'agit du bon article ou saisissez-le manuellement.")
         },

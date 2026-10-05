@@ -45,6 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import ma.bam.inventaire.ui.components.SingleLineAutoSizeText
 import ma.bam.inventaire.ui.quantityentry.EcartConfirmDialog
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
 import ma.bam.inventaire.ui.quantityentry.UnknownArticleDialog
@@ -213,7 +214,7 @@ fun ScanScreen(
                     tint = BamGreen
                 )
             },
-            title = { Text("Terminer cet inventaire ?", maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis) },
+            title = { SingleLineAutoSizeText("Terminer cet inventaire ?", style = MaterialTheme.typography.titleMedium) },
             text = {
                 Text(
                     "${uiState.counters.scanned} / ${uiState.counters.total} articles scannés. " +

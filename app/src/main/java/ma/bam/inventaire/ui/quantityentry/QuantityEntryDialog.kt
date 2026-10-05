@@ -28,9 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
+import ma.bam.inventaire.ui.components.SingleLineAutoSizeText
 import ma.bam.inventaire.util.formatQuantity
 
 @Composable
@@ -48,11 +48,9 @@ fun QuantityEntryDialog(
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Filled.Edit, contentDescription = null) },
         title = {
-            Text(
-                article.designation.ifBlank { article.codeArticle },
-                style = MaterialTheme.typography.titleSmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+            SingleLineAutoSizeText(
+                text = article.designation.ifBlank { article.codeArticle },
+                style = MaterialTheme.typography.titleMedium
             )
         },
         text = {

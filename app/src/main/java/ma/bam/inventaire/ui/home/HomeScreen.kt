@@ -40,11 +40,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ma.bam.inventaire.BuildConfig
 import ma.bam.inventaire.R
+import ma.bam.inventaire.ui.components.SingleLineAutoSizeText
 import ma.bam.inventaire.ui.inventorylist.InventoryListViewModel
 import ma.bam.inventaire.ui.inventorylist.SessionListItem
 import ma.bam.inventaire.ui.inventorylist.SwipeableSessionCard
@@ -161,7 +161,7 @@ fun HomeScreen(
                     tint = MaterialTheme.colorScheme.error
                 )
             },
-            title = { Text("Supprimer cet inventaire ?", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            title = { SingleLineAutoSizeText("Supprimer cet inventaire ?", style = MaterialTheme.typography.titleMedium) },
             text = {
                 Text(
                     "L'inventaire ${item.session.numero} sera définitivement supprimé, avec tous ses articles. Cette action est irréversible."
@@ -191,7 +191,7 @@ fun HomeScreen(
                     tint = BamGreen
                 )
             },
-            title = { Text("Clôturer cet inventaire ?", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            title = { SingleLineAutoSizeText("Clôturer cet inventaire ?", style = MaterialTheme.typography.titleMedium) },
             text = {
                 Text(
                     "Les quantités de l'inventaire ${item.session.numero} seront verrouillées : plus aucune modification ne sera possible tant qu'il n'aura pas été rouvert."
@@ -221,7 +221,7 @@ fun HomeScreen(
                     tint = BamGreen
                 )
             },
-            title = { Text("Reprendre les modifications ?", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            title = { SingleLineAutoSizeText("Reprendre les modifications ?", style = MaterialTheme.typography.titleMedium) },
             text = {
                 Text(
                     "L'inventaire ${item.session.numero} sera déverrouillé et ses articles pourront à nouveau être modifiés."
