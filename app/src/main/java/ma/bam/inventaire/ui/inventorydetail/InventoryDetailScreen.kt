@@ -168,93 +168,95 @@ fun InventoryDetailScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box {
-                    IconButton(onClick = { showPositionMenu = true }) {
-                        Icon(
-                            imageVector = Icons.Filled.FilterAlt,
-                            contentDescription = "Filtrer par position",
-                            tint = if (positionFilter != null) InProgressBlue else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = showPositionMenu,
-                        onDismissRequest = { showPositionMenu = false },
-                        modifier = Modifier.heightIn(max = 320.dp)
-                    ) {
-                        Text(
-                            "Filtrer par position",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
-                        Divider()
-                        DropdownMenuItem(
-                            text = { Text("Toutes les positions") },
-                            onClick = {
-                                viewModel.setPositionFilter(null)
-                                showPositionMenu = false
-                            },
-                            leadingIcon = { PositionCheckSlot(selected = positionFilter == null) }
-                        )
-                        availablePositions.forEach { position ->
-                            DropdownMenuItem(
-                                text = { Text(position) },
-                                onClick = {
-                                    viewModel.setPositionFilter(position)
-                                    showPositionMenu = false
-                                },
-                                leadingIcon = { PositionCheckSlot(selected = positionFilter == position) }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box {
+                        IconButton(onClick = { showPositionMenu = true }) {
+                            Icon(
+                                imageVector = Icons.Filled.FilterAlt,
+                                contentDescription = "Filtrer par position",
+                                tint = if (positionFilter != null) InProgressBlue else MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
+                        DropdownMenu(
+                            expanded = showPositionMenu,
+                            onDismissRequest = { showPositionMenu = false },
+                            modifier = Modifier.heightIn(max = 320.dp)
+                        ) {
+                            Text(
+                                "Filtrer par position",
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                            Divider()
+                            DropdownMenuItem(
+                                text = { Text("Toutes les positions") },
+                                onClick = {
+                                    viewModel.setPositionFilter(null)
+                                    showPositionMenu = false
+                                },
+                                leadingIcon = { PositionCheckSlot(selected = positionFilter == null) }
+                            )
+                            availablePositions.forEach { position ->
+                                DropdownMenuItem(
+                                    text = { Text(position) },
+                                    onClick = {
+                                        viewModel.setPositionFilter(position)
+                                        showPositionMenu = false
+                                    },
+                                    leadingIcon = { PositionCheckSlot(selected = positionFilter == position) }
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
                     }
-                }
-                Box {
-                    IconButton(onClick = { showSortMenu = true }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_sort),
-                            contentDescription = "Trier",
-                            modifier = Modifier.size(24.dp),
-                            tint = if (sort != ArticleSort.DEFAUT) InProgressBlue else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    DropdownMenu(
-                        expanded = showSortMenu,
-                        onDismissRequest = { showSortMenu = false }
-                    ) {
-                        Text(
-                            "Trier par",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                        )
-                        Divider()
-                        DropdownMenuItem(
-                            text = { Text("Ordre d'origine") },
-                            onClick = {
-                                viewModel.setSort(ArticleSort.DEFAUT)
-                                showSortMenu = false
-                            },
-                            leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.DEFAUT) }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Titre (A-Z)") },
-                            onClick = {
-                                viewModel.setSort(ArticleSort.TITRE)
-                                showSortMenu = false
-                            },
-                            leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.TITRE) }
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Pid") },
-                            onClick = {
-                                viewModel.setSort(ArticleSort.PID)
-                                showSortMenu = false
-                            },
-                            leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.PID) }
-                        )
+                    Box {
+                        IconButton(onClick = { showSortMenu = true }) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_sort),
+                                contentDescription = "Trier",
+                                modifier = Modifier.size(24.dp),
+                                tint = if (sort != ArticleSort.DEFAUT) InProgressBlue else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = showSortMenu,
+                            onDismissRequest = { showSortMenu = false }
+                        ) {
+                            Text(
+                                "Trier par",
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                            Divider()
+                            DropdownMenuItem(
+                                text = { Text("Ordre d'origine") },
+                                onClick = {
+                                    viewModel.setSort(ArticleSort.DEFAUT)
+                                    showSortMenu = false
+                                },
+                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.DEFAUT) }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Titre (A-Z)") },
+                                onClick = {
+                                    viewModel.setSort(ArticleSort.TITRE)
+                                    showSortMenu = false
+                                },
+                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.TITRE) }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Pid") },
+                                onClick = {
+                                    viewModel.setSort(ArticleSort.PID)
+                                    showSortMenu = false
+                                },
+                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.PID) }
+                            )
+                        }
                     }
                 }
                 Row(
