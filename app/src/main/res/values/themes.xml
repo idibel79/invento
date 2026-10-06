@@ -1,3 +1,13 @@
-<resources>
-    <style name="Theme.Inventaire" parent="android:Theme.Material.Light.NoActionBar" />
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!--
+        android:windowSplashScreen* (API 31+) contrôle l'écran affiché par le système entre
+        le tap sur l'icône et le premier frame de MainActivity. L'icône animée est forcée
+        transparente pour qu'on ne voie jamais l'icône de l'app : seul le fond blanc est
+        visible, puis l'écran de démarrage Compose (SplashScreen.kt, même fond blanc) prend
+        le relais sans coupure visible. Sans effet (ignoré) sur API < 31.
+    -->
+    <style name="Theme.Inventaire" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowSplashScreenBackground" tools:targetApi="31">@android:color/white</item>
+        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="31">@android:color/transparent</item>
+    </style>
 </resources>
