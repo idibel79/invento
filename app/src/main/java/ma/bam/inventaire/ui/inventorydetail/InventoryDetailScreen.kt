@@ -2,7 +2,6 @@ package ma.bam.inventaire.ui.inventorydetail
 
 import android.content.Intent
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
@@ -59,11 +58,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -74,6 +68,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ma.bam.inventaire.R
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.domain.EcartCalculator
+import ma.bam.inventaire.ui.components.fadingEdge
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
 import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.ui.theme.NotScannedGray
@@ -447,29 +442,6 @@ private fun ArticleInfoRow(text: String, icon: @Composable () -> Unit) {
         )
     }
 }
-
-/**
- * Estompe le bord droit d'un contenu scrollable horizontalement (le fait disparaître
- * progressivement vers la couleur de fond) pour signaler qu'il continue au-delà
- * de la zone visible.
- */
-private fun Modifier.fadingEdge(scrollState: ScrollState, edgeWidth: androidx.compose.ui.unit.Dp = 40.dp): Modifier =
-    this
-        .graphicsLayer { alpha = 0.99f }
-        .drawWithContent {
-            drawContent()
-            val edgePx = edgeWidth.toPx().coerceAtMost(size.width / 2f)
-            if (scrollState.maxValue > 0 && scrollState.value < scrollState.maxValue) {
-                drawRect(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(Color.Black, Color.Transparent),
-                        startX = size.width - edgePx,
-                        endX = size.width
-                    ),
-                    blendMode = BlendMode.DstIn
-                )
-            }
-        }
 
 @Composable
 private fun QuantityPill(

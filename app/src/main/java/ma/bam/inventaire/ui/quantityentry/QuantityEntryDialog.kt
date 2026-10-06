@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -35,7 +36,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.R
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
+import ma.bam.inventaire.ui.components.fadingEdge
 import ma.bam.inventaire.ui.theme.InProgressBlue
+import ma.bam.inventaire.ui.theme.SuccessGreen
 import ma.bam.inventaire.util.formatQuantity
 
 @Composable
@@ -53,6 +56,7 @@ fun QuantityEntryDialog(
         onDismissRequest = onDismiss,
         icon = { Icon(Icons.Filled.Edit, contentDescription = null) },
         title = {
+            val titleScrollState = rememberScrollState()
             Text(
                 article.designation.ifBlank { article.codeArticle },
                 style = MaterialTheme.typography.titleMedium,
@@ -61,7 +65,9 @@ fun QuantityEntryDialog(
                 maxLines = 1,
                 softWrap = false,
                 overflow = TextOverflow.Clip,
-                modifier = Modifier.horizontalScroll(rememberScrollState())
+                modifier = Modifier
+                    .fadingEdge(titleScrollState)
+                    .horizontalScroll(titleScrollState)
             )
         },
         text = {
@@ -87,7 +93,8 @@ fun QuantityEntryDialog(
         confirmButton = {
             TextButton(
                 enabled = quantite != null,
-                onClick = { quantite?.let(onConfirm) }
+                onClick = { quantite?.let(onConfirm) },
+                colors = ButtonDefaults.textButtonColors(contentColor = SuccessGreen)
             ) {
                 Text("Valider", fontWeight = FontWeight.SemiBold)
             }

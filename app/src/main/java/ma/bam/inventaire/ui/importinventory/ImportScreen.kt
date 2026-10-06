@@ -2,7 +2,7 @@ package ma.bam.inventaire.ui.importinventory
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -68,46 +68,51 @@ fun ImportScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Importer la liste de stock théorique", style = MaterialTheme.typography.titleLarge)
-            Spacer(modifier = Modifier.height(24.dp))
+            Text(text = "Importer la liste du stock système", style = MaterialTheme.typography.titleLarge)
 
-            when (val current = state) {
-                is ImportUiState.Idle -> {
-                    Text("Sélectionnez le fichier Excel (.xlsx) exporté depuis votre système de gestion.")
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = {
-                            filePicker.launch(
-                                arrayOf(
-                                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                )
+            Box(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    when (val current = state) {
+                        is ImportUiState.Idle -> {
+                            Text("Sélectionnez le fichier Excel (.xlsx) exporté depuis votre système de gestion.")
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(
+                                onClick = {
+                                    filePicker.launch(
+                                        arrayOf(
+                                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                        )
+                                    )
+                                },
+                                modifier = Modifier.fillMaxWidth().height(56.dp)
+                            ) {
+                                Text("Choisir un fichier")
+                            }
+                        }
+                        is ImportUiState.Loading -> {
+                            CircularProgressIndicator()
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text("Import en cours...")
+                        }
+                        is ImportUiState.Error -> {
+                            Text(
+                                text = current.message,
+                                color = MaterialTheme.colorScheme.error
                             )
-                        },
-                        modifier = Modifier.fillMaxWidth().height(56.dp)
-                    ) {
-                        Text("Choisir un fichier")
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Button(onClick = { viewModel.reset() }) {
+                                Text("Réessayer")
+                            }
+                        }
+                        is ImportUiState.Success -> {
+                            Text("Import réussi : ${current.nbArticles} articles.")
+                        }
                     }
-                }
-                is ImportUiState.Loading -> {
-                    CircularProgressIndicator()
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Import en cours...")
-                }
-                is ImportUiState.Error -> {
-                    Text(
-                        text = current.message,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { viewModel.reset() }) {
-                        Text("Réessayer")
-                    }
-                }
-                is ImportUiState.Success -> {
-                    Text("Import réussi : ${current.nbArticles} articles.")
                 }
             }
         }
