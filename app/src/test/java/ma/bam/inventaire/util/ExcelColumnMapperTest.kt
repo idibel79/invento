@@ -32,6 +32,7 @@ class ExcelColumnMapperTest {
         assertEquals(2, map[ExcelColumnMapper.CATEGORIE])
         assertEquals(3, map[ExcelColumnMapper.TVA])
         assertEquals(4, map[ExcelColumnMapper.PPV])
+        assertEquals(5, map[ExcelColumnMapper.PPH])
         assertEquals(6, map[ExcelColumnMapper.ZONE])
         assertEquals(7, map[ExcelColumnMapper.STOCK])
         assertEquals(8, map[ExcelColumnMapper.DATE_PEREMPTION])

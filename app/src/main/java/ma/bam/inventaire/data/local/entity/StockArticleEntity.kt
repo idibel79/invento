@@ -48,6 +48,8 @@ data class StockArticleEntity(
     val codeBarre2: String,
     /** PPV (prix public de vente), utilisé comme prix unitaire dans l'app. */
     val prixUnitaire: Double,
+    /** PPH (prix public hospitalier), affiché à titre informatif dans l'aperçu détaillé. */
+    val pph: Double,
     val dateImport: Long,
     val quantiteReelle: Double? = null,
     val ecart: Double? = null,

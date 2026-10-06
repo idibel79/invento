@@ -13,7 +13,7 @@ import ma.bam.inventaire.data.local.entity.StockArticleEntity
         InventorySessionEntity::class,
         StockArticleEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

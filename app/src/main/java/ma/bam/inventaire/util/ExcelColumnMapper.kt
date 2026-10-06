@@ -5,8 +5,8 @@ package ma.bam.inventaire.util
  * aux accents et aux espaces) vers les clés métier attendues.
  *
  * Colonnes attendues (export Sobrus - Stocks) : PID, Produit, Catégorie, TVA, PPV, PPH, Zone,
- * Stock, Date de péremption, Stock min, Stock max, Code barre 1, Code barre 2. PPH n'est pas
- * utilisé par l'app (PPV sert de prix unitaire).
+ * Stock, Date de péremption, Stock min, Stock max, Code barre 1, Code barre 2. PPV sert de prix
+ * unitaire ; PPH est affiché à titre informatif dans l'aperçu détaillé de l'article.
  */
 object ExcelColumnMapper {
 
@@ -15,6 +15,7 @@ object ExcelColumnMapper {
     const val CATEGORIE = "categorie"
     const val TVA = "tva"
     const val PPV = "ppv"
+    const val PPH = "pph"
     const val ZONE = "zone"
     const val STOCK = "stock"
     const val DATE_PEREMPTION = "date_de_peremption"

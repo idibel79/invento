@@ -75,6 +75,7 @@ class ExcelImportExportRepository @Inject constructor() {
             codeBarre1 = value(ExcelColumnMapper.CODE_BARRE_1),
             codeBarre2 = value(ExcelColumnMapper.CODE_BARRE_2),
             prixUnitaire = value(ExcelColumnMapper.PPV).toDoubleOrNull() ?: 0.0,
+            pph = value(ExcelColumnMapper.PPH).toDoubleOrNull() ?: 0.0,
             dateImport = System.currentTimeMillis()
         )
     }
@@ -87,7 +88,7 @@ class ExcelImportExportRepository @Inject constructor() {
         val header = listOf(
             "numero_inventaire", "date_inventaire", "statut", "pid", "produit", "categorie",
             "tva", "zone", "stock", "date_de_peremption", "stock_min", "stock_max",
-            "code_barre_1", "code_barre_2", "ppv", "quantite_reelle", "ecart", "ecart_valide"
+            "code_barre_1", "code_barre_2", "ppv", "pph", "quantite_reelle", "ecart", "ecart_valide"
         )
 
         val rows = mutableListOf<List<Any?>>(header)
@@ -110,6 +111,7 @@ class ExcelImportExportRepository @Inject constructor() {
                         article.codeBarre1,
                         article.codeBarre2,
                         article.prixUnitaire,
+                        article.pph,
                         article.quantiteReelle,
                         article.ecart,
                         if (article.ecartValide) "OUI" else "NON"

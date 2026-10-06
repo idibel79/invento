@@ -80,6 +80,7 @@ class ExcelImportExportRepositoryTest {
             codeBarre1 = "6111234500018",
             codeBarre2 = "",
             prixUnitaire = 45.50,
+            pph = 37.90,
             dateImport = 1759420800000L,
             quantiteReelle = 118.0,
             ecart = -2.0,
@@ -98,9 +99,9 @@ class ExcelImportExportRepositoryTest {
         assertEquals("ART-001", dataRow[3])
         assertEquals("code_barre_1", header[12])
         assertEquals("6111234500018", dataRow[12])
-        assertEquals("quantite_reelle", header[15])
-        assertEquals(118.0, dataRow[15].toDouble(), 0.0001)
-        assertEquals("ecart", header[16])
-        assertEquals(-2.0, dataRow[16].toDouble(), 0.0001)
+        assertEquals("quantite_reelle", header[16])
+        assertEquals(118.0, dataRow[16].toDouble(), 0.0001)
+        assertEquals("ecart", header[17])
+        assertEquals(-2.0, dataRow[17].toDouble(), 0.0001)
     }
 }

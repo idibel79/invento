@@ -1,9 +1,10 @@
 package ma.bam.inventaire.ui.inventorydetail
 
 import android.content.Intent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
@@ -94,6 +95,7 @@ fun InventoryDetailScreen(
     val positionFilter by viewModel.positionFilter.collectAsState()
     val availablePositions by viewModel.availablePositions.collectAsState()
     var editingArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
+    var detailArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
     var showPositionMenu by remember { mutableStateOf(false) }
     val locked = session?.verrouille == true
 
@@ -248,7 +250,8 @@ fun InventoryDetailScreen(
                     ArticleRow(
                         item = item,
                         locked = locked,
-                        onEdit = { editingArticle = item }
+                        onEdit = { editingArticle = item },
+                        onShowDetail = { detailArticle = item }
                     )
                 }
             }
@@ -270,6 +273,13 @@ fun InventoryDetailScreen(
             }
         )
     }
+
+    detailArticle?.let { article ->
+        ArticleDetailDialog(
+            article = article,
+            onDismiss = { detailArticle = null }
+        )
+    }
 }
 
 /** Coche si sélectionné, sinon un espace de même taille pour garder le texte des items alignés. */
@@ -282,11 +292,13 @@ private fun PositionCheckSlot(selected: Boolean) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ArticleRow(
     item: StockArticleEntity,
     locked: Boolean,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    onShowDetail: () -> Unit
 ) {
     val article = item
     val hasEcart = EcartCalculator.hasEcart(article.ecart)
@@ -300,7 +312,10 @@ private fun ArticleRow(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .let { if (notScanned && !locked) it.clickable(onClick = onEdit) else it },
+            .combinedClickable(
+                onClick = { if (notScanned && !locked) onEdit() },
+                onLongClick = onShowDetail
+            ),
         shape = RoundedCornerShape(14.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {

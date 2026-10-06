@@ -58,6 +58,7 @@ class InventoryRepositoryImpl @Inject constructor(
                     codeBarre1 = imported.codeBarre1,
                     codeBarre2 = imported.codeBarre2,
                     prixUnitaire = imported.prixUnitaire,
+                    pph = imported.pph,
                     dateImport = imported.dateImport
                 )
             }
