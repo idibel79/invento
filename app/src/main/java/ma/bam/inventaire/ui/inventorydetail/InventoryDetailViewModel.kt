@@ -30,6 +30,8 @@ import javax.inject.Inject
 
 enum class ArticleFilter { TOUS, SCANNES, ECARTS, NON_SCANNES }
 
+enum class ArticleSort { DEFAUT, TITRE, PID }
+
 sealed interface ExportEvent {
     data class Ready(val uri: Uri) : ExportEvent
     data class Error(val message: String) : ExportEvent
@@ -55,6 +57,9 @@ class InventoryDetailViewModel @Inject constructor(
     private val _positionFilter = MutableStateFlow<String?>(null)
     val positionFilter: StateFlow<String?> = _positionFilter.asStateFlow()
 
+    private val _sort = MutableStateFlow(ArticleSort.DEFAUT)
+    val sort: StateFlow<ArticleSort> = _sort.asStateFlow()
+
     val session: StateFlow<InventorySessionEntity?> = repository.observeSession(sessionId)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
@@ -66,7 +71,7 @@ class InventoryDetailViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val visibleArticles: StateFlow<List<StockArticleEntity>> =
-        combine(allArticles, _filter, _searchQuery, _positionFilter) { articles, filter, query, position ->
+        combine(allArticles, _filter, _searchQuery, _positionFilter, _sort) { articles, filter, query, position, sort ->
             var filtered = when (filter) {
                 ArticleFilter.TOUS -> articles
                 ArticleFilter.SCANNES -> articles.filter { it.quantiteReelle != null }
@@ -82,7 +87,13 @@ class InventoryDetailViewModel @Inject constructor(
                         it.codeBarre2.contains(query, ignoreCase = true)
                 }
             }
-            filtered
+            when (sort) {
+                ArticleSort.DEFAUT -> filtered
+                ArticleSort.TITRE -> filtered.sortedWith(
+                    compareBy(String.CASE_INSENSITIVE_ORDER) { it.designation.ifBlank { it.codeArticle } }
+                )
+                ArticleSort.PID -> filtered.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.codeArticle })
+            }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _exportEvents = Channel<ExportEvent>(Channel.BUFFERED)
@@ -98,6 +109,10 @@ class InventoryDetailViewModel @Inject constructor(
 
     fun setPositionFilter(position: String?) {
         _positionFilter.value = position
+    }
+
+    fun setSort(sort: ArticleSort) {
+        _sort.value = sort
     }
 
     fun updateQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean) {

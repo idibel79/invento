@@ -48,6 +48,7 @@ import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -89,9 +90,11 @@ fun InventoryDetailScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val positionFilter by viewModel.positionFilter.collectAsState()
     val availablePositions by viewModel.availablePositions.collectAsState()
+    val sort by viewModel.sort.collectAsState()
     var editingArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
     var detailArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
     var showPositionMenu by remember { mutableStateOf(false) }
+    var showSortMenu by remember { mutableStateOf(false) }
     val locked = session?.verrouille == true
 
     LaunchedEffect(Unit) {
@@ -206,6 +209,52 @@ fun InventoryDetailScreen(
                             )
                         }
                         Spacer(modifier = Modifier.height(4.dp))
+                    }
+                }
+                Box {
+                    IconButton(onClick = { showSortMenu = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.SortByAlpha,
+                            contentDescription = "Trier",
+                            tint = if (sort != ArticleSort.DEFAUT) InProgressBlue else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = showSortMenu,
+                        onDismissRequest = { showSortMenu = false }
+                    ) {
+                        Text(
+                            "Trier par",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        )
+                        Divider()
+                        DropdownMenuItem(
+                            text = { Text("Ordre d'origine") },
+                            onClick = {
+                                viewModel.setSort(ArticleSort.DEFAUT)
+                                showSortMenu = false
+                            },
+                            leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.DEFAUT) }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Titre (A-Z)") },
+                            onClick = {
+                                viewModel.setSort(ArticleSort.TITRE)
+                                showSortMenu = false
+                            },
+                            leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.TITRE) }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("PID (A-Z)") },
+                            onClick = {
+                                viewModel.setSort(ArticleSort.PID)
+                                showSortMenu = false
+                            },
+                            leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.PID) }
+                        )
                     }
                 }
                 Row(
