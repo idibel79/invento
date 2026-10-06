@@ -215,6 +215,7 @@ fun InventoryDetailScreen(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_sort),
                             contentDescription = "Trier",
+                            modifier = Modifier.size(24.dp),
                             tint = if (sort != ArticleSort.DEFAUT) InProgressBlue else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
