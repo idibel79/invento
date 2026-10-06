@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
+import ma.bam.inventaire.ui.components.fadingEdge
 import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.util.formatQuantity
 
@@ -35,6 +36,7 @@ fun ArticleDetailDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
+            val titleScrollState = rememberScrollState()
             Text(
                 article.designation.ifBlank { article.codeArticle },
                 style = MaterialTheme.typography.titleMedium,
@@ -43,7 +45,9 @@ fun ArticleDetailDialog(
                 maxLines = 1,
                 softWrap = false,
                 overflow = TextOverflow.Clip,
-                modifier = Modifier.horizontalScroll(rememberScrollState())
+                modifier = Modifier
+                    .fadingEdge(titleScrollState)
+                    .horizontalScroll(titleScrollState)
             )
         },
         text = {
