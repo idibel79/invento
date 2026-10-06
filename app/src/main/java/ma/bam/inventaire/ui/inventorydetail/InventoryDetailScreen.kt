@@ -48,7 +48,6 @@ import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -214,7 +213,7 @@ fun InventoryDetailScreen(
                 Box {
                     IconButton(onClick = { showSortMenu = true }) {
                         Icon(
-                            imageVector = Icons.Filled.SortByAlpha,
+                            painter = painterResource(id = R.drawable.ic_sort),
                             contentDescription = "Trier",
                             tint = if (sort != ArticleSort.DEFAUT) InProgressBlue else MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -248,7 +247,7 @@ fun InventoryDetailScreen(
                             leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.TITRE) }
                         )
                         DropdownMenuItem(
-                            text = { Text("PID (A-Z)") },
+                            text = { Text("Pid") },
                             onClick = {
                                 viewModel.setSort(ArticleSort.PID)
                                 showSortMenu = false
