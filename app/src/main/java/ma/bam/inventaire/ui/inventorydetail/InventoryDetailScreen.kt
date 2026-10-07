@@ -271,7 +271,7 @@ fun InventoryDetailScreen(
                     FilterChip(
                         selected = filter == ArticleFilter.SCANNES,
                         onClick = { viewModel.setFilter(ArticleFilter.SCANNES) },
-                        label = { Text("Scannés") }
+                        label = { Text("Inventoriés") }
                     )
                     FilterChip(
                         selected = filter == ArticleFilter.ECARTS,
