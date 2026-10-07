@@ -125,12 +125,12 @@ fun ScanScreen(
                         OutlinedTextField(
                             value = manualCode,
                             onValueChange = { manualCode = it },
-                            label = { Text("Code-barres / code article") },
+                            label = { Text("Titre du produit") },
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                             keyboardActions = KeyboardActions(onDone = {
                                 if (manualCode.isNotBlank()) {
-                                    viewModel.onCodeDetected(manualCode.trim())
+                                    viewModel.onTitleSearch(manualCode.trim())
                                     manualCode = ""
                                 }
                             }),
@@ -140,13 +140,13 @@ fun ScanScreen(
                         Button(
                             onClick = {
                                 if (manualCode.isNotBlank()) {
-                                    viewModel.onCodeDetected(manualCode.trim())
+                                    viewModel.onTitleSearch(manualCode.trim())
                                     manualCode = ""
                                 }
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("Valider le code")
+                            Text("Valider")
                         }
                     }
                 }

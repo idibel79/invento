@@ -62,6 +62,20 @@ class ScanViewModel @Inject constructor(
         }
     }
 
+    fun onTitleSearch(title: String) {
+        if (_uiState.value.dialog != ScanDialogState.None) return // un dialog est déjà ouvert
+        viewModelScope.launch {
+            val found = repository.findArticleByTitle(sessionId, title)
+            if (found == null) {
+                feedbackUtil.onScanError()
+                _uiState.value = _uiState.value.copy(dialog = ScanDialogState.UnknownArticle(title))
+            } else {
+                feedbackUtil.onScanSuccess()
+                _uiState.value = _uiState.value.copy(dialog = ScanDialogState.QuantityEntry(found))
+            }
+        }
+    }
+
     fun confirmQuantity(article: StockArticleEntity, quantiteReelle: Double) {
         val ecart = EcartCalculator.compute(article.quantiteTheorique, quantiteReelle)
         if (EcartCalculator.hasEcart(ecart)) {

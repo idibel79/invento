@@ -22,6 +22,9 @@ interface InventoryRepository {
     /** Recherche un article par code-barres scanné ou par code_article saisi manuellement. */
     suspend fun findArticleByCode(sessionId: String, code: String): StockArticleEntity?
 
+    /** Recherche un article par titre de produit saisi manuellement. */
+    suspend fun findArticleByTitle(sessionId: String, title: String): StockArticleEntity?
+
     suspend fun recordScan(articleId: Long, quantiteReelle: Double, ecartValide: Boolean)
 
     suspend fun updateQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean)
