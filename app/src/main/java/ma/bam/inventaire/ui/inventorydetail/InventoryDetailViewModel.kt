@@ -28,7 +28,7 @@ import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
 
-enum class ArticleFilter { TOUS, SCANNES, ECARTS, NON_SCANNES }
+enum class ArticleFilter { TOUS, SCANNES, ECARTS, NON_SCANNES, NEGATIFS }
 
 enum class ArticleSort { DEFAUT, TITRE, PID }
 
@@ -77,6 +77,7 @@ class InventoryDetailViewModel @Inject constructor(
                 ArticleFilter.SCANNES -> articles.filter { it.quantiteReelle != null }
                 ArticleFilter.ECARTS -> articles.filter { it.ecart != null && it.ecart != 0.0 }
                 ArticleFilter.NON_SCANNES -> articles.filter { it.quantiteReelle == null }
+                ArticleFilter.NEGATIFS -> articles.filter { it.quantiteTheorique < 0 }
             }
             if (position != null) {
                 filtered = filtered.filter { it.emplacement == position }

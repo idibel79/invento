@@ -283,6 +283,11 @@ fun InventoryDetailScreen(
                         onClick = { viewModel.setFilter(ArticleFilter.NON_SCANNES) },
                         label = { Text("Non scannés") }
                     )
+                    FilterChip(
+                        selected = filter == ArticleFilter.NEGATIFS,
+                        onClick = { viewModel.setFilter(ArticleFilter.NEGATIFS) },
+                        label = { Text("Négatifs") }
+                    )
                 }
             }
             Divider()
