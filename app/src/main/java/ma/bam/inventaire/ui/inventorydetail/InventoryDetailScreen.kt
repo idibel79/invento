@@ -244,18 +244,18 @@ fun InventoryDetailScreen(
                             DropdownMenuItem(
                                 text = { Text("Titre (A-Z)") },
                                 onClick = {
-                                    viewModel.setSort(ArticleSort.TITRE)
+                                    viewModel.setSort(ArticleSort.TITRE_AZ)
                                     showSortMenu = false
                                 },
-                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.TITRE) }
+                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.TITRE_AZ) }
                             )
                             DropdownMenuItem(
-                                text = { Text("Pid") },
+                                text = { Text("Titre (Z-A)") },
                                 onClick = {
-                                    viewModel.setSort(ArticleSort.PID)
+                                    viewModel.setSort(ArticleSort.TITRE_ZA)
                                     showSortMenu = false
                                 },
-                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.PID) }
+                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.TITRE_ZA) }
                             )
                         }
                     }

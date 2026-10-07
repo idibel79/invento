@@ -30,7 +30,7 @@ import javax.inject.Inject
 
 enum class ArticleFilter { TOUS, SCANNES, ECARTS, NON_SCANNES, NEGATIFS, VIDE }
 
-enum class ArticleSort { DEFAUT, TITRE, PID }
+enum class ArticleSort { DEFAUT, TITRE_AZ, TITRE_ZA }
 
 sealed interface ExportEvent {
     data class Ready(val uri: Uri) : ExportEvent
@@ -93,10 +93,12 @@ class InventoryDetailViewModel @Inject constructor(
             }
             when (sort) {
                 ArticleSort.DEFAUT -> filtered
-                ArticleSort.TITRE -> filtered.sortedWith(
+                ArticleSort.TITRE_AZ -> filtered.sortedWith(
                     compareBy(String.CASE_INSENSITIVE_ORDER) { it.designation.ifBlank { it.codeArticle } }
                 )
-                ArticleSort.PID -> filtered.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.codeArticle })
+                ArticleSort.TITRE_ZA -> filtered.sortedWith(
+                    compareByDescending(String.CASE_INSENSITIVE_ORDER) { it.designation.ifBlank { it.codeArticle } }
+                )
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
