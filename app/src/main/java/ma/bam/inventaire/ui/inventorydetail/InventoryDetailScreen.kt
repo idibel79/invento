@@ -70,6 +70,7 @@ import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.domain.EcartCalculator
 import ma.bam.inventaire.ui.components.fadingEdge
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
+import ma.bam.inventaire.ui.theme.EcartRed
 import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.ui.theme.NotScannedGray
 import ma.bam.inventaire.ui.theme.SuccessGreen
@@ -359,9 +360,10 @@ private fun ArticleRow(
     val article = item
     val hasEcart = EcartCalculator.hasEcart(article.ecart)
     val notScanned = article.quantiteReelle == null
+    val ecartColor = article.ecart?.let { if (it < 0) EcartRed else InProgressBlue }
     val statusColor = when {
         notScanned -> NotScannedGray
-        hasEcart -> MaterialTheme.colorScheme.error
+        hasEcart -> ecartColor ?: MaterialTheme.colorScheme.error
         else -> SuccessGreen
     }
 
