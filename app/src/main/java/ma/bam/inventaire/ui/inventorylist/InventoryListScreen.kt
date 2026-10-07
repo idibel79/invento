@@ -18,8 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material.icons.filled.HorizontalRule
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Schedule
@@ -282,7 +282,7 @@ fun InventorySessionCard(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = Icons.Filled.HorizontalRule,
+                                imageVector = Icons.Filled.Cancel,
                                 contentDescription = null,
                                 modifier = Modifier.size(14.dp),
                                 tint = NotScannedGray
