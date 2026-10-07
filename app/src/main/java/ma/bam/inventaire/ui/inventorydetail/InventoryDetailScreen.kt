@@ -140,7 +140,7 @@ fun InventoryDetailScreen(
                     value = searchQuery,
                     onValueChange = viewModel::setSearchQuery,
                     modifier = Modifier.weight(1f),
-                    label = { Text("Code-barres") },
+                    label = { Text("Code ou titre") },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {

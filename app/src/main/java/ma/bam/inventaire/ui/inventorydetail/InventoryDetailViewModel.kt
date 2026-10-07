@@ -84,7 +84,9 @@ class InventoryDetailViewModel @Inject constructor(
             if (query.isNotBlank()) {
                 filtered = filtered.filter {
                     it.codeBarre1.contains(query, ignoreCase = true) ||
-                        it.codeBarre2.contains(query, ignoreCase = true)
+                        it.codeBarre2.contains(query, ignoreCase = true) ||
+                        it.codeArticle.contains(query, ignoreCase = true) ||
+                        it.designation.contains(query, ignoreCase = true)
                 }
             }
             when (sort) {
