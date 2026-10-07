@@ -128,11 +128,13 @@ fun ScanScreen(
                         }
                     }
                 } else {
+                    val idle = manualQuery.isBlank()
                     Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
+                        if (idle) Spacer(modifier = Modifier.weight(1f))
                         OutlinedTextField(
                             value = manualQuery,
                             onValueChange = viewModel::setManualQuery,
-                            label = { Text("Titre, code article ou code-barres") },
+                            label = { Text("Code ou titre") },
                             singleLine = true,
                             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
                             trailingIcon = {
@@ -147,8 +149,8 @@ fun ScanScreen(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         when {
-                            manualQuery.isBlank() -> Text(
-                                "Tapez un titre, un code article ou un code-barres pour retrouver un produit.",
+                            idle -> Text(
+                                "Tapez un code ou un titre pour retrouver un produit.",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -169,6 +171,7 @@ fun ScanScreen(
                                 }
                             }
                         }
+                        if (idle) Spacer(modifier = Modifier.weight(1f))
                     }
                 }
             }
