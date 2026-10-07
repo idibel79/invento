@@ -171,7 +171,7 @@ fun ScanScreen(
                         onClick = { manualMode = !manualMode },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(if (manualMode) "Utiliser la caméra" else "Saisie manuelle")
+                        Text(if (manualMode) "Scanner" else "Saisie manuelle")
                     }
                     Button(
                         onClick = { showFinalizeConfirm = true },
