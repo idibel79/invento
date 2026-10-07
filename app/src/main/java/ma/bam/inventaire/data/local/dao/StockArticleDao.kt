@@ -36,17 +36,6 @@ interface StockArticleDao {
     )
     suspend fun findByCode(sessionId: String, code: String): StockArticleEntity?
 
-    /** Recherche par titre de produit (correspondance partielle, insensible à la casse). */
-    @Query(
-        """
-        SELECT * FROM stock_article
-        WHERE sessionId = :sessionId
-          AND designation LIKE '%' || :title || '%' COLLATE NOCASE
-        LIMIT 1
-        """
-    )
-    suspend fun findByTitle(sessionId: String, title: String): StockArticleEntity?
-
     @Query("SELECT COUNT(*) FROM stock_article WHERE sessionId = :sessionId")
     suspend fun countForSession(sessionId: String): Int
 

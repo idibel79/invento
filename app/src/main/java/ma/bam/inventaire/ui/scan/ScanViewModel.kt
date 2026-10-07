@@ -5,8 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.data.repository.InventoryRepository
@@ -44,6 +47,24 @@ class ScanViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ScanUiState())
     val uiState: StateFlow<ScanUiState> = _uiState.asStateFlow()
 
+    private val _manualQuery = MutableStateFlow("")
+    val manualQuery: StateFlow<String> = _manualQuery.asStateFlow()
+
+    /** Produits correspondant à la saisie manuelle (titre, code article ou code-barres). */
+    val manualResults: StateFlow<List<StockArticleEntity>> =
+        combine(repository.observeArticles(sessionId), _manualQuery) { articles, query ->
+            if (query.isBlank()) {
+                emptyList()
+            } else {
+                articles.filter {
+                    it.designation.contains(query, ignoreCase = true) ||
+                        it.codeArticle.contains(query, ignoreCase = true) ||
+                        it.codeBarre1.contains(query, ignoreCase = true) ||
+                        it.codeBarre2.contains(query, ignoreCase = true)
+                }.take(20)
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     init {
         refreshCounters()
     }
@@ -62,18 +83,15 @@ class ScanViewModel @Inject constructor(
         }
     }
 
-    fun onTitleSearch(title: String) {
+    fun setManualQuery(query: String) {
+        _manualQuery.value = query
+    }
+
+    fun selectManualArticle(article: StockArticleEntity) {
         if (_uiState.value.dialog != ScanDialogState.None) return // un dialog est déjà ouvert
-        viewModelScope.launch {
-            val found = repository.findArticleByTitle(sessionId, title)
-            if (found == null) {
-                feedbackUtil.onScanError()
-                _uiState.value = _uiState.value.copy(dialog = ScanDialogState.UnknownArticle(title))
-            } else {
-                feedbackUtil.onScanSuccess()
-                _uiState.value = _uiState.value.copy(dialog = ScanDialogState.QuantityEntry(found))
-            }
-        }
+        feedbackUtil.onScanSuccess()
+        _manualQuery.value = ""
+        _uiState.value = _uiState.value.copy(dialog = ScanDialogState.QuantityEntry(article))
     }
 
     fun confirmQuantity(article: StockArticleEntity, quantiteReelle: Double) {

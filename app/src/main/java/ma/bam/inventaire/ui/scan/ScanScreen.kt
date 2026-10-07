@@ -1,6 +1,8 @@
 package ma.bam.inventaire.ui.scan
 
 import android.Manifest
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,15 +12,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.FlashOn
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.TaskAlt
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,11 +47,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.ui.components.SingleLineAutoSizeText
 import ma.bam.inventaire.ui.quantityentry.EcartConfirmDialog
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
@@ -61,7 +70,8 @@ fun ScanScreen(
     val uiState by viewModel.uiState.collectAsState()
     val cameraPermission = rememberPermissionState(Manifest.permission.CAMERA)
     var manualMode by remember { mutableStateOf(false) }
-    var manualCode by remember { mutableStateOf("") }
+    val manualQuery by viewModel.manualQuery.collectAsState()
+    val manualResults by viewModel.manualResults.collectAsState()
     var showFinalizeConfirm by remember { mutableStateOf(false) }
     var torchOn by remember { mutableStateOf(false) }
 
@@ -118,35 +128,46 @@ fun ScanScreen(
                         }
                     }
                 } else {
-                    Column(
-                        modifier = Modifier.fillMaxSize().padding(24.dp),
-                        verticalArrangement = Arrangement.Center
-                    ) {
+                    Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
                         OutlinedTextField(
-                            value = manualCode,
-                            onValueChange = { manualCode = it },
-                            label = { Text("Titre du produit") },
+                            value = manualQuery,
+                            onValueChange = viewModel::setManualQuery,
+                            label = { Text("Titre, code article ou code-barres") },
                             singleLine = true,
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                            keyboardActions = KeyboardActions(onDone = {
-                                if (manualCode.isNotBlank()) {
-                                    viewModel.onTitleSearch(manualCode.trim())
-                                    manualCode = ""
-                                }
-                            }),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Button(
-                            onClick = {
-                                if (manualCode.isNotBlank()) {
-                                    viewModel.onTitleSearch(manualCode.trim())
-                                    manualCode = ""
+                            leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                            trailingIcon = {
+                                if (manualQuery.isNotEmpty()) {
+                                    IconButton(onClick = { viewModel.setManualQuery("") }) {
+                                        Icon(Icons.Filled.Close, contentDescription = "Effacer")
+                                    }
                                 }
                             },
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                             modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Valider")
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        when {
+                            manualQuery.isBlank() -> Text(
+                                "Tapez un titre, un code article ou un code-barres pour retrouver un produit.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            manualResults.isEmpty() -> Text(
+                                "Aucun produit trouvé.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            else -> LazyColumn(
+                                modifier = Modifier.weight(1f).fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(manualResults, key = { it.id }) { article ->
+                                    ManualSearchResultRow(
+                                        article = article,
+                                        onClick = { viewModel.selectManualArticle(article) }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -233,5 +254,38 @@ fun ScanScreen(
                 TextButton(onClick = { showFinalizeConfirm = false }) { Text("Continuer") }
             }
         )
+    }
+}
+
+@Composable
+private fun ManualSearchResultRow(
+    article: StockArticleEntity,
+    onClick: () -> Unit
+) {
+    val codesBarres = listOf(article.codeBarre1, article.codeBarre2).filter { it.isNotBlank() }
+    Card(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Text(
+                article.designation.ifBlank { article.codeArticle },
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                listOf(article.codeArticle, codesBarres.joinToString(" / "))
+                    .filter { it.isNotBlank() }
+                    .joinToString(" · "),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
