@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.R
+import ma.bam.inventaire.ui.theme.BamAmber
 import ma.bam.inventaire.ui.theme.EcartRed
 import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.ui.theme.NotScannedGray
@@ -268,27 +270,52 @@ fun InventorySessionCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                if (item.counters.pendingEcarts > 0) {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50))
-                            .background(EcartRed.copy(alpha = 0.12f))
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.ErrorOutline,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = EcartRed
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            "${item.counters.pendingEcarts} écart${if (item.counters.pendingEcarts > 1) "s" else ""}",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = EcartRed,
-                            fontWeight = FontWeight.Medium
-                        )
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    if (item.counters.negativeStock > 0) {
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(BamAmber.copy(alpha = 0.15f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.TrendingDown,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = BamAmber
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                "${item.counters.negativeStock} négatif${if (item.counters.negativeStock > 1) "s" else ""}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = BamAmber,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                    if (item.counters.pendingEcarts > 0) {
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(EcartRed.copy(alpha = 0.12f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.ErrorOutline,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = EcartRed
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                "${item.counters.pendingEcarts} écart${if (item.counters.pendingEcarts > 1) "s" else ""}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = EcartRed,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
             }

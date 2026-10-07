@@ -27,7 +27,7 @@ sealed interface ScanDialogState {
 }
 
 data class ScanUiState(
-    val counters: SessionCounters = SessionCounters(0, 0, 0),
+    val counters: SessionCounters = SessionCounters(0, 0, 0, 0),
     val dialog: ScanDialogState = ScanDialogState.None,
     val finalized: Boolean = false
 )

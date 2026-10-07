@@ -46,7 +46,8 @@ interface InventoryRepository {
 data class SessionCounters(
     val total: Int,
     val scanned: Int,
-    val pendingEcarts: Int
+    val pendingEcarts: Int,
+    val negativeStock: Int
 )
 
 /** Article tel que décodé depuis le fichier Excel importé (export Sobrus), avant persistance. */

@@ -55,4 +55,7 @@ interface StockArticleDao {
 
     @Query("SELECT COUNT(*) FROM stock_article WHERE sessionId = :sessionId AND ecart IS NOT NULL AND ecart != 0 AND ecartValide = 0")
     suspend fun countPendingEcartsForSession(sessionId: String): Int
+
+    @Query("SELECT COUNT(*) FROM stock_article WHERE sessionId = :sessionId AND quantiteTheorique < 0")
+    suspend fun countNegativeStockForSession(sessionId: String): Int
 }
