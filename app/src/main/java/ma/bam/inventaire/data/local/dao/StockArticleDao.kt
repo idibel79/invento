@@ -47,4 +47,7 @@ interface StockArticleDao {
 
     @Query("SELECT COUNT(*) FROM stock_article WHERE sessionId = :sessionId AND quantiteTheorique < 0")
     suspend fun countNegativeStockForSession(sessionId: String): Int
+
+    @Query("SELECT COUNT(*) FROM stock_article WHERE sessionId = :sessionId AND quantiteTheorique = 0")
+    suspend fun countEmptyStockForSession(sessionId: String): Int
 }

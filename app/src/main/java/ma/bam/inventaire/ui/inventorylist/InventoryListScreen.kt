@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.HorizontalRule
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
 import androidx.compose.material.icons.filled.Schedule
@@ -266,12 +267,35 @@ fun InventorySessionCard(
                 )
             }
 
-            if (item.counters.negativeStock > 0 || item.counters.pendingEcarts > 0) {
+            if (item.counters.negativeStock > 0 || item.counters.emptyStock > 0 || item.counters.pendingEcarts > 0) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    if (item.counters.emptyStock > 0) {
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(50))
+                                .background(NotScannedGray.copy(alpha = 0.18f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.HorizontalRule,
+                                contentDescription = null,
+                                modifier = Modifier.size(14.dp),
+                                tint = NotScannedGray
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                "${item.counters.emptyStock} vide${if (item.counters.emptyStock > 1) "s" else ""}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = NotScannedGray,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
                     if (item.counters.negativeStock > 0) {
                         Row(
                             modifier = Modifier

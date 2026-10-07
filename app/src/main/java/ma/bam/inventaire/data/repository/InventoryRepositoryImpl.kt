@@ -117,11 +117,13 @@ class InventoryRepositoryImpl @Inject constructor(
         val scanned = articleDao.countScannedForSession(sessionId)
         val pending = articleDao.countPendingEcartsForSession(sessionId)
         val negativeStock = articleDao.countNegativeStockForSession(sessionId)
+        val emptyStock = articleDao.countEmptyStockForSession(sessionId)
         return SessionCounters(
             total = total,
             scanned = scanned,
             pendingEcarts = pending,
-            negativeStock = negativeStock
+            negativeStock = negativeStock,
+            emptyStock = emptyStock
         )
     }
 }
