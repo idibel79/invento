@@ -1,6 +1,5 @@
 package ma.bam.inventaire.ui.inventorydetail
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
@@ -17,10 +15,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
-import ma.bam.inventaire.ui.components.fadingEdge
 import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.util.formatQuantity
 
@@ -36,18 +32,11 @@ fun ArticleDetailDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            val titleScrollState = rememberScrollState()
             Text(
                 article.designation.ifBlank { article.codeArticle },
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = InProgressBlue,
-                maxLines = 1,
-                softWrap = false,
-                overflow = TextOverflow.Clip,
-                modifier = Modifier
-                    .fadingEdge(titleScrollState)
-                    .horizontalScroll(titleScrollState)
+                color = InProgressBlue
             )
         },
         text = {
