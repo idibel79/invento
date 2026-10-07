@@ -292,7 +292,7 @@ fun InventoryDetailScreen(
                     FilterChip(
                         selected = filter == ArticleFilter.VIDE,
                         onClick = { viewModel.setFilter(ArticleFilter.VIDE) },
-                        label = { Text("Vide") }
+                        label = { Text("Vides") }
                     )
                 }
             }
