@@ -363,7 +363,7 @@ private fun ArticleRow(
     val ecartColor = article.ecart?.let { if (it < 0) EcartRed else InProgressBlue }
     val statusColor = when {
         notScanned -> NotScannedGray
-        hasEcart -> ecartColor ?: MaterialTheme.colorScheme.error
+        hasEcart -> EcartRed
         else -> SuccessGreen
     }
 
@@ -441,7 +441,7 @@ private fun ArticleRow(
                             QuantityPill(
                                 label = "Écart",
                                 value = article.ecart?.let { formatQuantity(it, showSign = true) } ?: "-",
-                                color = statusColor
+                                color = ecartColor ?: statusColor
                             )
                         }
                     }
