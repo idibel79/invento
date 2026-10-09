@@ -96,8 +96,6 @@ fun InventoryDetailScreen(
     val categoryFilter by viewModel.categoryFilter.collectAsState()
     val availableCategories by viewModel.availableCategories.collectAsState()
     val availableTvas by viewModel.availableTvas.collectAsState()
-    val priceFilter by viewModel.priceFilter.collectAsState()
-    val availablePrices by viewModel.availablePrices.collectAsState()
     val sort by viewModel.sort.collectAsState()
     var editingArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
     var detailArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
@@ -197,7 +195,7 @@ fun InventoryDetailScreen(
                             Icon(
                                 imageVector = Icons.Filled.FilterAlt,
                                 contentDescription = "Filtrer",
-                                tint = if (positionFilter != null || categoryFilter != null || priceFilter != null) {
+                                tint = if (positionFilter != null || categoryFilter != null) {
                                     InProgressBlue
                                 } else {
                                     MaterialTheme.colorScheme.onSurfaceVariant
@@ -219,14 +217,11 @@ fun InventoryDetailScreen(
                                         onClick = {
                                             viewModel.setPositionFilter(null)
                                             viewModel.setCategoryFilter(null)
-                                            viewModel.setPriceFilter(null)
                                             showFilterMenu = false
                                         },
                                         leadingIcon = {
                                             PositionCheckSlot(
-                                                selected = positionFilter == null &&
-                                                    categoryFilter == null &&
-                                                    priceFilter == null
+                                                selected = positionFilter == null && categoryFilter == null
                                             )
                                         }
                                     )
@@ -244,12 +239,6 @@ fun InventoryDetailScreen(
                                         onClick = { filterSection = FilterSection.CATEGORIE },
                                         trailingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null) },
                                         colors = filterSectionItemColors(categoryFilter != null)
-                                    )
-                                    DropdownMenuItem(
-                                        text = { Text("Prix") },
-                                        onClick = { filterSection = FilterSection.PRIX },
-                                        trailingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null) },
-                                        colors = filterSectionItemColors(priceFilter != null)
                                     )
                                     DropdownMenuItem(
                                         text = { Text("Zones") },
@@ -307,32 +296,6 @@ fun InventoryDetailScreen(
                                                 showFilterMenu = false
                                             },
                                             leadingIcon = { PositionCheckSlot(selected = categoryFilter == category) }
-                                        )
-                                    }
-                                }
-                                FilterSection.PRIX -> {
-                                    DropdownMenuItem(
-                                        text = { Text("Prix", fontWeight = FontWeight.SemiBold) },
-                                        onClick = { filterSection = null },
-                                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
-                                    )
-                                    Divider()
-                                    DropdownMenuItem(
-                                        text = { Text("Tous les prix") },
-                                        onClick = {
-                                            viewModel.setPriceFilter(null)
-                                            showFilterMenu = false
-                                        },
-                                        leadingIcon = { PositionCheckSlot(selected = priceFilter == null) }
-                                    )
-                                    availablePrices.forEach { price ->
-                                        DropdownMenuItem(
-                                            text = { Text("${formatQuantity(price)} DH") },
-                                            onClick = {
-                                                viewModel.setPriceFilter(price)
-                                                showFilterMenu = false
-                                            },
-                                            leadingIcon = { PositionCheckSlot(selected = priceFilter == price) }
                                         )
                                     }
                                 }
@@ -505,7 +468,7 @@ private fun PositionCheckSlot(selected: Boolean) {
     }
 }
 
-private enum class FilterSection { ZONES, CATEGORIE, PRIX }
+private enum class FilterSection { ZONES, CATEGORIE }
 
 @Composable
 private fun filterSectionItemColors(active: Boolean): MenuItemColors {
