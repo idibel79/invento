@@ -18,7 +18,7 @@ import ma.bam.inventaire.ui.navigation.InventaireNavGraph
 import ma.bam.inventaire.ui.splash.SplashScreen
 import ma.bam.inventaire.ui.theme.InventaireTheme
 
-private const val SPLASH_DURATION_MS = 5000L
+private const val SPLASH_DURATION_MS = 3000L
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
