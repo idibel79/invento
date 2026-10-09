@@ -36,8 +36,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -96,6 +98,8 @@ fun InventoryDetailScreen(
     val categoryFilter by viewModel.categoryFilter.collectAsState()
     val availableCategories by viewModel.availableCategories.collectAsState()
     val availableTvas by viewModel.availableTvas.collectAsState()
+    val priceRangeFilter by viewModel.priceRangeFilter.collectAsState()
+    val priceBounds by viewModel.priceBounds.collectAsState()
     val sort by viewModel.sort.collectAsState()
     var editingArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
     var detailArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
@@ -195,7 +199,7 @@ fun InventoryDetailScreen(
                             Icon(
                                 imageVector = Icons.Filled.FilterAlt,
                                 contentDescription = "Filtrer",
-                                tint = if (positionFilter != null || categoryFilter != null) {
+                                tint = if (positionFilter != null || categoryFilter != null || priceRangeFilter != null) {
                                     InProgressBlue
                                 } else {
                                     MaterialTheme.colorScheme.onSurfaceVariant
@@ -217,11 +221,14 @@ fun InventoryDetailScreen(
                                         onClick = {
                                             viewModel.setPositionFilter(null)
                                             viewModel.setCategoryFilter(null)
+                                            viewModel.setPriceRangeFilter(null)
                                             showFilterMenu = false
                                         },
                                         leadingIcon = {
                                             PositionCheckSlot(
-                                                selected = positionFilter == null && categoryFilter == null
+                                                selected = positionFilter == null &&
+                                                    categoryFilter == null &&
+                                                    priceRangeFilter == null
                                             )
                                         }
                                     )
@@ -239,6 +246,12 @@ fun InventoryDetailScreen(
                                         onClick = { filterSection = FilterSection.CATEGORIE },
                                         trailingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null) },
                                         colors = filterSectionItemColors(categoryFilter != null)
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("Prix") },
+                                        onClick = { filterSection = FilterSection.PRIX },
+                                        trailingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null) },
+                                        colors = filterSectionItemColors(priceRangeFilter != null)
                                     )
                                     DropdownMenuItem(
                                         text = { Text("Zones") },
@@ -298,6 +311,22 @@ fun InventoryDetailScreen(
                                             leadingIcon = { PositionCheckSlot(selected = categoryFilter == category) }
                                         )
                                     }
+                                }
+                                FilterSection.PRIX -> {
+                                    DropdownMenuItem(
+                                        text = { Text("Prix", fontWeight = FontWeight.SemiBold) },
+                                        onClick = { filterSection = null },
+                                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
+                                    )
+                                    Divider()
+                                    PriceRangeFilterContent(
+                                        bounds = priceBounds,
+                                        currentRange = priceRangeFilter,
+                                        onApply = { range ->
+                                            viewModel.setPriceRangeFilter(range)
+                                            showFilterMenu = false
+                                        }
+                                    )
                                 }
                             }
                         }
@@ -468,12 +497,48 @@ private fun PositionCheckSlot(selected: Boolean) {
     }
 }
 
-private enum class FilterSection { ZONES, CATEGORIE }
+private enum class FilterSection { ZONES, CATEGORIE, PRIX }
 
 @Composable
 private fun filterSectionItemColors(active: Boolean): MenuItemColors {
     val color = if (active) InProgressBlue else MaterialTheme.colorScheme.onSurface
     return MenuDefaults.itemColors(textColor = color, trailingIconColor = color)
+}
+
+/** Slider min/max de prix pour le filtre. [bounds] a une portée nulle si la session n'a qu'un seul prix. */
+@Composable
+private fun PriceRangeFilterContent(
+    bounds: ClosedFloatingPointRange<Float>,
+    currentRange: ClosedFloatingPointRange<Float>?,
+    onApply: (ClosedFloatingPointRange<Float>?) -> Unit
+) {
+    var sliderValue by remember(bounds) { mutableStateOf(currentRange ?: bounds) }
+    Column(modifier = Modifier.width(260.dp).padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Text(
+            "${formatQuantity(sliderValue.start.toDouble())} DH – ${formatQuantity(sliderValue.endInclusive.toDouble())} DH",
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium
+        )
+        if (bounds.start < bounds.endInclusive) {
+            RangeSlider(
+                value = sliderValue,
+                onValueChange = { sliderValue = it },
+                valueRange = bounds
+            )
+        } else {
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(onClick = {
+                sliderValue = bounds
+                onApply(null)
+            }) { Text("Réinitialiser") }
+            TextButton(onClick = { onApply(sliderValue) }) { Text("Appliquer") }
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)

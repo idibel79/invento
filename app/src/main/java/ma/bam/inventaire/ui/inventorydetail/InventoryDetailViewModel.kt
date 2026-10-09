@@ -63,6 +63,10 @@ class InventoryDetailViewModel @Inject constructor(
     private val _categoryFilter = MutableStateFlow<String?>(null)
     val categoryFilter: StateFlow<String?> = _categoryFilter.asStateFlow()
 
+    /** Plage de prix (PPV) sélectionnée, ou null = tous les prix. */
+    private val _priceRangeFilter = MutableStateFlow<ClosedFloatingPointRange<Float>?>(null)
+    val priceRangeFilter: StateFlow<ClosedFloatingPointRange<Float>?> = _priceRangeFilter.asStateFlow()
+
     private val _sort = MutableStateFlow(ArticleSort.DEFAUT)
     val sort: StateFlow<ArticleSort> = _sort.asStateFlow()
 
@@ -84,11 +88,29 @@ class InventoryDetailViewModel @Inject constructor(
         .map { articles -> articles.map { it.tva }.filter { it.isNotBlank() }.distinct().sorted() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private val positionAndCategoryFilter: Flow<Pair<String?, String?>> =
-        combine(_positionFilter, _categoryFilter) { position, category -> position to category }
+    /** Bornes min/max des prix (PPV) de la session, pour le slider de filtre. */
+    val priceBounds: StateFlow<ClosedFloatingPointRange<Float>> = allArticles
+        .map { articles ->
+            val prices = articles.map { it.prixUnitaire.toFloat() }
+            val min = prices.minOrNull() ?: 0f
+            val max = prices.maxOrNull() ?: 0f
+            min..max
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0f..0f)
+
+    private data class FieldFilters(
+        val position: String?,
+        val category: String?,
+        val priceRange: ClosedFloatingPointRange<Float>?
+    )
+
+    private val fieldFilters: Flow<FieldFilters> =
+        combine(_positionFilter, _categoryFilter, _priceRangeFilter) { position, category, priceRange ->
+            FieldFilters(position, category, priceRange)
+        }
 
     val visibleArticles: StateFlow<List<StockArticleEntity>> =
-        combine(allArticles, _filter, _searchQuery, positionAndCategoryFilter, _sort) { articles, filter, query, (position, category), sort ->
+        combine(allArticles, _filter, _searchQuery, fieldFilters, _sort) { articles, filter, query, fields, sort ->
             var filtered = when (filter) {
                 ArticleFilter.TOUS -> articles
                 ArticleFilter.SCANNES -> articles.filter { it.quantiteReelle != null }
@@ -97,11 +119,14 @@ class InventoryDetailViewModel @Inject constructor(
                 ArticleFilter.NEGATIFS -> articles.filter { it.quantiteTheorique < 0 }
                 ArticleFilter.VIDE -> articles.filter { it.quantiteTheorique == 0.0 }
             }
-            if (position != null) {
-                filtered = filtered.filter { it.emplacement == position }
+            if (fields.position != null) {
+                filtered = filtered.filter { it.emplacement == fields.position }
             }
-            if (category != null) {
-                filtered = filtered.filter { it.categorie == category }
+            if (fields.category != null) {
+                filtered = filtered.filter { it.categorie == fields.category }
+            }
+            if (fields.priceRange != null) {
+                filtered = filtered.filter { it.prixUnitaire.toFloat() in fields.priceRange }
             }
             if (query.isNotBlank()) {
                 filtered = filtered.filter {
@@ -141,6 +166,10 @@ class InventoryDetailViewModel @Inject constructor(
 
     fun setCategoryFilter(category: String?) {
         _categoryFilter.value = category
+    }
+
+    fun setPriceRangeFilter(range: ClosedFloatingPointRange<Float>?) {
+        _priceRangeFilter.value = range
     }
 
     fun setSort(sort: ArticleSort) {
