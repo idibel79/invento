@@ -23,6 +23,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -38,6 +40,7 @@ import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -513,31 +516,88 @@ private fun PriceRangeFilterContent(
     onApply: (ClosedFloatingPointRange<Float>?) -> Unit
 ) {
     var sliderValue by remember(bounds) { mutableStateOf(currentRange ?: bounds) }
-    Column(modifier = Modifier.width(260.dp).padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(
-            "${formatQuantity(sliderValue.start.toDouble())} DH – ${formatQuantity(sliderValue.endInclusive.toDouble())} DH",
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium
-        )
+    Column(modifier = Modifier.width(280.dp).padding(horizontal = 16.dp, vertical = 12.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            PriceBadge(sliderValue.start)
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                modifier = Modifier.size(14.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            PriceBadge(sliderValue.endInclusive)
+        }
         if (bounds.start < bounds.endInclusive) {
+            Spacer(modifier = Modifier.height(4.dp))
             RangeSlider(
                 value = sliderValue,
                 onValueChange = { sliderValue = it },
-                valueRange = bounds
+                valueRange = bounds,
+                colors = SliderDefaults.colors(
+                    thumbColor = InProgressBlue,
+                    activeTrackColor = InProgressBlue,
+                    inactiveTrackColor = InProgressBlue.copy(alpha = 0.2f)
+                )
             )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    "${formatQuantity(bounds.start.toDouble())} DH",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    "${formatQuantity(bounds.endInclusive.toDouble())} DH",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         } else {
             Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "Un seul prix disponible",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
+        Spacer(modifier = Modifier.height(8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             TextButton(onClick = {
                 sliderValue = bounds
                 onApply(null)
             }) { Text("Réinitialiser") }
-            TextButton(onClick = { onApply(sliderValue) }) { Text("Appliquer") }
+            Button(
+                onClick = { onApply(sliderValue) },
+                colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen)
+            ) { Text("Appliquer") }
         }
+    }
+}
+
+@Composable
+private fun PriceBadge(value: Float) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(InProgressBlue.copy(alpha = 0.12f))
+            .padding(horizontal = 10.dp, vertical = 4.dp)
+    ) {
+        Text(
+            "${formatQuantity(value.toDouble())} DH",
+            style = MaterialTheme.typography.labelMedium,
+            color = InProgressBlue,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 
