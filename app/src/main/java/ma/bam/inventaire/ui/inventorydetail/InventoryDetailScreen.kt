@@ -72,10 +72,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ma.bam.inventaire.R
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.domain.EcartCalculator
+import ma.bam.inventaire.ui.components.SingleLineAutoSizeText
 import ma.bam.inventaire.ui.components.fadingEdge
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
 import ma.bam.inventaire.ui.theme.EcartRed
@@ -215,7 +217,9 @@ fun InventoryDetailScreen(
                                 showFilterMenu = false
                                 filterSection = null
                             },
-                            modifier = Modifier.heightIn(max = 420.dp)
+                            modifier = Modifier
+                                .width(280.dp)
+                                .heightIn(max = 420.dp)
                         ) {
                             when (filterSection) {
                                 null -> {
@@ -516,7 +520,7 @@ private fun PriceRangeFilterContent(
     onApply: (ClosedFloatingPointRange<Float>?) -> Unit
 ) {
     var sliderValue by remember(bounds) { mutableStateOf(currentRange ?: bounds) }
-    Column(modifier = Modifier.width(280.dp).padding(horizontal = 16.dp, vertical = 12.dp)) {
+    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -586,17 +590,28 @@ private fun PriceRangeFilterContent(
 
 @Composable
 private fun PriceBadge(value: Float) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(InProgressBlue.copy(alpha = 0.12f))
-            .padding(horizontal = 10.dp, vertical = 4.dp)
-    ) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .clip(CircleShape)
+                .background(InProgressBlue.copy(alpha = 0.12f)),
+            contentAlignment = Alignment.Center
+        ) {
+            SingleLineAutoSizeText(
+                text = formatQuantity(value.toDouble()),
+                modifier = Modifier.padding(horizontal = 6.dp),
+                style = MaterialTheme.typography.labelLarge,
+                color = InProgressBlue,
+                fontWeight = FontWeight.SemiBold,
+                minFontSize = 9.sp
+            )
+        }
+        Spacer(modifier = Modifier.height(2.dp))
         Text(
-            "${formatQuantity(value.toDouble())} DH",
-            style = MaterialTheme.typography.labelMedium,
-            color = InProgressBlue,
-            fontWeight = FontWeight.Medium
+            "DH",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
