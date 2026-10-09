@@ -63,6 +63,10 @@ class InventoryDetailViewModel @Inject constructor(
     private val _categoryFilter = MutableStateFlow<String?>(null)
     val categoryFilter: StateFlow<String?> = _categoryFilter.asStateFlow()
 
+    /** Prix (PPV) sélectionné, ou null = tous les prix. */
+    private val _priceFilter = MutableStateFlow<Double?>(null)
+    val priceFilter: StateFlow<Double?> = _priceFilter.asStateFlow()
+
     private val _sort = MutableStateFlow(ArticleSort.DEFAUT)
     val sort: StateFlow<ArticleSort> = _sort.asStateFlow()
 
@@ -84,11 +88,19 @@ class InventoryDetailViewModel @Inject constructor(
         .map { articles -> articles.map { it.tva }.filter { it.isNotBlank() }.distinct().sorted() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    private val positionAndCategoryFilter: Flow<Pair<String?, String?>> =
-        combine(_positionFilter, _categoryFilter) { position, category -> position to category }
+    val availablePrices: StateFlow<List<Double>> = allArticles
+        .map { articles -> articles.map { it.prixUnitaire }.distinct().sorted() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    private data class FieldFilters(val position: String?, val category: String?, val price: Double?)
+
+    private val fieldFilters: Flow<FieldFilters> =
+        combine(_positionFilter, _categoryFilter, _priceFilter) { position, category, price ->
+            FieldFilters(position, category, price)
+        }
 
     val visibleArticles: StateFlow<List<StockArticleEntity>> =
-        combine(allArticles, _filter, _searchQuery, positionAndCategoryFilter, _sort) { articles, filter, query, (position, category), sort ->
+        combine(allArticles, _filter, _searchQuery, fieldFilters, _sort) { articles, filter, query, fields, sort ->
             var filtered = when (filter) {
                 ArticleFilter.TOUS -> articles
                 ArticleFilter.SCANNES -> articles.filter { it.quantiteReelle != null }
@@ -97,11 +109,14 @@ class InventoryDetailViewModel @Inject constructor(
                 ArticleFilter.NEGATIFS -> articles.filter { it.quantiteTheorique < 0 }
                 ArticleFilter.VIDE -> articles.filter { it.quantiteTheorique == 0.0 }
             }
-            if (position != null) {
-                filtered = filtered.filter { it.emplacement == position }
+            if (fields.position != null) {
+                filtered = filtered.filter { it.emplacement == fields.position }
             }
-            if (category != null) {
-                filtered = filtered.filter { it.categorie == category }
+            if (fields.category != null) {
+                filtered = filtered.filter { it.categorie == fields.category }
+            }
+            if (fields.price != null) {
+                filtered = filtered.filter { it.prixUnitaire == fields.price }
             }
             if (query.isNotBlank()) {
                 filtered = filtered.filter {
@@ -141,6 +156,10 @@ class InventoryDetailViewModel @Inject constructor(
 
     fun setCategoryFilter(category: String?) {
         _categoryFilter.value = category
+    }
+
+    fun setPriceFilter(price: Double?) {
+        _priceFilter.value = price
     }
 
     fun setSort(sort: ArticleSort) {

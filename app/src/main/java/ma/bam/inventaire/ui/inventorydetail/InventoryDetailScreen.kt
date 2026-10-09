@@ -39,7 +39,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -94,11 +93,12 @@ fun InventoryDetailScreen(
     val categoryFilter by viewModel.categoryFilter.collectAsState()
     val availableCategories by viewModel.availableCategories.collectAsState()
     val availableTvas by viewModel.availableTvas.collectAsState()
+    val priceFilter by viewModel.priceFilter.collectAsState()
+    val availablePrices by viewModel.availablePrices.collectAsState()
     val sort by viewModel.sort.collectAsState()
     var editingArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
     var detailArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
-    var showPositionMenu by remember { mutableStateOf(false) }
-    var showCategoryMenu by remember { mutableStateOf(false) }
+    var showFilterMenu by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
     var showCreateDialog by remember { mutableStateOf(false) }
     val locked = session?.verrouille == true
@@ -184,17 +184,21 @@ fun InventoryDetailScreen(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box {
-                        IconButton(onClick = { showPositionMenu = true }) {
+                        IconButton(onClick = { showFilterMenu = true }) {
                             Icon(
                                 imageVector = Icons.Filled.FilterAlt,
-                                contentDescription = "Filtrer par zones",
-                                tint = if (positionFilter != null) InProgressBlue else MaterialTheme.colorScheme.onSurfaceVariant
+                                contentDescription = "Filtrer",
+                                tint = if (positionFilter != null || categoryFilter != null || priceFilter != null) {
+                                    InProgressBlue
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                }
                             )
                         }
                         DropdownMenu(
-                            expanded = showPositionMenu,
-                            onDismissRequest = { showPositionMenu = false },
-                            modifier = Modifier.heightIn(max = 320.dp)
+                            expanded = showFilterMenu,
+                            onDismissRequest = { showFilterMenu = false },
+                            modifier = Modifier.heightIn(max = 420.dp)
                         ) {
                             Text(
                                 "Filtrer par zones",
@@ -208,7 +212,7 @@ fun InventoryDetailScreen(
                                 text = { Text("Toutes les zones") },
                                 onClick = {
                                     viewModel.setPositionFilter(null)
-                                    showPositionMenu = false
+                                    showFilterMenu = false
                                 },
                                 leadingIcon = { PositionCheckSlot(selected = positionFilter == null) }
                             )
@@ -217,27 +221,13 @@ fun InventoryDetailScreen(
                                     text = { Text(position) },
                                     onClick = {
                                         viewModel.setPositionFilter(position)
-                                        showPositionMenu = false
+                                        showFilterMenu = false
                                     },
                                     leadingIcon = { PositionCheckSlot(selected = positionFilter == position) }
                                 )
                             }
-                            Spacer(modifier = Modifier.height(4.dp))
-                        }
-                    }
-                    Box {
-                        IconButton(onClick = { showCategoryMenu = true }) {
-                            Icon(
-                                imageVector = Icons.Filled.Category,
-                                contentDescription = "Filtrer par catégorie",
-                                tint = if (categoryFilter != null) InProgressBlue else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = showCategoryMenu,
-                            onDismissRequest = { showCategoryMenu = false },
-                            modifier = Modifier.heightIn(max = 320.dp)
-                        ) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Divider()
                             Text(
                                 "Filtrer par catégorie",
                                 style = MaterialTheme.typography.labelLarge,
@@ -250,7 +240,7 @@ fun InventoryDetailScreen(
                                 text = { Text("Toutes les catégories") },
                                 onClick = {
                                     viewModel.setCategoryFilter(null)
-                                    showCategoryMenu = false
+                                    showFilterMenu = false
                                 },
                                 leadingIcon = { PositionCheckSlot(selected = categoryFilter == null) }
                             )
@@ -259,9 +249,37 @@ fun InventoryDetailScreen(
                                     text = { Text(category) },
                                     onClick = {
                                         viewModel.setCategoryFilter(category)
-                                        showCategoryMenu = false
+                                        showFilterMenu = false
                                     },
                                     leadingIcon = { PositionCheckSlot(selected = categoryFilter == category) }
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Divider()
+                            Text(
+                                "Filtrer par prix",
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                            Divider()
+                            DropdownMenuItem(
+                                text = { Text("Tous les prix") },
+                                onClick = {
+                                    viewModel.setPriceFilter(null)
+                                    showFilterMenu = false
+                                },
+                                leadingIcon = { PositionCheckSlot(selected = priceFilter == null) }
+                            )
+                            availablePrices.forEach { price ->
+                                DropdownMenuItem(
+                                    text = { Text("${formatQuantity(price)} DH") },
+                                    onClick = {
+                                        viewModel.setPriceFilter(price)
+                                        showFilterMenu = false
+                                    },
+                                    leadingIcon = { PositionCheckSlot(selected = priceFilter == price) }
                                 )
                             }
                             Spacer(modifier = Modifier.height(4.dp))
