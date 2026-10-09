@@ -257,6 +257,22 @@ fun InventoryDetailScreen(
                                 },
                                 leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.TITRE_ZA) }
                             )
+                            DropdownMenuItem(
+                                text = { Text("Prix") },
+                                onClick = {
+                                    viewModel.setSort(ArticleSort.PRIX)
+                                    showSortMenu = false
+                                },
+                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.PRIX) }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Quantité") },
+                                onClick = {
+                                    viewModel.setSort(ArticleSort.QUANTITE)
+                                    showSortMenu = false
+                                },
+                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.QUANTITE) }
+                            )
                         }
                     }
                 }
