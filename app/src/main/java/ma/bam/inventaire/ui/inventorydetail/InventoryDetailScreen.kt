@@ -33,12 +33,15 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -99,6 +102,7 @@ fun InventoryDetailScreen(
     var editingArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
     var detailArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
     var showFilterMenu by remember { mutableStateOf(false) }
+    var filterSection by remember { mutableStateOf<FilterSection?>(null) }
     var showSortMenu by remember { mutableStateOf(false) }
     var showCreateDialog by remember { mutableStateOf(false) }
     val locked = session?.verrouille == true
@@ -184,7 +188,12 @@ fun InventoryDetailScreen(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box {
-                        IconButton(onClick = { showFilterMenu = true }) {
+                        IconButton(
+                            onClick = {
+                                filterSection = null
+                                showFilterMenu = true
+                            }
+                        ) {
                             Icon(
                                 imageVector = Icons.Filled.FilterAlt,
                                 contentDescription = "Filtrer",
@@ -197,92 +206,137 @@ fun InventoryDetailScreen(
                         }
                         DropdownMenu(
                             expanded = showFilterMenu,
-                            onDismissRequest = { showFilterMenu = false },
+                            onDismissRequest = {
+                                showFilterMenu = false
+                                filterSection = null
+                            },
                             modifier = Modifier.heightIn(max = 420.dp)
                         ) {
-                            Text(
-                                "Filtrer par zones",
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                            Divider()
-                            DropdownMenuItem(
-                                text = { Text("Toutes les zones") },
-                                onClick = {
-                                    viewModel.setPositionFilter(null)
-                                    showFilterMenu = false
-                                },
-                                leadingIcon = { PositionCheckSlot(selected = positionFilter == null) }
-                            )
-                            availablePositions.forEach { position ->
-                                DropdownMenuItem(
-                                    text = { Text(position) },
-                                    onClick = {
-                                        viewModel.setPositionFilter(position)
-                                        showFilterMenu = false
-                                    },
-                                    leadingIcon = { PositionCheckSlot(selected = positionFilter == position) }
-                                )
+                            when (filterSection) {
+                                null -> {
+                                    DropdownMenuItem(
+                                        text = { Text("Tous") },
+                                        onClick = {
+                                            viewModel.setPositionFilter(null)
+                                            viewModel.setCategoryFilter(null)
+                                            viewModel.setPriceFilter(null)
+                                            showFilterMenu = false
+                                        },
+                                        leadingIcon = {
+                                            PositionCheckSlot(
+                                                selected = positionFilter == null &&
+                                                    categoryFilter == null &&
+                                                    priceFilter == null
+                                            )
+                                        }
+                                    )
+                                    Divider()
+                                    Text(
+                                        "Filtrer par",
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                    )
+                                    Divider()
+                                    DropdownMenuItem(
+                                        text = { Text("Catégories") },
+                                        onClick = { filterSection = FilterSection.CATEGORIE },
+                                        trailingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null) },
+                                        colors = filterSectionItemColors(categoryFilter != null)
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("Prix") },
+                                        onClick = { filterSection = FilterSection.PRIX },
+                                        trailingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null) },
+                                        colors = filterSectionItemColors(priceFilter != null)
+                                    )
+                                    DropdownMenuItem(
+                                        text = { Text("Zones") },
+                                        onClick = { filterSection = FilterSection.ZONES },
+                                        trailingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null) },
+                                        colors = filterSectionItemColors(positionFilter != null)
+                                    )
+                                }
+                                FilterSection.ZONES -> {
+                                    DropdownMenuItem(
+                                        text = { Text("Zones", fontWeight = FontWeight.SemiBold) },
+                                        onClick = { filterSection = null },
+                                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
+                                    )
+                                    Divider()
+                                    DropdownMenuItem(
+                                        text = { Text("Toutes les zones") },
+                                        onClick = {
+                                            viewModel.setPositionFilter(null)
+                                            showFilterMenu = false
+                                        },
+                                        leadingIcon = { PositionCheckSlot(selected = positionFilter == null) }
+                                    )
+                                    availablePositions.forEach { position ->
+                                        DropdownMenuItem(
+                                            text = { Text(position) },
+                                            onClick = {
+                                                viewModel.setPositionFilter(position)
+                                                showFilterMenu = false
+                                            },
+                                            leadingIcon = { PositionCheckSlot(selected = positionFilter == position) }
+                                        )
+                                    }
+                                }
+                                FilterSection.CATEGORIE -> {
+                                    DropdownMenuItem(
+                                        text = { Text("Catégories", fontWeight = FontWeight.SemiBold) },
+                                        onClick = { filterSection = null },
+                                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
+                                    )
+                                    Divider()
+                                    DropdownMenuItem(
+                                        text = { Text("Toutes les catégories") },
+                                        onClick = {
+                                            viewModel.setCategoryFilter(null)
+                                            showFilterMenu = false
+                                        },
+                                        leadingIcon = { PositionCheckSlot(selected = categoryFilter == null) }
+                                    )
+                                    availableCategories.forEach { category ->
+                                        DropdownMenuItem(
+                                            text = { Text(category) },
+                                            onClick = {
+                                                viewModel.setCategoryFilter(category)
+                                                showFilterMenu = false
+                                            },
+                                            leadingIcon = { PositionCheckSlot(selected = categoryFilter == category) }
+                                        )
+                                    }
+                                }
+                                FilterSection.PRIX -> {
+                                    DropdownMenuItem(
+                                        text = { Text("Prix", fontWeight = FontWeight.SemiBold) },
+                                        onClick = { filterSection = null },
+                                        leadingIcon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) }
+                                    )
+                                    Divider()
+                                    DropdownMenuItem(
+                                        text = { Text("Tous les prix") },
+                                        onClick = {
+                                            viewModel.setPriceFilter(null)
+                                            showFilterMenu = false
+                                        },
+                                        leadingIcon = { PositionCheckSlot(selected = priceFilter == null) }
+                                    )
+                                    availablePrices.forEach { price ->
+                                        DropdownMenuItem(
+                                            text = { Text("${formatQuantity(price)} DH") },
+                                            onClick = {
+                                                viewModel.setPriceFilter(price)
+                                                showFilterMenu = false
+                                            },
+                                            leadingIcon = { PositionCheckSlot(selected = priceFilter == price) }
+                                        )
+                                    }
+                                }
                             }
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Divider()
-                            Text(
-                                "Filtrer par catégorie",
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                            Divider()
-                            DropdownMenuItem(
-                                text = { Text("Toutes les catégories") },
-                                onClick = {
-                                    viewModel.setCategoryFilter(null)
-                                    showFilterMenu = false
-                                },
-                                leadingIcon = { PositionCheckSlot(selected = categoryFilter == null) }
-                            )
-                            availableCategories.forEach { category ->
-                                DropdownMenuItem(
-                                    text = { Text(category) },
-                                    onClick = {
-                                        viewModel.setCategoryFilter(category)
-                                        showFilterMenu = false
-                                    },
-                                    leadingIcon = { PositionCheckSlot(selected = categoryFilter == category) }
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Divider()
-                            Text(
-                                "Filtrer par prix",
-                                style = MaterialTheme.typography.labelLarge,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                            Divider()
-                            DropdownMenuItem(
-                                text = { Text("Tous les prix") },
-                                onClick = {
-                                    viewModel.setPriceFilter(null)
-                                    showFilterMenu = false
-                                },
-                                leadingIcon = { PositionCheckSlot(selected = priceFilter == null) }
-                            )
-                            availablePrices.forEach { price ->
-                                DropdownMenuItem(
-                                    text = { Text("${formatQuantity(price)} DH") },
-                                    onClick = {
-                                        viewModel.setPriceFilter(price)
-                                        showFilterMenu = false
-                                    },
-                                    leadingIcon = { PositionCheckSlot(selected = priceFilter == price) }
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(4.dp))
                         }
                     }
                     Box {
@@ -449,6 +503,14 @@ private fun PositionCheckSlot(selected: Boolean) {
     } else {
         Spacer(modifier = Modifier.size(24.dp))
     }
+}
+
+private enum class FilterSection { ZONES, CATEGORIE, PRIX }
+
+@Composable
+private fun filterSectionItemColors(active: Boolean): MenuItemColors {
+    val color = if (active) InProgressBlue else MaterialTheme.colorScheme.onSurface
+    return MenuDefaults.itemColors(textColor = color, trailingIconColor = color)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
