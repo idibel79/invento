@@ -14,8 +14,8 @@ android {
         applicationId = "ma.bam.inventaire"
         minSdk = 24
         targetSdk = 35
-        versionCode = 93
-        versionName = "2.6.28"
+        versionCode = 94
+        versionName = "2.6.29"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

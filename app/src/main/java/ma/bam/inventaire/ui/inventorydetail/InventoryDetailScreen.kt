@@ -72,12 +72,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ma.bam.inventaire.R
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.domain.EcartCalculator
-import ma.bam.inventaire.ui.components.SingleLineAutoSizeText
 import ma.bam.inventaire.ui.components.fadingEdge
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
 import ma.bam.inventaire.ui.theme.EcartRed
@@ -513,6 +511,7 @@ private fun filterSectionItemColors(active: Boolean): MenuItemColors {
 }
 
 /** Slider min/max de prix pour le filtre. [bounds] a une portée nulle si la session n'a qu'un seul prix. */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PriceRangeFilterContent(
     bounds: ClosedFloatingPointRange<Float>,
@@ -545,7 +544,9 @@ private fun PriceRangeFilterContent(
                     thumbColor = InProgressBlue,
                     activeTrackColor = InProgressBlue,
                     inactiveTrackColor = InProgressBlue.copy(alpha = 0.2f)
-                )
+                ),
+                startThumb = { CircleThumb() },
+                endThumb = { CircleThumb() }
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -590,30 +591,30 @@ private fun PriceRangeFilterContent(
 
 @Composable
 private fun PriceBadge(value: Float) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(
-            modifier = Modifier
-                .size(56.dp)
-                .clip(CircleShape)
-                .background(InProgressBlue.copy(alpha = 0.12f)),
-            contentAlignment = Alignment.Center
-        ) {
-            SingleLineAutoSizeText(
-                text = formatQuantity(value.toDouble()),
-                modifier = Modifier.padding(horizontal = 6.dp),
-                style = MaterialTheme.typography.labelLarge,
-                color = InProgressBlue,
-                fontWeight = FontWeight.SemiBold,
-                minFontSize = 9.sp
-            )
-        }
-        Spacer(modifier = Modifier.height(2.dp))
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(InProgressBlue.copy(alpha = 0.12f))
+            .padding(horizontal = 10.dp, vertical = 4.dp)
+    ) {
         Text(
-            "DH",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            "${formatQuantity(value.toDouble())} DH",
+            style = MaterialTheme.typography.labelMedium,
+            color = InProgressBlue,
+            fontWeight = FontWeight.Medium
         )
     }
+}
+
+/** Pouce rond pour le slider de prix (au lieu de la barre par défaut de Material 3). */
+@Composable
+private fun CircleThumb() {
+    Box(
+        modifier = Modifier
+            .size(20.dp)
+            .clip(CircleShape)
+            .background(InProgressBlue)
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
