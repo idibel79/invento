@@ -42,29 +42,31 @@ class InventoryRepositoryImpl @Inject constructor(
         )
         sessionDao.insert(session)
 
-        articleDao.insertAll(
-            articles.map { imported ->
-                StockArticleEntity(
-                    sessionId = session.id,
-                    codeArticle = imported.codeArticle,
-                    designation = imported.designation,
-                    categorie = imported.categorie,
-                    tva = imported.tva,
-                    emplacement = imported.emplacement,
-                    quantiteTheorique = imported.quantiteTheorique,
-                    datePeremption = imported.datePeremption,
-                    stockMin = imported.stockMin,
-                    stockMax = imported.stockMax,
-                    codeBarre1 = imported.codeBarre1,
-                    codeBarre2 = imported.codeBarre2,
-                    prixUnitaire = imported.prixUnitaire,
-                    pph = imported.pph,
-                    dateImport = imported.dateImport
-                )
-            }
-        )
+        articleDao.insertAll(articles.map { it.toEntity(session.id) })
         return session
     }
+
+    override suspend fun addArticle(sessionId: String, article: ImportedArticle) {
+        articleDao.insert(article.toEntity(sessionId))
+    }
+
+    private fun ImportedArticle.toEntity(sessionId: String) = StockArticleEntity(
+        sessionId = sessionId,
+        codeArticle = codeArticle,
+        designation = designation,
+        categorie = categorie,
+        tva = tva,
+        emplacement = emplacement,
+        quantiteTheorique = quantiteTheorique,
+        datePeremption = datePeremption,
+        stockMin = stockMin,
+        stockMax = stockMax,
+        codeBarre1 = codeBarre1,
+        codeBarre2 = codeBarre2,
+        prixUnitaire = prixUnitaire,
+        pph = pph,
+        dateImport = dateImport
+    )
 
     override suspend fun findArticleByCode(
         sessionId: String,

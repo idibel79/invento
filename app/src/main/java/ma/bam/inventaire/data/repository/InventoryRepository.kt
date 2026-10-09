@@ -19,6 +19,9 @@ interface InventoryRepository {
 
     suspend fun createSession(fileName: String, articles: List<ImportedArticle>): InventorySessionEntity
 
+    /** Ajoute manuellement un article à une session existante (page des produits). */
+    suspend fun addArticle(sessionId: String, article: ImportedArticle)
+
     /** Recherche un article par code-barres scanné ou par code_article saisi manuellement. */
     suspend fun findArticleByCode(sessionId: String, code: String): StockArticleEntity?
 

@@ -24,6 +24,7 @@ import kotlinx.coroutines.withContext
 import ma.bam.inventaire.data.local.entity.InventorySessionEntity
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.data.repository.ExcelImportExportRepository
+import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.data.repository.InventoryRepository
 import java.io.File
 import java.io.FileOutputStream
@@ -77,6 +78,10 @@ class InventoryDetailViewModel @Inject constructor(
 
     val availableCategories: StateFlow<List<String>> = allArticles
         .map { articles -> articles.map { it.categorie }.filter { it.isNotBlank() }.distinct().sorted() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val availableTvas: StateFlow<List<String>> = allArticles
+        .map { articles -> articles.map { it.tva }.filter { it.isNotBlank() }.distinct().sorted() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val positionAndCategoryFilter: Flow<Pair<String?, String?>> =
@@ -145,6 +150,12 @@ class InventoryDetailViewModel @Inject constructor(
     fun updateQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean) {
         viewModelScope.launch {
             repository.updateQuantity(articleId, quantiteReelle, ecartValide)
+        }
+    }
+
+    fun createArticle(article: ImportedArticle) {
+        viewModelScope.launch {
+            repository.addArticle(sessionId, article)
         }
     }
 

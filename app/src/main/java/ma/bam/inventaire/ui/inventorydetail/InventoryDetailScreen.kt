@@ -93,12 +93,14 @@ fun InventoryDetailScreen(
     val availablePositions by viewModel.availablePositions.collectAsState()
     val categoryFilter by viewModel.categoryFilter.collectAsState()
     val availableCategories by viewModel.availableCategories.collectAsState()
+    val availableTvas by viewModel.availableTvas.collectAsState()
     val sort by viewModel.sort.collectAsState()
     var editingArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
     var detailArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
     var showPositionMenu by remember { mutableStateOf(false) }
     var showCategoryMenu by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
+    var showCreateDialog by remember { mutableStateOf(false) }
     val locked = session?.verrouille == true
 
     LaunchedEffect(Unit) {
@@ -127,6 +129,13 @@ fun InventoryDetailScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { showCreateDialog = true }, enabled = !locked) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_add_product),
+                            contentDescription = "Créer un produit",
+                            tint = if (locked) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                     IconButton(onClick = { viewModel.exportCurrentSession() }) {
                         Icon(Icons.Default.Share, contentDescription = "Exporter")
                     }
@@ -397,6 +406,19 @@ fun InventoryDetailScreen(
         ArticleDetailDialog(
             article = article,
             onDismiss = { detailArticle = null }
+        )
+    }
+
+    if (showCreateDialog) {
+        CreateArticleDialog(
+            availableCategories = availableCategories,
+            availableTvas = availableTvas,
+            availableZones = availablePositions,
+            onDismiss = { showCreateDialog = false },
+            onConfirm = { article ->
+                viewModel.createArticle(article)
+                showCreateDialog = false
+            }
         )
     }
 }
