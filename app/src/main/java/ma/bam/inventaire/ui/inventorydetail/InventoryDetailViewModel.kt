@@ -13,6 +13,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -53,9 +54,13 @@ class InventoryDetailViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
-    /** Position (emplacement) sélectionnée, ou null = toutes les positions. */
+    /** Position (emplacement) sélectionnée, ou null = toutes les zones. */
     private val _positionFilter = MutableStateFlow<String?>(null)
     val positionFilter: StateFlow<String?> = _positionFilter.asStateFlow()
+
+    /** Catégorie sélectionnée, ou null = toutes les catégories. */
+    private val _categoryFilter = MutableStateFlow<String?>(null)
+    val categoryFilter: StateFlow<String?> = _categoryFilter.asStateFlow()
 
     private val _sort = MutableStateFlow(ArticleSort.DEFAUT)
     val sort: StateFlow<ArticleSort> = _sort.asStateFlow()
@@ -70,8 +75,15 @@ class InventoryDetailViewModel @Inject constructor(
         .map { articles -> articles.map { it.emplacement }.filter { it.isNotBlank() }.distinct().sorted() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val availableCategories: StateFlow<List<String>> = allArticles
+        .map { articles -> articles.map { it.categorie }.filter { it.isNotBlank() }.distinct().sorted() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    private val positionAndCategoryFilter: Flow<Pair<String?, String?>> =
+        combine(_positionFilter, _categoryFilter) { position, category -> position to category }
+
     val visibleArticles: StateFlow<List<StockArticleEntity>> =
-        combine(allArticles, _filter, _searchQuery, _positionFilter, _sort) { articles, filter, query, position, sort ->
+        combine(allArticles, _filter, _searchQuery, positionAndCategoryFilter, _sort) { articles, filter, query, (position, category), sort ->
             var filtered = when (filter) {
                 ArticleFilter.TOUS -> articles
                 ArticleFilter.SCANNES -> articles.filter { it.quantiteReelle != null }
@@ -82,6 +94,9 @@ class InventoryDetailViewModel @Inject constructor(
             }
             if (position != null) {
                 filtered = filtered.filter { it.emplacement == position }
+            }
+            if (category != null) {
+                filtered = filtered.filter { it.categorie == category }
             }
             if (query.isNotBlank()) {
                 filtered = filtered.filter {
@@ -117,6 +132,10 @@ class InventoryDetailViewModel @Inject constructor(
 
     fun setPositionFilter(position: String?) {
         _positionFilter.value = position
+    }
+
+    fun setCategoryFilter(category: String?) {
+        _categoryFilter.value = category
     }
 
     fun setSort(sort: ArticleSort) {
