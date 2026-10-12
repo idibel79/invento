@@ -82,7 +82,7 @@ fun HomeScreen(
                 Image(
                     painter = painterResource(id = R.drawable.logo_invento_transparent),
                     contentDescription = "Invento",
-                    modifier = Modifier.width(120.dp)
+                    modifier = Modifier.width(180.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
