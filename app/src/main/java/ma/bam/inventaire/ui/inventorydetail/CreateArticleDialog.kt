@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -21,7 +22,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.data.repository.ImportedArticle
+import ma.bam.inventaire.ui.components.StaticLabelTextField
 import ma.bam.inventaire.ui.theme.SuccessGreen
 import ma.bam.inventaire.util.formatQuantity
 
@@ -87,37 +88,41 @@ fun CreateArticleDialog(
                     .heightIn(max = 420.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                OutlinedTextField(
+                StaticLabelTextField(
                     value = designation,
                     onValueChange = { designation = it },
-                    placeholder = { Text("Titre du produit") },
+                    label = "Titre du produit",
+                    containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     isError = showErrors && designation.isBlank(),
                     modifier = Modifier.fillMaxWidth()
                 )
                 FieldSpacer()
-                OutlinedTextField(
+                StaticLabelTextField(
                     value = codeArticle,
                     onValueChange = { codeArticle = it },
-                    placeholder = { Text("Code article (PID)") },
+                    label = "Code article (PID)",
+                    containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     isError = showErrors && codeArticle.isBlank(),
                     modifier = Modifier.fillMaxWidth()
                 )
                 FieldSpacer()
-                OutlinedTextField(
+                StaticLabelTextField(
                     value = codeBarre1,
                     onValueChange = { codeBarre1 = it },
-                    placeholder = { Text("Code-barres 1") },
+                    label = "Code-barres 1",
+                    containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     isError = showErrors && codeBarre1.isBlank(),
                     modifier = Modifier.fillMaxWidth()
                 )
                 FieldSpacer()
-                OutlinedTextField(
+                StaticLabelTextField(
                     value = codeBarre2,
                     onValueChange = { codeBarre2 = it },
-                    placeholder = { Text("Code-barres 2 (optionnel)") },
+                    label = "Code-barres 2 (optionnel)",
+                    containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -146,38 +151,42 @@ fun CreateArticleDialog(
                     isError = showErrors && zone == null
                 )
                 FieldSpacer()
-                OutlinedTextField(
+                StaticLabelTextField(
                     value = quantiteText,
                     onValueChange = { quantiteText = it },
-                    placeholder = { Text("Quantité système (optionnel)") },
+                    label = "Quantité système (optionnel)",
+                    containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.fillMaxWidth()
                 )
                 FieldSpacer()
-                OutlinedTextField(
+                StaticLabelTextField(
                     value = quantiteInventaireText,
                     onValueChange = { quantiteInventaireText = it },
-                    placeholder = { Text("Quantité inventaire (optionnel)") },
+                    label = "Quantité inventaire (optionnel)",
+                    containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.fillMaxWidth()
                 )
                 FieldSpacer()
-                OutlinedTextField(
+                StaticLabelTextField(
                     value = prixText,
                     onValueChange = { prixText = it },
-                    placeholder = { Text("PPV") },
+                    label = "PPV",
+                    containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = showErrors && prix == null,
                     modifier = Modifier.fillMaxWidth()
                 )
                 FieldSpacer()
-                OutlinedTextField(
+                StaticLabelTextField(
                     value = pphText,
                     onValueChange = { pphText = it },
-                    placeholder = { Text("PPH") },
+                    label = "PPH",
+                    containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = showErrors && pph == null,
@@ -284,11 +293,12 @@ private fun DropdownField(
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxWidth()) {
-        OutlinedTextField(
+        StaticLabelTextField(
             value = selected.orEmpty(),
             onValueChange = {},
+            label = label,
+            containerColor = AlertDialogDefaults.containerColor,
             readOnly = true,
-            placeholder = { Text(label) },
             trailingIcon = {
                 IconButton(onClick = { expanded = true }) {
                     Icon(Icons.Filled.ArrowDropDown, contentDescription = "Ouvrir la liste")

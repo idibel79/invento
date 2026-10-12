@@ -31,7 +31,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -55,6 +54,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.ui.components.SingleLineAutoSizeText
+import ma.bam.inventaire.ui.components.StaticLabelTextField
 import ma.bam.inventaire.ui.quantityentry.EcartConfirmDialog
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
 import ma.bam.inventaire.ui.quantityentry.UnknownArticleDialog
@@ -131,10 +131,11 @@ fun ScanScreen(
                     val idle = manualQuery.isBlank()
                     Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
                         if (idle) Spacer(modifier = Modifier.weight(1f))
-                        OutlinedTextField(
+                        StaticLabelTextField(
                             value = manualQuery,
                             onValueChange = viewModel::setManualQuery,
-                            placeholder = { Text("Code ou titre") },
+                            label = "Code ou titre",
+                            containerColor = MaterialTheme.colorScheme.background,
                             singleLine = true,
                             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
                             trailingIcon = {

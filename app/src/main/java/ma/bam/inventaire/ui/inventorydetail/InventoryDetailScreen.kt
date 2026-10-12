@@ -37,7 +37,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.MenuItemColors
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SliderDefaults
@@ -79,6 +78,7 @@ import ma.bam.inventaire.R
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.domain.EcartCalculator
+import ma.bam.inventaire.ui.components.StaticLabelTextField
 import ma.bam.inventaire.ui.components.fadingEdge
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
 import ma.bam.inventaire.ui.theme.EcartRed
@@ -164,11 +164,12 @@ fun InventoryDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedTextField(
+                StaticLabelTextField(
                     value = searchQuery,
                     onValueChange = viewModel::setSearchQuery,
+                    label = "Code ou titre",
+                    containerColor = MaterialTheme.colorScheme.background,
                     modifier = Modifier.weight(1f),
-                    placeholder = { Text("Code ou titre") },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     trailingIcon = {
                         if (searchQuery.isNotEmpty()) {

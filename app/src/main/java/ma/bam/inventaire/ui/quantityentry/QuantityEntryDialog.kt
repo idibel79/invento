@@ -16,10 +16,10 @@ import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.R
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
+import ma.bam.inventaire.ui.components.StaticLabelTextField
 import ma.bam.inventaire.ui.components.fadingEdge
 import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.ui.theme.SuccessGreen
@@ -82,10 +83,11 @@ fun QuantityEntryDialog(
                 )
                 InfoRow(icon = Icons.Filled.Sell, text = "${formatQuantity(article.prixUnitaire)} DH")
                 Spacer(modifier = Modifier.height(16.dp))
-                OutlinedTextField(
+                StaticLabelTextField(
                     value = text,
                     onValueChange = { text = it },
-                    placeholder = { Text("Quantité réelle constatée") },
+                    label = "Quantité réelle constatée",
+                    containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.fillMaxWidth()
