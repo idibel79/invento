@@ -1,25 +1,38 @@
 package ma.bam.inventaire.ui.inventorydetail
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FactCheck
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,12 +43,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import ma.bam.inventaire.R
 import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.ui.components.StaticLabelTextField
+import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.ui.theme.SuccessGreen
 import ma.bam.inventaire.util.formatQuantity
 
@@ -242,30 +261,67 @@ fun ArticleCreatedDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        icon = { Icon(Icons.Filled.CheckCircle, contentDescription = null, tint = SuccessGreen) },
-        title = { Text("Votre produit a bien été créé", fontWeight = FontWeight.SemiBold) },
+        icon = {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(SuccessGreen.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Filled.CheckCircle,
+                    contentDescription = null,
+                    tint = SuccessGreen,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+        },
+        title = {
+            Text(
+                "Votre produit a bien été créé",
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
         text = {
-            Column {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     article.designation.ifBlank { article.codeArticle },
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    color = InProgressBlue,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Code article (PID) : ${article.codeArticle}")
-                Text("Code-barres 1 : ${article.codeBarre1}")
-                if (article.codeBarre2.isNotBlank()) {
-                    Text("Code-barres 2 : ${article.codeBarre2}")
+                Spacer(modifier = Modifier.height(12.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(12.dp))
+                DetailRow(painter = painterResource(id = R.drawable.ic_pid_cross), text = article.codeArticle)
+                val codesBarres = listOf(article.codeBarre1, article.codeBarre2).filter { it.isNotBlank() }
+                if (codesBarres.isNotEmpty()) {
+                    DetailRow(
+                        painter = painterResource(id = R.drawable.ic_barcode_scan),
+                        text = codesBarres.joinToString(" / ")
+                    )
                 }
-                Text("Catégorie : ${article.categorie}")
-                Text("Zone : ${article.emplacement}")
-                Text("Quantité système : ${formatQuantity(article.quantiteTheorique)}")
-                Text(
-                    "Quantité inventaire : " +
+                DetailRow(icon = Icons.Filled.Category, text = article.categorie)
+                DetailRow(icon = Icons.Filled.Place, text = article.emplacement)
+                DetailRow(
+                    icon = Icons.Filled.Inventory2,
+                    text = "Quantité système : ${formatQuantity(article.quantiteTheorique)}"
+                )
+                DetailRow(
+                    icon = Icons.AutoMirrored.Filled.FactCheck,
+                    text = "Quantité inventaire : " +
                         (article.quantiteReelle?.let { formatQuantity(it) } ?: "-")
                 )
-                Text("PPV : ${formatQuantity(article.prixUnitaire)} DH")
-                Text("PPH : ${formatQuantity(article.pph)} DH")
+                DetailRow(icon = Icons.Filled.Sell, text = "PPV : ${formatQuantity(article.prixUnitaire)} DH")
+                DetailRow(
+                    icon = Icons.Filled.LocalHospital,
+                    text = "PPH : ${formatQuantity(article.pph)} DH"
+                )
             }
         },
         confirmButton = {
@@ -277,6 +333,48 @@ fun ArticleCreatedDialog(
             }
         }
     )
+}
+
+@Composable
+private fun DetailRow(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
+    DetailRow(text = text) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun DetailRow(painter: androidx.compose.ui.graphics.painter.Painter, text: String) {
+    DetailRow(text = text) {
+        Icon(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun DetailRow(text: String, icon: @Composable () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        icon()
+        Text(
+            text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
 }
 
 @Composable
