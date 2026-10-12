@@ -571,9 +571,10 @@ private fun PriceRangeFilterContent(
             Spacer(modifier = Modifier.height(4.dp))
             RangeSlider(
                 value = sliderValue,
-                onValueChange = { range ->
-                    val roundedStart = (range.start / priceStepSize).roundToInt() * priceStepSize
-                    val roundedEnd = (range.endInclusive / priceStepSize).roundToInt() * priceStepSize
+                onValueChange = { range -> sliderValue = range },
+                onValueChangeFinished = {
+                    val roundedStart = (sliderValue.start / priceStepSize).roundToInt() * priceStepSize
+                    val roundedEnd = (sliderValue.endInclusive / priceStepSize).roundToInt() * priceStepSize
                     val clampedStart = roundedStart.coerceIn(bounds.start, bounds.endInclusive)
                     val clampedEnd = roundedEnd.coerceIn(bounds.start, bounds.endInclusive)
                     sliderValue = minOf(clampedStart, clampedEnd)..maxOf(clampedStart, clampedEnd)
