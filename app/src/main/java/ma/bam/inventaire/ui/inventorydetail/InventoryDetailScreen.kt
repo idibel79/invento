@@ -86,6 +86,7 @@ import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.ui.theme.NotScannedGray
 import ma.bam.inventaire.ui.theme.SuccessGreen
 import ma.bam.inventaire.util.formatQuantity
+import java.util.Locale
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -559,14 +560,14 @@ private fun PriceRangeFilterContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            PriceBadge(sliderValue.start)
+            PriceBadge(floor(sliderValue.start).toInt())
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
                 modifier = Modifier.size(14.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            PriceBadge(sliderValue.endInclusive)
+            PriceBadge(ceil(sliderValue.endInclusive).toInt())
         }
         if (bounds.start < bounds.endInclusive) {
             Spacer(modifier = Modifier.height(4.dp))
@@ -605,12 +606,12 @@ private fun PriceRangeFilterContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    "${floor(bounds.start).toInt()} DH",
+                    "${String.format(Locale.FRANCE, "%.2f", bounds.start)} DH",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    "${ceil(bounds.endInclusive).toInt()} DH",
+                    "${String.format(Locale.FRANCE, "%.2f", bounds.endInclusive)} DH",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -641,7 +642,7 @@ private fun PriceRangeFilterContent(
 }
 
 @Composable
-private fun PriceBadge(value: Float) {
+private fun PriceBadge(value: Int) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(50))
@@ -649,7 +650,7 @@ private fun PriceBadge(value: Float) {
             .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(
-            "${value.roundToInt()} DH",
+            "$value DH",
             style = MaterialTheme.typography.labelMedium,
             color = InProgressBlue,
             fontWeight = FontWeight.Medium
