@@ -66,5 +66,6 @@ data class ImportedArticle(
     val codeBarre2: String,
     val prixUnitaire: Double,
     val pph: Double,
-    val dateImport: Long
+    val dateImport: Long,
+    val quantiteReelle: Double? = null
 )

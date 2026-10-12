@@ -77,6 +77,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ma.bam.inventaire.R
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
+import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.domain.EcartCalculator
 import ma.bam.inventaire.ui.components.fadingEdge
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
@@ -112,6 +113,7 @@ fun InventoryDetailScreen(
     var filterSection by remember { mutableStateOf<FilterSection?>(null) }
     var showSortMenu by remember { mutableStateOf(false) }
     var showCreateDialog by remember { mutableStateOf(false) }
+    var createdArticle by remember { mutableStateOf<ImportedArticle?>(null) }
     val locked = session?.verrouille == true
 
     LaunchedEffect(Unit) {
@@ -144,7 +146,7 @@ fun InventoryDetailScreen(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_add_product),
                             contentDescription = "Créer un produit",
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(30.dp),
                             tint = if (locked) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -506,7 +508,15 @@ fun InventoryDetailScreen(
             onConfirm = { article ->
                 viewModel.createArticle(article)
                 showCreateDialog = false
+                createdArticle = article
             }
+        )
+    }
+
+    createdArticle?.let { article ->
+        ArticleCreatedDialog(
+            article = article,
+            onDismiss = { createdArticle = null }
         )
     }
 }

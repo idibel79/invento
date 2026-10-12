@@ -50,23 +50,30 @@ class InventoryRepositoryImpl @Inject constructor(
         articleDao.insert(article.toEntity(sessionId))
     }
 
-    private fun ImportedArticle.toEntity(sessionId: String) = StockArticleEntity(
-        sessionId = sessionId,
-        codeArticle = codeArticle,
-        designation = designation,
-        categorie = categorie,
-        tva = tva,
-        emplacement = emplacement,
-        quantiteTheorique = quantiteTheorique,
-        datePeremption = datePeremption,
-        stockMin = stockMin,
-        stockMax = stockMax,
-        codeBarre1 = codeBarre1,
-        codeBarre2 = codeBarre2,
-        prixUnitaire = prixUnitaire,
-        pph = pph,
-        dateImport = dateImport
-    )
+    private fun ImportedArticle.toEntity(sessionId: String): StockArticleEntity {
+        val ecart = quantiteReelle?.let { EcartCalculator.compute(quantiteTheorique, it) }
+        return StockArticleEntity(
+            sessionId = sessionId,
+            codeArticle = codeArticle,
+            designation = designation,
+            categorie = categorie,
+            tva = tva,
+            emplacement = emplacement,
+            quantiteTheorique = quantiteTheorique,
+            datePeremption = datePeremption,
+            stockMin = stockMin,
+            stockMax = stockMax,
+            codeBarre1 = codeBarre1,
+            codeBarre2 = codeBarre2,
+            prixUnitaire = prixUnitaire,
+            pph = pph,
+            dateImport = dateImport,
+            quantiteReelle = quantiteReelle,
+            ecart = ecart,
+            ecartValide = if (ecart != null) !EcartCalculator.hasEcart(ecart) else false,
+            dateScan = if (quantiteReelle != null) dateImport else null
+        )
+    }
 
     override suspend fun findArticleByCode(
         sessionId: String,

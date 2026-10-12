@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.ui.theme.SuccessGreen
+import ma.bam.inventaire.util.formatQuantity
 
 private fun String.toDoubleOrNullFr(): Double? = replace(",", ".").toDoubleOrNull()
 
@@ -60,11 +62,13 @@ fun CreateArticleDialog(
     var tva by remember { mutableStateOf<String?>(null) }
     var zone by remember { mutableStateOf<String?>(null) }
     var quantiteText by remember { mutableStateOf("") }
+    var quantiteInventaireText by remember { mutableStateOf("") }
     var prixText by remember { mutableStateOf("") }
     var pphText by remember { mutableStateOf("") }
     var showErrors by remember { mutableStateOf(false) }
 
     val quantite = if (quantiteText.isBlank()) 0.0 else quantiteText.toDoubleOrNullFr()
+    val quantiteInventaire = if (quantiteInventaireText.isBlank()) null else quantiteInventaireText.toDoubleOrNullFr()
     val prix = prixText.toDoubleOrNullFr()
     val pph = pphText.toDoubleOrNullFr()
 
@@ -145,7 +149,16 @@ fun CreateArticleDialog(
                 OutlinedTextField(
                     value = quantiteText,
                     onValueChange = { quantiteText = it },
-                    label = { Text("Quantité en stock (optionnel)") },
+                    label = { Text("Quantité système (optionnel)") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                FieldSpacer()
+                OutlinedTextField(
+                    value = quantiteInventaireText,
+                    onValueChange = { quantiteInventaireText = it },
+                    label = { Text("Quantité inventaire (optionnel)") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.fillMaxWidth()
@@ -191,7 +204,8 @@ fun CreateArticleDialog(
                                 codeBarre2 = codeBarre2.trim(),
                                 prixUnitaire = prix ?: 0.0,
                                 pph = pph ?: 0.0,
-                                dateImport = System.currentTimeMillis()
+                                dateImport = System.currentTimeMillis(),
+                                quantiteReelle = quantiteInventaire
                             )
                         )
                     } else {
@@ -205,6 +219,51 @@ fun CreateArticleDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Annuler") }
+        }
+    )
+}
+
+/** Popup de confirmation affiché juste après la création manuelle d'un produit. */
+@Composable
+fun ArticleCreatedDialog(
+    article: ImportedArticle,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Filled.CheckCircle, contentDescription = null, tint = SuccessGreen) },
+        title = { Text("Votre produit a bien été créé", fontWeight = FontWeight.SemiBold) },
+        text = {
+            Column {
+                Text(
+                    article.designation.ifBlank { article.codeArticle },
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Code article (PID) : ${article.codeArticle}")
+                Text("Code-barres 1 : ${article.codeBarre1}")
+                if (article.codeBarre2.isNotBlank()) {
+                    Text("Code-barres 2 : ${article.codeBarre2}")
+                }
+                Text("Catégorie : ${article.categorie}")
+                Text("Zone : ${article.emplacement}")
+                Text("Quantité système : ${formatQuantity(article.quantiteTheorique)}")
+                Text(
+                    "Quantité inventaire : " +
+                        (article.quantiteReelle?.let { formatQuantity(it) } ?: "-")
+                )
+                Text("PPV : ${formatQuantity(article.prixUnitaire)} DH")
+                Text("PPH : ${formatQuantity(article.pph)} DH")
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.textButtonColors(contentColor = SuccessGreen)
+            ) {
+                Text("OK", fontWeight = FontWeight.SemiBold)
+            }
         }
     )
 }
