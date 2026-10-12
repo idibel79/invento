@@ -39,7 +39,9 @@ private fun String.toDoubleOrNullFr(): Double? = replace(",", ".").toDoubleOrNul
 
 /**
  * Popup de création manuelle d'un produit (page des produits). Tous les champs sont
- * obligatoires, sauf la quantité en stock (par défaut 0 si non saisie).
+ * obligatoires sauf le code-barres 2 et la quantité en stock (par défaut 0 si non saisie).
+ * Le bouton "Créer" reste toujours actif ; s'il manque un champ obligatoire, celui-ci est
+ * mis en évidence en rouge au lieu de bloquer le bouton.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,21 +60,18 @@ fun CreateArticleDialog(
     var tva by remember { mutableStateOf<String?>(null) }
     var zone by remember { mutableStateOf<String?>(null) }
     var quantiteText by remember { mutableStateOf("") }
-    var stockMinText by remember { mutableStateOf("") }
-    var stockMaxText by remember { mutableStateOf("") }
     var prixText by remember { mutableStateOf("") }
     var pphText by remember { mutableStateOf("") }
+    var showErrors by remember { mutableStateOf(false) }
 
     val quantite = if (quantiteText.isBlank()) 0.0 else quantiteText.toDoubleOrNullFr()
-    val stockMin = stockMinText.toDoubleOrNullFr()
-    val stockMax = stockMaxText.toDoubleOrNullFr()
     val prix = prixText.toDoubleOrNullFr()
     val pph = pphText.toDoubleOrNullFr()
 
-    val isValid = designation.isNotBlank() && codeArticle.isNotBlank() &&
-        codeBarre1.isNotBlank() && codeBarre2.isNotBlank() &&
+    val isComplete = designation.isNotBlank() && codeArticle.isNotBlank() &&
+        codeBarre1.isNotBlank() &&
         categorie != null && tva != null && zone != null &&
-        quantite != null && stockMin != null && stockMax != null && prix != null && pph != null
+        quantite != null && prix != null && pph != null
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -89,6 +88,7 @@ fun CreateArticleDialog(
                     onValueChange = { designation = it },
                     label = { Text("Titre du produit") },
                     singleLine = true,
+                    isError = showErrors && designation.isBlank(),
                     modifier = Modifier.fillMaxWidth()
                 )
                 FieldSpacer()
@@ -97,6 +97,7 @@ fun CreateArticleDialog(
                     onValueChange = { codeArticle = it },
                     label = { Text("Code article (PID)") },
                     singleLine = true,
+                    isError = showErrors && codeArticle.isBlank(),
                     modifier = Modifier.fillMaxWidth()
                 )
                 FieldSpacer()
@@ -105,13 +106,14 @@ fun CreateArticleDialog(
                     onValueChange = { codeBarre1 = it },
                     label = { Text("Code-barres 1") },
                     singleLine = true,
+                    isError = showErrors && codeBarre1.isBlank(),
                     modifier = Modifier.fillMaxWidth()
                 )
                 FieldSpacer()
                 OutlinedTextField(
                     value = codeBarre2,
                     onValueChange = { codeBarre2 = it },
-                    label = { Text("Code-barres 2") },
+                    label = { Text("Code-barres 2 (optionnel)") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -120,21 +122,24 @@ fun CreateArticleDialog(
                     label = "Catégorie",
                     options = availableCategories,
                     selected = categorie,
-                    onSelect = { categorie = it }
+                    onSelect = { categorie = it },
+                    isError = showErrors && categorie == null
                 )
                 FieldSpacer()
                 DropdownField(
                     label = "TVA",
                     options = availableTvas,
                     selected = tva,
-                    onSelect = { tva = it }
+                    onSelect = { tva = it },
+                    isError = showErrors && tva == null
                 )
                 FieldSpacer()
                 DropdownField(
                     label = "Zone",
                     options = availableZones,
                     selected = zone,
-                    onSelect = { zone = it }
+                    onSelect = { zone = it },
+                    isError = showErrors && zone == null
                 )
                 FieldSpacer()
                 OutlinedTextField(
@@ -147,29 +152,12 @@ fun CreateArticleDialog(
                 )
                 FieldSpacer()
                 OutlinedTextField(
-                    value = stockMinText,
-                    onValueChange = { stockMinText = it },
-                    label = { Text("Stock min") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                FieldSpacer()
-                OutlinedTextField(
-                    value = stockMaxText,
-                    onValueChange = { stockMaxText = it },
-                    label = { Text("Stock max") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                FieldSpacer()
-                OutlinedTextField(
                     value = prixText,
                     onValueChange = { prixText = it },
                     label = { Text("PPV") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    isError = showErrors && prix == null,
                     modifier = Modifier.fillMaxWidth()
                 )
                 FieldSpacer()
@@ -179,32 +167,36 @@ fun CreateArticleDialog(
                     label = { Text("PPH") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    isError = showErrors && pph == null,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         },
         confirmButton = {
             TextButton(
-                enabled = isValid,
                 onClick = {
-                    onConfirm(
-                        ImportedArticle(
-                            codeArticle = codeArticle.trim(),
-                            designation = designation.trim(),
-                            categorie = categorie.orEmpty(),
-                            tva = tva.orEmpty(),
-                            emplacement = zone.orEmpty(),
-                            quantiteTheorique = quantite ?: 0.0,
-                            datePeremption = "",
-                            stockMin = stockMin ?: 0.0,
-                            stockMax = stockMax ?: 0.0,
-                            codeBarre1 = codeBarre1.trim(),
-                            codeBarre2 = codeBarre2.trim(),
-                            prixUnitaire = prix ?: 0.0,
-                            pph = pph ?: 0.0,
-                            dateImport = System.currentTimeMillis()
+                    if (isComplete) {
+                        onConfirm(
+                            ImportedArticle(
+                                codeArticle = codeArticle.trim(),
+                                designation = designation.trim(),
+                                categorie = categorie.orEmpty(),
+                                tva = tva.orEmpty(),
+                                emplacement = zone.orEmpty(),
+                                quantiteTheorique = quantite ?: 0.0,
+                                datePeremption = "",
+                                stockMin = 0.0,
+                                stockMax = 0.0,
+                                codeBarre1 = codeBarre1.trim(),
+                                codeBarre2 = codeBarre2.trim(),
+                                prixUnitaire = prix ?: 0.0,
+                                pph = pph ?: 0.0,
+                                dateImport = System.currentTimeMillis()
+                            )
                         )
-                    )
+                    } else {
+                        showErrors = true
+                    }
                 },
                 colors = ButtonDefaults.textButtonColors(contentColor = SuccessGreen)
             ) {
@@ -228,7 +220,8 @@ private fun DropdownField(
     label: String,
     options: List<String>,
     selected: String?,
-    onSelect: (String) -> Unit
+    onSelect: (String) -> Unit,
+    isError: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -243,6 +236,7 @@ private fun DropdownField(
                 }
             },
             singleLine = true,
+            isError = isError,
             modifier = Modifier.fillMaxWidth()
         )
         DropdownMenu(

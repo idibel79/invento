@@ -143,6 +143,7 @@ fun InventoryDetailScreen(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_add_product),
                             contentDescription = "Créer un produit",
+                            modifier = Modifier.size(24.dp),
                             tint = if (locked) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -740,7 +741,7 @@ private fun ArticleRow(
                             value = article.quantiteReelle?.let { formatQuantity(it) } ?: "-",
                             color = if (notScanned) NotScannedGray else null
                         )
-                        if (!notScanned) {
+                        if (!notScanned && hasEcart) {
                             QuantityPill(
                                 label = "Écart",
                                 value = article.ecart?.let { formatQuantity(it, showSign = true) } ?: "-",
