@@ -658,19 +658,26 @@ private fun PriceBadge(value: Float) {
 /** Pouce rond pour le slider de prix (au lieu de la barre par défaut de Material 3). */
 @Composable
 private fun CircleThumb() {
+    // La zone tactile (48dp) est plus grande que le cercle visible (20dp) pour que le
+    // glissement reste facile même si le doigt n'est pas pile sur le cercle.
     Box(
-        modifier = Modifier
-            .size(20.dp)
-            .clip(CircleShape)
-            .background(InProgressBlue),
+        modifier = Modifier.size(48.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
-                .size(10.dp)
+                .size(20.dp)
                 .clip(CircleShape)
-                .background(Color.White)
-        )
+                .background(InProgressBlue),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(10.dp)
+                    .clip(CircleShape)
+                    .background(Color.White)
+            )
+        }
     }
 }
 
