@@ -55,6 +55,7 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -698,8 +699,8 @@ private fun ArticleRow(
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 ArticleInfoRow(
-                    painter = painterResource(id = R.drawable.ic_pid_cross),
-                    text = article.codeArticle
+                    icon = Icons.Filled.Sell,
+                    text = "${formatQuantity(article.prixUnitaire)} DH"
                 )
                 val codesBarres = listOf(article.codeBarre1, article.codeBarre2).filter { it.isNotBlank() }
                 if (codesBarres.isNotEmpty()) {
