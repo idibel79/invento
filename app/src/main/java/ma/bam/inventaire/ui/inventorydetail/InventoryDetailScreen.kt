@@ -546,7 +546,17 @@ private fun PriceRangeFilterContent(
                     inactiveTrackColor = InProgressBlue.copy(alpha = 0.2f)
                 ),
                 startThumb = { CircleThumb() },
-                endThumb = { CircleThumb() }
+                endThumb = { CircleThumb() },
+                track = { state ->
+                    SliderDefaults.Track(
+                        rangeSliderState = state,
+                        colors = SliderDefaults.colors(
+                            activeTrackColor = InProgressBlue,
+                            inactiveTrackColor = InProgressBlue.copy(alpha = 0.2f)
+                        ),
+                        thumbTrackGapSize = 0.dp
+                    )
+                }
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
