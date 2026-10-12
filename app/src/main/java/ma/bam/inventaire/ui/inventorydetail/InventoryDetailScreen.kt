@@ -66,6 +66,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -382,20 +383,36 @@ fun InventoryDetailScreen(
                                 leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.TITRE_ZA) }
                             )
                             DropdownMenuItem(
-                                text = { Text("Prix") },
+                                text = { Text("Prix (Min-Max)") },
                                 onClick = {
-                                    viewModel.setSort(ArticleSort.PRIX)
+                                    viewModel.setSort(ArticleSort.PRIX_ASC)
                                     showSortMenu = false
                                 },
-                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.PRIX) }
+                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.PRIX_ASC) }
                             )
                             DropdownMenuItem(
-                                text = { Text("Quantité") },
+                                text = { Text("Prix (Max-Min)") },
                                 onClick = {
-                                    viewModel.setSort(ArticleSort.QUANTITE)
+                                    viewModel.setSort(ArticleSort.PRIX_DESC)
                                     showSortMenu = false
                                 },
-                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.QUANTITE) }
+                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.PRIX_DESC) }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Quantité (Min-Max)") },
+                                onClick = {
+                                    viewModel.setSort(ArticleSort.QUANTITE_ASC)
+                                    showSortMenu = false
+                                },
+                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.QUANTITE_ASC) }
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Quantité (Max-Min)") },
+                                onClick = {
+                                    viewModel.setSort(ArticleSort.QUANTITE_DESC)
+                                    showSortMenu = false
+                                },
+                                leadingIcon = { PositionCheckSlot(selected = sort == ArticleSort.QUANTITE_DESC) }
                             )
                         }
                     }
@@ -550,6 +567,7 @@ private fun PriceRangeFilterContent(
                 track = { state ->
                     SliderDefaults.Track(
                         rangeSliderState = state,
+                        modifier = Modifier.height(4.dp),
                         colors = SliderDefaults.colors(
                             activeTrackColor = InProgressBlue,
                             inactiveTrackColor = InProgressBlue.copy(alpha = 0.2f)
@@ -591,10 +609,9 @@ private fun PriceRangeFilterContent(
                 sliderValue = bounds
                 onApply(null)
             }) { Text("Réinitialiser") }
-            Button(
-                onClick = { onApply(sliderValue) },
-                colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen)
-            ) { Text("Appliquer") }
+            TextButton(onClick = { onApply(sliderValue) }) {
+                Text("Appliquer", color = SuccessGreen, fontWeight = FontWeight.SemiBold)
+            }
         }
     }
 }
@@ -623,8 +640,16 @@ private fun CircleThumb() {
         modifier = Modifier
             .size(20.dp)
             .clip(CircleShape)
-            .background(InProgressBlue)
-    )
+            .background(InProgressBlue),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(10.dp)
+                .clip(CircleShape)
+                .background(Color.White)
+        )
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
