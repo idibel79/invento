@@ -441,7 +441,7 @@ fun InventoryDetailScreen(
                     FilterChip(
                         selected = filter == ArticleFilter.NON_SCANNES,
                         onClick = { viewModel.setFilter(ArticleFilter.NON_SCANNES) },
-                        label = { Text("Non scannés") }
+                        label = { Text("Non inventoriés") }
                     )
                     FilterChip(
                         selected = filter == ArticleFilter.NEGATIFS,

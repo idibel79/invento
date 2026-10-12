@@ -12,7 +12,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -74,11 +76,11 @@ fun QuantityEntryDialog(
             Column {
                 InfoRow(painter = painterResource(id = R.drawable.ic_pid_cross), text = article.codeArticle)
                 InfoRow(icon = Icons.Filled.Place, text = article.emplacement)
-                Text(
-                    "Quantité théorique : ${formatQuantity(article.quantiteTheorique)}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                InfoRow(
+                    icon = Icons.Filled.Inventory2,
+                    text = "Quantité système : ${formatQuantity(article.quantiteTheorique)}"
                 )
+                InfoRow(icon = Icons.Filled.Sell, text = "${formatQuantity(article.prixUnitaire)} DH")
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
                     value = text,
