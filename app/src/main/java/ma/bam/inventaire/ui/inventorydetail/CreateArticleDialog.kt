@@ -1,5 +1,6 @@
 package ma.bam.inventaire.ui.inventorydetail
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -308,6 +309,12 @@ private fun DropdownField(
             singleLine = true,
             isError = isError,
             modifier = Modifier.fillMaxWidth()
+        )
+        // Capte le clic sur tout le champ (pas seulement la flèche) pour ouvrir la liste.
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .clickable(onClick = { expanded = true })
         )
         DropdownMenu(
             expanded = expanded,
