@@ -2,11 +2,13 @@ package ma.bam.inventaire.ui.inventorydetail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -18,7 +20,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FactCheck
-import androidx.compose.material.icons.filled.AddBox
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.CheckCircle
@@ -50,10 +51,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ma.bam.inventaire.R
 import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.ui.components.StaticLabelTextField
+import ma.bam.inventaire.ui.components.fadingEdge
 import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.ui.theme.SuccessGreen
 import ma.bam.inventaire.util.formatQuantity
@@ -100,7 +103,13 @@ fun CreateArticleDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        icon = { Icon(Icons.Filled.AddBox, contentDescription = null) },
+        icon = {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_add_product),
+                contentDescription = null,
+                modifier = Modifier.size(32.dp)
+            )
+        },
         title = { Text("Nouveau produit", fontWeight = FontWeight.SemiBold) },
         text = {
             Column(
@@ -392,9 +401,12 @@ private fun DropdownField(
     isError: Boolean = false
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val valueScrollState = rememberScrollState()
     Box(modifier = Modifier.fillMaxWidth()) {
         StaticLabelTextField(
-            value = selected.orEmpty(),
+            // La valeur réelle est affichée par le Text défilant ci-dessous (pour pouvoir
+            // glisser et lire le texte en entier) ; le champ natif reste donc vide.
+            value = "",
             onValueChange = {},
             label = label,
             containerColor = AlertDialogDefaults.containerColor,
@@ -408,12 +420,36 @@ private fun DropdownField(
             isError = isError,
             modifier = Modifier.fillMaxWidth()
         )
-        // Capte le clic sur tout le champ (pas seulement la flèche) pour ouvrir la liste.
+        // Capte le clic sur tout le champ (pas seulement la flèche) pour ouvrir la liste, et
+        // affiche la valeur sélectionnée en glissable pour pouvoir lire le texte en entier.
         Box(
             modifier = Modifier
                 .matchParentSize()
                 .clickable(onClick = { expanded = true })
-        )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 16.dp, end = 48.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(
+                    selected.orEmpty(),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = if (isError) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
+                    maxLines = 1,
+                    softWrap = false,
+                    overflow = TextOverflow.Clip,
+                    modifier = Modifier
+                        .fadingEdge(valueScrollState)
+                        .horizontalScroll(valueScrollState)
+                )
+            }
+        }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
