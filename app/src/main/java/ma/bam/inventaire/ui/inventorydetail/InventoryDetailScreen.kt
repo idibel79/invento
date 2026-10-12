@@ -551,12 +551,6 @@ private fun PriceRangeFilterContent(
 ) {
     var sliderValue by remember(bounds) { mutableStateOf(currentRange ?: bounds) }
     val priceStepSize = 10f
-    val priceSpan = bounds.endInclusive - bounds.start
-    val priceSteps = if (priceSpan > priceStepSize) {
-        (priceSpan / priceStepSize).roundToInt().coerceAtLeast(1) - 1
-    } else {
-        0
-    }
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -576,9 +570,14 @@ private fun PriceRangeFilterContent(
             Spacer(modifier = Modifier.height(4.dp))
             RangeSlider(
                 value = sliderValue,
-                onValueChange = { sliderValue = it },
+                onValueChange = { range ->
+                    val roundedStart = (range.start / priceStepSize).roundToInt() * priceStepSize
+                    val roundedEnd = (range.endInclusive / priceStepSize).roundToInt() * priceStepSize
+                    val clampedStart = roundedStart.coerceIn(bounds.start, bounds.endInclusive)
+                    val clampedEnd = roundedEnd.coerceIn(bounds.start, bounds.endInclusive)
+                    sliderValue = minOf(clampedStart, clampedEnd)..maxOf(clampedStart, clampedEnd)
+                },
                 valueRange = bounds,
-                steps = priceSteps,
                 colors = SliderDefaults.colors(
                     thumbColor = InProgressBlue,
                     activeTrackColor = InProgressBlue,
