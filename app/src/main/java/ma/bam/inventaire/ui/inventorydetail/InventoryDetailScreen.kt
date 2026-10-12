@@ -86,6 +86,7 @@ import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.ui.theme.NotScannedGray
 import ma.bam.inventaire.ui.theme.SuccessGreen
 import ma.bam.inventaire.util.formatQuantity
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -549,6 +550,13 @@ private fun PriceRangeFilterContent(
     onApply: (ClosedFloatingPointRange<Float>?) -> Unit
 ) {
     var sliderValue by remember(bounds) { mutableStateOf(currentRange ?: bounds) }
+    val priceStepSize = 10f
+    val priceSpan = bounds.endInclusive - bounds.start
+    val priceSteps = if (priceSpan > priceStepSize) {
+        (priceSpan / priceStepSize).roundToInt().coerceAtLeast(1) - 1
+    } else {
+        0
+    }
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -570,6 +578,7 @@ private fun PriceRangeFilterContent(
                 value = sliderValue,
                 onValueChange = { sliderValue = it },
                 valueRange = bounds,
+                steps = priceSteps,
                 colors = SliderDefaults.colors(
                     thumbColor = InProgressBlue,
                     activeTrackColor = InProgressBlue,
