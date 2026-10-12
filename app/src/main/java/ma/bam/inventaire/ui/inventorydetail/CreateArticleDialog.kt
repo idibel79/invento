@@ -88,6 +88,7 @@ fun CreateArticleDialog(
                     .heightIn(max = 420.dp)
                     .verticalScroll(rememberScrollState())
             ) {
+                Spacer(modifier = Modifier.height(12.dp))
                 StaticLabelTextField(
                     value = designation,
                     onValueChange = { designation = it },
@@ -279,7 +280,7 @@ fun ArticleCreatedDialog(
 
 @Composable
 private fun FieldSpacer() {
-    Spacer(modifier = Modifier.height(10.dp))
+    Spacer(modifier = Modifier.height(20.dp))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
