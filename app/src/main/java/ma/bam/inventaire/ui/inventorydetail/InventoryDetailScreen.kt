@@ -86,7 +86,8 @@ import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.ui.theme.NotScannedGray
 import ma.bam.inventaire.ui.theme.SuccessGreen
 import ma.bam.inventaire.util.formatQuantity
-import java.util.Locale
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -604,12 +605,12 @@ private fun PriceRangeFilterContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    "${String.format(Locale.FRANCE, "%.2f", bounds.start)} DH",
+                    "${floor(bounds.start).toInt()} DH",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    "${String.format(Locale.FRANCE, "%.2f", bounds.endInclusive)} DH",
+                    "${ceil(bounds.endInclusive).toInt()} DH",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
