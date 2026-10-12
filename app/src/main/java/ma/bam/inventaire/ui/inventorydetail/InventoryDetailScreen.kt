@@ -86,6 +86,7 @@ import ma.bam.inventaire.ui.theme.InProgressBlue
 import ma.bam.inventaire.ui.theme.NotScannedGray
 import ma.bam.inventaire.ui.theme.SuccessGreen
 import ma.bam.inventaire.util.formatQuantity
+import java.util.Locale
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -602,12 +603,12 @@ private fun PriceRangeFilterContent(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    "${formatQuantity(bounds.start.toDouble())} DH",
+                    "${String.format(Locale.FRANCE, "%.2f", bounds.start)} DH",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    "${formatQuantity(bounds.endInclusive.toDouble())} DH",
+                    "${String.format(Locale.FRANCE, "%.2f", bounds.endInclusive)} DH",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -646,7 +647,7 @@ private fun PriceBadge(value: Float) {
             .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(
-            "${formatQuantity(value.toDouble())} DH",
+            "${value.roundToInt()} DH",
             style = MaterialTheme.typography.labelMedium,
             color = InProgressBlue,
             fontWeight = FontWeight.Medium
