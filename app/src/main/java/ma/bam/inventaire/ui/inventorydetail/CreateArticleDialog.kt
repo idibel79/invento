@@ -90,7 +90,7 @@ fun CreateArticleDialog(
                 OutlinedTextField(
                     value = designation,
                     onValueChange = { designation = it },
-                    label = { Text("Titre du produit") },
+                    placeholder = { Text("Titre du produit") },
                     singleLine = true,
                     isError = showErrors && designation.isBlank(),
                     modifier = Modifier.fillMaxWidth()
@@ -99,7 +99,7 @@ fun CreateArticleDialog(
                 OutlinedTextField(
                     value = codeArticle,
                     onValueChange = { codeArticle = it },
-                    label = { Text("Code article (PID)") },
+                    placeholder = { Text("Code article (PID)") },
                     singleLine = true,
                     isError = showErrors && codeArticle.isBlank(),
                     modifier = Modifier.fillMaxWidth()
@@ -108,7 +108,7 @@ fun CreateArticleDialog(
                 OutlinedTextField(
                     value = codeBarre1,
                     onValueChange = { codeBarre1 = it },
-                    label = { Text("Code-barres 1") },
+                    placeholder = { Text("Code-barres 1") },
                     singleLine = true,
                     isError = showErrors && codeBarre1.isBlank(),
                     modifier = Modifier.fillMaxWidth()
@@ -117,7 +117,7 @@ fun CreateArticleDialog(
                 OutlinedTextField(
                     value = codeBarre2,
                     onValueChange = { codeBarre2 = it },
-                    label = { Text("Code-barres 2 (optionnel)") },
+                    placeholder = { Text("Code-barres 2 (optionnel)") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -149,7 +149,7 @@ fun CreateArticleDialog(
                 OutlinedTextField(
                     value = quantiteText,
                     onValueChange = { quantiteText = it },
-                    label = { Text("Quantité système (optionnel)") },
+                    placeholder = { Text("Quantité système (optionnel)") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.fillMaxWidth()
@@ -158,7 +158,7 @@ fun CreateArticleDialog(
                 OutlinedTextField(
                     value = quantiteInventaireText,
                     onValueChange = { quantiteInventaireText = it },
-                    label = { Text("Quantité inventaire (optionnel)") },
+                    placeholder = { Text("Quantité inventaire (optionnel)") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.fillMaxWidth()
@@ -167,7 +167,7 @@ fun CreateArticleDialog(
                 OutlinedTextField(
                     value = prixText,
                     onValueChange = { prixText = it },
-                    label = { Text("PPV") },
+                    placeholder = { Text("PPV") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = showErrors && prix == null,
@@ -177,7 +177,7 @@ fun CreateArticleDialog(
                 OutlinedTextField(
                     value = pphText,
                     onValueChange = { pphText = it },
-                    label = { Text("PPH") },
+                    placeholder = { Text("PPH") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     isError = showErrors && pph == null,
@@ -288,7 +288,7 @@ private fun DropdownField(
             value = selected.orEmpty(),
             onValueChange = {},
             readOnly = true,
-            label = { Text(label) },
+            placeholder = { Text(label) },
             trailingIcon = {
                 IconButton(onClick = { expanded = true }) {
                     Icon(Icons.Filled.ArrowDropDown, contentDescription = "Ouvrir la liste")

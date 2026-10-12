@@ -134,7 +134,7 @@ fun ScanScreen(
                         OutlinedTextField(
                             value = manualQuery,
                             onValueChange = viewModel::setManualQuery,
-                            label = { Text("Code ou titre") },
+                            placeholder = { Text("Code ou titre") },
                             singleLine = true,
                             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
                             trailingIcon = {

@@ -85,7 +85,7 @@ fun QuantityEntryDialog(
                 OutlinedTextField(
                     value = text,
                     onValueChange = { text = it },
-                    label = { Text("Quantité réelle constatée") },
+                    placeholder = { Text("Quantité réelle constatée") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier.fillMaxWidth()
