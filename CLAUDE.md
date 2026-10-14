@@ -17,20 +17,27 @@ Status column option ids:
 Flow for every task:
 1. Only take cards that are in **Todo**. Never start work on a Backlog card on your own
    initiative — it only moves to Todo when the user decides to prioritize it.
-2. When starting work on a card, move it to **In progress**.
+2. When starting work on a card, move it to **In progress** and create a branch `issue-N`
+   (N = the issue number) from the latest `origin/master`. All commits for the card go there,
+   never directly on `master`.
 3. Implement the change, following the versioning workflow below.
 4. Build and install the APK on the user's phone (see "Build & install"). Do **not** test or
    drive the app yourself (see "Testing").
-5. When the implementation is installed, move the card to **Test** and tell the user it's ready
-   to verify on-device. Do not put `Closes #N` / `Fixes #N` in commit messages — that would
+5. When the implementation is installed:
+   - `git push -u origin issue-N` and open a PR `issue-N` → `master` (`gh pr create`). CI
+     (`.github/workflows/ci.yml`) builds the APK and runs the unit tests on it.
+   - Move the card to **Test** and tell the user it's ready to verify on-device, with the PR link.
+   Do not put `Closes #N` / `Fixes #N` in commit messages or the PR body — that would
    auto-close the issue and auto-move the card, bypassing this flow. Mention the issue number in
    prose instead (e.g. "issue #5").
 6. Wait for the user to report back that manual testing passed. Only then:
-   - move the card to **Done**, and
-   - `git push origin master` (and `--tags`) — pushing is automatic at this point, no need to
-     ask separately.
-   If the user instead reports a problem, keep the card in Test (or move back to In progress)
-   and fix it — expect it to return to Test after the fix.
+   - merge the PR with a merge commit (`gh pr merge <N> --merge --delete-branch`, not squash or
+     rebase, so the version tag stays on `master`'s history), once CI is green,
+   - `git push origin vX.Y.Z` to publish the tag, and
+   - move the card to **Done**.
+   This is automatic at this point, no need to ask separately.
+   If the user instead reports a problem, keep the card in Test (or move back to In progress),
+   fix it on the same branch and push again — expect it to return to Test after the fix.
 
 Moving cards: `gh project item-list 6 --owner idibel79 --format json` to get the item id, then
 `gh project item-edit --id <item-id> --project-id PVT_kwHOAuiUNs4Bl6Fc --field-id PVTSSF_lAHOAuiUNs4Bl6FczhklFj8 --single-select-option-id <option-id>`.
@@ -46,8 +53,10 @@ After every code change (before considering a task done):
   `app/build.gradle.kts`. Nothing else needs updating — `HomeScreen.kt` reads the version live
   via `BuildConfig.VERSION_NAME`.
 - Commit with a message describing the change, then tag it `vX.Y.Z` (annotated tag).
-- Don't push unless the push step above (user confirmed Test passed) applies, or the user
-  explicitly asks.
+- Push only to the card's `issue-N` branch (step 5 above). `master` only changes by merging the
+  PR after the user confirmed Test passed, or when the user explicitly asks.
+- If `master` moved while the branch was in Test and the version collides, merge `master` into
+  the branch, bump to the next free version and re-tag before merging.
 
 ## Build & install
 
