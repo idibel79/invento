@@ -1,0 +1,12 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!--
+        android:windowSplashScreen* (API 31+) contrôle l'écran affiché par le système entre
+        le tap sur l'icône et le premier frame de MainActivity : fond blanc et le logo Invento
+        (splash_icon, 116dp au centre), puis l'écran de démarrage Compose (SplashScreen.kt, même
+        fond blanc, même logo) prend le relais. Sans effet (ignoré) sur API < 31.
+    -->
+    <style name="Theme.Inventaire" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowSplashScreenBackground" tools:targetApi="31">@android:color/white</item>
+        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="31">@drawable/splash_icon</item>
+    </style>
+</resources>
