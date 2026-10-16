@@ -62,6 +62,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ma.bam.inventaire.ui.theme.BamNavy
+import ma.bam.inventaire.ui.theme.BamNavyFill
+import ma.bam.inventaire.ui.theme.BorderColor
+import ma.bam.inventaire.ui.theme.CardSurface
+import ma.bam.inventaire.ui.theme.ControlBorder
+import ma.bam.inventaire.ui.theme.OnBrand
+import ma.bam.inventaire.ui.theme.TrackColor
 import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.BamPrimaryContainer
 import ma.bam.inventaire.ui.theme.TextPrimary
@@ -70,8 +76,8 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
-private val SheetBorder = Color(0xFFE1E6F0)
-private val SegmentBorder = Color(0xFFC9D3E6)
+private val SheetBorder: Color @Composable get() = TrackColor
+private val SegmentBorder: Color @Composable get() = ControlBorder
 private val FieldShape = RoundedCornerShape(10.dp)
 val SheetShape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)
 
@@ -83,7 +89,7 @@ fun SheetHandle() {
             .padding(top = 10.dp, bottom = 6.dp)
             .size(width = 40.dp, height = 4.dp)
             .clip(CircleShape)
-            .background(Color(0xFFD5DCEA))
+            .background(BorderColor)
     )
 }
 
@@ -134,7 +140,7 @@ fun FilterSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         shape = SheetShape,
-        containerColor = Color.White,
+        containerColor = CardSurface,
         dragHandle = { SheetHandle() }
     ) {
         Column(
@@ -256,7 +262,7 @@ fun FilterSheet(
                 Button(
                     onClick = { onApply(draftFilter, draftPosition, draftCategory, effectivePrice) },
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = BamNavy, contentColor = Color.White),
+                    colors = ButtonDefaults.buttonColors(containerColor = BamNavyFill, contentColor = OnBrand),
                     modifier = Modifier.weight(1.6f).height(48.dp)
                 ) {
                     Text(
@@ -307,8 +313,8 @@ private fun SheetDropdown(
                 unfocusedLabelColor = if (active) BamNavy else TextSecondary,
                 focusedTrailingIconColor = BamNavy,
                 unfocusedTrailingIconColor = if (active) BamNavy else TextSecondary,
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White
+                focusedContainerColor = CardSurface,
+                unfocusedContainerColor = CardSurface
             ),
             modifier = Modifier
                 .fillMaxWidth()
@@ -317,7 +323,7 @@ private fun SheetDropdown(
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            containerColor = Color.White,
+            containerColor = CardSurface,
             modifier = Modifier.heightIn(max = 320.dp)
         ) {
             options.forEach { option ->
@@ -368,14 +374,14 @@ private fun NavyThumb() {
             modifier = Modifier
                 .size(20.dp)
                 .clip(CircleShape)
-                .background(BamNavy),
+                .background(BamNavyFill),
             contentAlignment = Alignment.Center
         ) {
             Box(
                 modifier = Modifier
                     .size(10.dp)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(OnBrand)
             )
         }
     }
@@ -407,7 +413,7 @@ fun SortSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         shape = SheetShape,
-        containerColor = Color.White,
+        containerColor = CardSurface,
         dragHandle = { SheetHandle() }
     ) {
         Column(
@@ -432,7 +438,7 @@ fun SortSheet(
                         .fillMaxWidth()
                         .heightIn(min = 56.dp)
                         .clip(shape)
-                        .background(if (active) BamPrimaryContainer else Color.White)
+                        .background(if (active) BamPrimaryContainer else CardSurface)
                         .border(1.dp, if (active) BamNavy else SheetBorder, shape)
                         .then(
                             if (row.options.isEmpty()) Modifier.clickable { onSelect(ArticleSort.DEFAUT) } else Modifier
@@ -480,7 +486,7 @@ private fun SegmentedDirection(
         modifier = Modifier
             .clip(shape)
             .border(1.5.dp, if (rowActive) BamNavy else SegmentBorder, shape)
-            .background(Color.White)
+            .background(CardSurface)
             .padding(1.5.dp)
             .clip(RoundedCornerShape(8.5.dp))
             .height(IntrinsicSize.Min)
@@ -497,11 +503,11 @@ private fun SegmentedDirection(
                 )
             }
             val isSelected = value == selected
-            val contentColor = if (isSelected) Color.White else BamNavy
+            val contentColor = if (isSelected) OnBrand else BamNavy
             Row(
                 modifier = Modifier
                     .size(width = 64.dp, height = 40.dp)
-                    .background(if (isSelected) BamNavy else Color.White)
+                    .background(if (isSelected) BamNavyFill else CardSurface)
                     .clickable { onSelect(value) },
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically

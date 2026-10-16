@@ -42,6 +42,13 @@ import kotlinx.coroutines.launch
 import ma.bam.inventaire.ui.components.PopupHaptic
 import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.ui.theme.BamNavy
+import ma.bam.inventaire.ui.theme.BamNavyFill
+import ma.bam.inventaire.ui.theme.BamPrimaryContainer
+import ma.bam.inventaire.ui.theme.CardSurface
+import ma.bam.inventaire.ui.theme.ControlBorder
+import ma.bam.inventaire.ui.theme.Hairline
+import ma.bam.inventaire.ui.theme.OnBrand
+import ma.bam.inventaire.ui.theme.SoftBand
 import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.StatusSuccess
 import ma.bam.inventaire.ui.theme.StatusSuccessBg
@@ -70,7 +77,7 @@ fun ArticleCreatedSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         shape = SheetShape,
-        containerColor = Color.White,
+        containerColor = CardSurface,
         dragHandle = { SheetHandle() }
     ) {
         Column(
@@ -98,11 +105,11 @@ fun ArticleCreatedSheet(
                 }
                 CreatedField("Zone") { FieldValue(article.emplacement) }
             }
-            Band(color = Color(0xFFE6EEFF)) {
+            Band(color = BamPrimaryContainer) {
                 BandRow("PPV", "${formatQuantity(article.prixUnitaire)} DH")
                 BandRow("PPH", "${formatQuantity(article.pph)} DH")
             }
-            Band(color = Color(0xFFF4F6FB)) {
+            Band(color = SoftBand) {
                 BandRow("Quantité système", formatQuantity(article.quantiteTheorique))
                 article.quantiteReelle?.let {
                     BandRow("Quantité inventoriée", formatQuantity(it), valueColor = BamPrimary)
@@ -115,7 +122,7 @@ fun ArticleCreatedSheet(
                 OutlinedButton(
                     onClick = { hideThen(onCreateAnother) },
                     shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Color(0xFFC9D3E6)),
+                    border = BorderStroke(1.dp, ControlBorder),
                     modifier = Modifier.weight(1f).height(46.dp)
                 ) {
                     Text("Créer un autre", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = BamNavy)
@@ -123,7 +130,7 @@ fun ArticleCreatedSheet(
                 Button(
                     onClick = { hideThen(onDismiss) },
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = BamNavy, contentColor = Color.White),
+                    colors = ButtonDefaults.buttonColors(containerColor = BamNavyFill, contentColor = OnBrand),
                     modifier = Modifier.weight(1f).height(46.dp)
                 ) {
                     Text("Terminé", fontSize = 14.sp, fontWeight = FontWeight.Bold)
@@ -170,7 +177,7 @@ private fun CreatedField(label: String, content: @Composable () -> Unit) {
         )
         content()
     }
-    HorizontalDivider(thickness = 1.dp, color = Color(0xFFE6E9F0))
+    HorizontalDivider(thickness = 1.dp, color = Hairline)
 }
 
 @Composable

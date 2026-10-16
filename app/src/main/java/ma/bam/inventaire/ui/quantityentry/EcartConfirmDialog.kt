@@ -50,8 +50,12 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,8 +65,16 @@ import androidx.compose.ui.window.DialogWindowProvider
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.ui.components.PopupHaptic
 import ma.bam.inventaire.ui.theme.BamNavy
+import ma.bam.inventaire.ui.theme.BamNavyFill
+import ma.bam.inventaire.ui.theme.CardSurface
+import ma.bam.inventaire.ui.theme.ControlBorder
+import ma.bam.inventaire.ui.theme.OnBrand
+import ma.bam.inventaire.ui.theme.SoftBand
 import ma.bam.inventaire.ui.theme.BamPrimary
+import ma.bam.inventaire.domain.EcartCalculator
 import ma.bam.inventaire.ui.theme.StatusEcart
+import ma.bam.inventaire.ui.theme.StatusNegative
+import ma.bam.inventaire.ui.theme.StatusNegativeBg
 import ma.bam.inventaire.ui.theme.StatusEcartBg
 import ma.bam.inventaire.ui.theme.TextMuted
 import ma.bam.inventaire.ui.theme.TextPrimary
@@ -116,7 +128,7 @@ fun EcartConfirmDialog(
             ) {
                 Surface(
                     shape = RoundedCornerShape(24.dp),
-                    color = Color.White,
+                    color = CardSurface,
                     shadowElevation = 10.dp,
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -157,18 +169,22 @@ private fun ColumnScope.EcartStep(
     onCorrect: () -> Unit,
     onValidate: () -> Unit
 ) {
+    // Même règle que les cartes produit : rouge à partir de ±5, orange en dessous.
+    val fort = EcartCalculator.isEcartFort(ecart)
+    val ecartColor = if (fort) StatusEcart else StatusNegative
+    val ecartBg = if (fort) StatusEcartBg else StatusNegativeBg
     Box(
         modifier = Modifier
             .align(Alignment.CenterHorizontally)
             .size(52.dp)
             .clip(CircleShape)
-            .background(StatusEcartBg),
+            .background(ecartBg),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             Icons.Outlined.WarningAmber,
             contentDescription = null,
-            tint = StatusEcart,
+            tint = ecartColor,
             modifier = Modifier.size(26.dp)
         )
     }
@@ -180,7 +196,7 @@ private fun ColumnScope.EcartStep(
     ) {
         QuantityTile("Système", formatQuantity(article.quantiteTheorique), QuantityBand, TextSecondary, BamNavy)
         QuantityTile("Compté", formatQuantity(quantiteReelle), QuantityBand, TextSecondary, BamNavy)
-        QuantityTile("Écart", formatQuantity(ecart, showSign = true), StatusEcartBg, StatusEcart, StatusEcart)
+        QuantityTile("Écart", formatQuantity(ecart, showSign = true), ecartBg, ecartColor, ecartColor)
     }
     DialogButtons(
         secondaryLabel = "Corriger",
@@ -198,18 +214,34 @@ private fun ColumnScope.CorrectionStep(
 ) {
     // Nouvelle correction : on repart de la remarque existante, que « Enregistrer » remplace.
     var remarque by remember { mutableStateOf(article.remarque.orEmpty()) }
+    // Préremplie avec la quantité système (écart nul), modifiable avec − / + ou au clavier.
+    var field by remember {
+        val initial = formatQuantity(article.quantiteTheorique)
+        mutableStateOf(TextFieldValue(initial, selection = TextRange(initial.length)))
+    }
+    val quantite = field.text.replace(",", ".").toDoubleOrNull()
+    val keyboard = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     DialogTitle("Corriger la quantité")
     ProductName(article)
     QuantityBandRow("Quantité système", article.quantiteTheorique)
-    // La correction aligne la quantité comptée sur le système : l'article devient conforme.
-    QuantityBandRow("Quantité comptée", article.quantiteTheorique)
+    CountedQuantityInput(
+        field = field,
+        onFieldChange = { field = it },
+        quantiteTheorique = article.quantiteTheorique,
+        onDone = {
+            keyboard?.hide()
+            focusManager.clearFocus()
+        }
+    )
     RemarqueField(value = remarque, onValueChange = { remarque = it })
     DialogButtons(
         secondaryLabel = "Annuler",
         onSecondary = onCancel,
         primaryLabel = "Enregistrer",
-        onPrimary = { onSave(article.quantiteTheorique, remarque) }
+        onPrimary = { quantite?.let { onSave(it, remarque) } },
+        primaryEnabled = quantite != null
     )
 }
 
@@ -377,7 +409,7 @@ private fun DialogButtons(
             onClick = onSecondary,
             shape = ControlShape,
             border = BorderStroke(1.dp, StepBorder),
-            colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White),
+            colors = ButtonDefaults.outlinedButtonColors(containerColor = CardSurface),
             modifier = Modifier.weight(1f).height(44.dp)
         ) {
             Text(secondaryLabel, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = BamNavy, maxLines = 1)
@@ -387,10 +419,10 @@ private fun DialogButtons(
             onClick = onPrimary,
             shape = ControlShape,
             colors = ButtonDefaults.buttonColors(
-                containerColor = BamNavy,
-                contentColor = Color.White,
-                disabledContainerColor = BamNavy.copy(alpha = 0.4f),
-                disabledContentColor = Color.White
+                containerColor = BamNavyFill,
+                contentColor = OnBrand,
+                disabledContainerColor = BamNavyFill.copy(alpha = 0.4f),
+                disabledContentColor = OnBrand
             ),
             modifier = Modifier.weight(1.3f).height(44.dp)
         ) {

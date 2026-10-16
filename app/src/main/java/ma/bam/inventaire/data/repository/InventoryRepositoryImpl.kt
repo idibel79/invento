@@ -135,19 +135,6 @@ class InventoryRepositoryImpl @Inject constructor(
         sessionDao.deleteById(sessionId)
     }
 
-    override suspend fun getSessionCounters(sessionId: String): SessionCounters {
-        val total = articleDao.countForSession(sessionId)
-        val scanned = articleDao.countScannedForSession(sessionId)
-        val pending = articleDao.countPendingEcartsForSession(sessionId)
-        val negativeStock = articleDao.countNegativeStockForSession(sessionId)
-        val emptyStock = articleDao.countEmptyStockForSession(sessionId)
-        return SessionCounters(
-            total = total,
-            scanned = scanned,
-            ecarts = articleDao.countEcartsForSession(sessionId),
-            pendingEcarts = pending,
-            negativeStock = negativeStock,
-            emptyStock = emptyStock
-        )
-    }
+    override suspend fun getSessionCounters(sessionId: String): SessionCounters =
+        articleDao.countersForSession(sessionId)
 }

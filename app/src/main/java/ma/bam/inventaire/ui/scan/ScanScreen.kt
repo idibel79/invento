@@ -87,6 +87,11 @@ import ma.bam.inventaire.ui.quantityentry.EcartConfirmDialog
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
 import ma.bam.inventaire.ui.quantityentry.UnknownArticleDialog
 import ma.bam.inventaire.ui.theme.BamNavy
+import ma.bam.inventaire.ui.theme.BamNavyFill
+import ma.bam.inventaire.ui.theme.CardSurface
+import ma.bam.inventaire.ui.theme.ControlBorder
+import ma.bam.inventaire.ui.theme.OnBrand
+import ma.bam.inventaire.ui.theme.TrackColor
 import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.StatusEcart
 import ma.bam.inventaire.ui.theme.StatusEcartBg
@@ -95,9 +100,9 @@ import ma.bam.inventaire.ui.theme.TextMuted
 import ma.bam.inventaire.ui.theme.TextPrimary
 import ma.bam.inventaire.ui.theme.TextSecondary
 
-private val FieldBorder = Color(0xFFE1E6F0)
-private val ProgressTrack = Color(0xFFE1E6F0)
-private val ButtonOutline = Color(0xFFC9D3E6)
+private val FieldBorder: Color @Composable get() = TrackColor
+private val ProgressTrack: Color @Composable get() = TrackColor
+private val ButtonOutline: Color @Composable get() = ControlBorder
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -275,7 +280,7 @@ fun ScanScreen(
                     spotColor = TextPrimary.copy(alpha = 0.3f)
                 )
                 .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                .background(Color.White)
+                .background(CardSurface)
                 .navigationBarsPadding()
                 .padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 14.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -355,7 +360,7 @@ fun ScanScreen(
                 Button(
                     onClick = { showFinalizeConfirm = true },
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = BamNavy, contentColor = Color.White),
+                    colors = ButtonDefaults.buttonColors(containerColor = BamNavyFill, contentColor = OnBrand),
                     contentPadding = CompactButtonPadding,
                     modifier = Modifier.weight(1f).height(46.dp)
                 ) {
@@ -451,7 +456,7 @@ private fun ManualSearchField(
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White)
+                    .background(CardSurface)
                     .border(
                         width = if (focused) 2.dp else 1.dp,
                         color = if (focused) BamNavy else FieldBorder,

@@ -4,6 +4,7 @@ import android.util.Size
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
+import java.util.concurrent.Executors
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -43,7 +44,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import ma.bam.inventaire.ui.theme.BamCyan
+import ma.bam.inventaire.ui.theme.LightInventoPalette
 
 @Composable
 fun CameraPreview(
@@ -55,6 +56,11 @@ fun CameraPreview(
     val lifecycleOwner = LocalLifecycleOwner.current
     val previewView = remember(context) { PreviewView(context) }
     var camera by remember { mutableStateOf<Camera?>(null) }
+
+    // Analyse des images hors du fil principal, pour ne pas faire saccader l'écran pendant le scan
+    // (les résultats ML Kit reviennent ensuite sur le fil principal).
+    val analysisExecutor = remember { Executors.newSingleThreadExecutor() }
+    DisposableEffect(Unit) { onDispose { analysisExecutor.shutdown() } }
 
     DisposableEffect(lifecycleOwner) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
@@ -71,7 +77,7 @@ fun CameraPreview(
                 .build()
                 .also {
                     it.setAnalyzer(
-                        ContextCompat.getMainExecutor(context),
+                        analysisExecutor,
                         BarcodeAnalyzer(onBarcodeDetected = onBarcodeDetected)
                     )
                 }
@@ -156,7 +162,7 @@ private fun ScanWindowOverlay(modifier: Modifier = Modifier) {
 
         val lineY = top + windowHeight / 2f
         drawLine(
-            color = BamCyan.copy(alpha = lineAlpha),
+            color = LightInventoPalette.cyan.copy(alpha = lineAlpha),
             start = Offset(left + 12.dp.toPx(), lineY),
             end = Offset(left + windowWidth - 12.dp.toPx(), lineY),
             strokeWidth = 3.dp.toPx(),
@@ -186,7 +192,7 @@ private fun DrawScope.drawDimmedScrim(windowRect: Rect, cornerRadius: Float) {
 }
 
 private fun DrawScope.drawCorners(left: Float, top: Float, right: Float, bottom: Float) {
-    val color = BamCyan
+    val color = LightInventoPalette.cyan
     val length = 22.dp.toPx()
     val stroke = 4.dp.toPx()
 

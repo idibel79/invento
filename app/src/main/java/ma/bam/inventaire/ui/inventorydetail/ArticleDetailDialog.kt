@@ -39,6 +39,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.ui.theme.BamNavy
+import ma.bam.inventaire.ui.theme.BamPrimaryContainer
+import ma.bam.inventaire.ui.theme.CardSurface
+import ma.bam.inventaire.ui.theme.ControlBorder
+import ma.bam.inventaire.ui.theme.Hairline
+import ma.bam.inventaire.ui.theme.SoftBand
 import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.TextSecondary
 import ma.bam.inventaire.util.formatQuantity
@@ -59,7 +64,7 @@ fun ArticleDetailDialog(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         shape = SheetShape,
-        containerColor = Color.White,
+        containerColor = CardSurface,
         dragHandle = { SheetHandle() }
     ) {
         Column(
@@ -126,10 +131,10 @@ fun ArticleDetailDialog(
     }
 }
 
-private val FieldDivider = Color(0xFFE6E9F0)
-private val PriceBand = Color(0xFFE6EEFF)
-private val BandDivider = Color(0xFFC9D3E6)
-private val QuantityBand = Color(0xFFF4F6FB)
+private val FieldDivider: Color @Composable get() = Hairline
+private val PriceBand: Color @Composable get() = BamPrimaryContainer
+private val BandDivider: Color @Composable get() = ControlBorder
+private val QuantityBand: Color @Composable get() = SoftBand
 
 /** Icône code-barres de la maquette : cinq traits verticaux (viewBox 24, trait 2, bouts arrondis). */
 internal val BarcodeIcon: ImageVector = ImageVector.Builder(

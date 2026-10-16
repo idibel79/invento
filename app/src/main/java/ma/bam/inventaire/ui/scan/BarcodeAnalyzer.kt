@@ -5,6 +5,7 @@ import androidx.annotation.OptIn
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
@@ -24,9 +25,25 @@ class BarcodeAnalyzer(
     private val onBarcodeDetected: (String) -> Unit
 ) : ImageAnalysis.Analyzer {
 
-    private val scanner = BarcodeScanning.getClient()
+    // Seuls les formats des produits (EAN-13 / EAN-8, UPC-A, Code 128) : les autres formats
+    // (UPC-E, ITF, Codabar...) produisaient de faux codes en lisant une partie d'un EAN.
+    private val scanner = BarcodeScanning.getClient(
+        BarcodeScannerOptions.Builder()
+            .setBarcodeFormats(
+                Barcode.FORMAT_EAN_13,
+                Barcode.FORMAT_EAN_8,
+                Barcode.FORMAT_UPC_A,
+                Barcode.FORMAT_CODE_128
+            )
+            .build()
+    )
     private var lastDetectedValue: String? = null
     private var lastDetectedAt: Long = 0L
+
+    // Lecture candidate : un code n'est retenu qu'après avoir été lu identique sur 2 images
+    // proches, ce qui écarte les lectures erronées isolées.
+    private var candidateValue: String? = null
+    private var candidateAt: Long = 0L
 
     @OptIn(ExperimentalGetImage::class)
     override fun analyze(imageProxy: ImageProxy) {
@@ -59,6 +76,12 @@ class BarcodeAnalyzer(
         }?.rawValue ?: return
 
         val now = System.currentTimeMillis()
+        if (value != candidateValue || now - candidateAt > CONFIRM_WINDOW_MS) {
+            candidateValue = value
+            candidateAt = now
+            return
+        }
+        candidateAt = now
         if (value == lastDetectedValue && now - lastDetectedAt < minIntervalMs) {
             return
         }
@@ -89,7 +112,11 @@ class BarcodeAnalyzer(
 
     companion object {
         /** Demi-largeur (en fraction de la dimension totale) de la bande acceptée autour du trait de visée.
-         * Volontairement étroite : seul un code-barres réellement aligné sur le trait rouge doit être lu. */
-        private const val SCAN_LINE_TOLERANCE_FRACTION = 0.035f
+         * Couvre la fenêtre de visée sans déborder : un code-barres dans le cadre est lu même s'il n'est pas
+         * pile sur le trait, un code-barres hors du cadre ne l'est pas. */
+        private const val SCAN_LINE_TOLERANCE_FRACTION = 0.09f
+
+        /** Délai max entre les 2 lectures identiques qui confirment un code. */
+        private const val CONFIRM_WINDOW_MS = 700L
     }
 }

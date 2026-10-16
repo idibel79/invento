@@ -106,8 +106,14 @@ import ma.bam.inventaire.ui.components.PillShape
 import ma.bam.inventaire.ui.components.EllipsisScrollBox
 import ma.bam.inventaire.ui.components.rememberLongPressHaptic
 import ma.bam.inventaire.ui.components.rememberTapHaptic
+import ma.bam.inventaire.ui.quantityentry.EcartConfirmDialog
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
 import ma.bam.inventaire.ui.theme.BamNavy
+import ma.bam.inventaire.ui.theme.BamNavyFill
+import ma.bam.inventaire.ui.theme.BamPrimaryFill
+import ma.bam.inventaire.ui.theme.CardSurface
+import ma.bam.inventaire.ui.theme.OnBrand
+import ma.bam.inventaire.ui.theme.SelectedCardBg
 import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.StatusEcart
 import ma.bam.inventaire.ui.theme.StatusEcartBg
@@ -152,6 +158,7 @@ fun InventoryDetailScreen(
     val priceBounds by viewModel.priceBounds.collectAsState()
     val sort by viewModel.sort.collectAsState()
     var editingArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
+    var pendingEcart by remember { mutableStateOf<PendingEcart?>(null) }
     var detailArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
     val positionCounts by viewModel.positionCounts.collectAsState()
     val categoryCounts by viewModel.categoryCounts.collectAsState()
@@ -391,13 +398,31 @@ fun InventoryDetailScreen(
             article = article,
             onDismiss = { editingArticle = null },
             onConfirm = { quantite ->
+                // Même enchaînement qu'après un scan : un écart ouvre la popup « Écart détecté ».
                 val ecart = EcartCalculator.compute(article.quantiteTheorique, quantite)
-                viewModel.updateQuantity(
-                    articleId = article.id,
-                    quantiteReelle = quantite,
-                    ecartValide = !EcartCalculator.hasEcart(ecart)
-                )
+                if (EcartCalculator.hasEcart(ecart)) {
+                    pendingEcart = PendingEcart(article, quantite, ecart)
+                } else {
+                    viewModel.updateQuantity(article.id, quantite, ecartValide = true)
+                }
                 editingArticle = null
+            }
+        )
+    }
+
+    pendingEcart?.let { pending ->
+        EcartConfirmDialog(
+            article = pending.article,
+            quantiteReelle = pending.quantiteReelle,
+            ecart = pending.ecart,
+            onDismiss = { pendingEcart = null },
+            onValidate = {
+                viewModel.updateQuantity(pending.article.id, pending.quantiteReelle, ecartValide = true)
+                pendingEcart = null
+            },
+            onSaveCorrection = { quantite, remarque ->
+                viewModel.saveCorrection(pending.article.id, quantite, remarque)
+                pendingEcart = null
             }
         )
     }
@@ -486,7 +511,7 @@ private fun ProgressCard(scanned: Int, total: Int, modifier: Modifier = Modifier
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .background(Color(0xFFCEDEFF))
+            .background(SelectedCardBg)
             .padding(horizontal = 18.dp, vertical = 16.dp)
     ) {
         Row(verticalAlignment = Alignment.Bottom) {
@@ -520,7 +545,7 @@ private fun ProgressCard(scanned: Int, total: Int, modifier: Modifier = Modifier
                 .height(8.dp)
                 .clip(PillShape),
             color = BamPrimary,
-            trackColor = Color.White,
+            trackColor = CardSurface,
             strokeCap = StrokeCap.Round,
             gapSize = 0.dp,
             drawStopIndicator = {}
@@ -562,7 +587,7 @@ private fun SquareToolButton(
                     .offset(x = (-5).dp, y = 5.dp)
                     .size(16.dp)
                     .clip(CircleShape)
-                    .background(BamPrimary),
+                    .background(BamPrimaryFill),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -570,7 +595,7 @@ private fun SquareToolButton(
                     fontSize = 10.sp,
                     lineHeight = 10.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = OnBrand
                 )
             }
         } else if (active) {
@@ -606,22 +631,22 @@ private fun QuickFilterChip(
                     count.toString(),
                     style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = TabularNums),
                     fontWeight = FontWeight.Bold,
-                    color = if (selected) Color.White.copy(alpha = 0.7f) else BamNavy.copy(alpha = 0.7f)
+                    color = if (selected) OnBrand.copy(alpha = 0.7f) else BamNavy.copy(alpha = 0.7f)
                 )
             }
         },
         shape = PillShape,
         colors = FilterChipDefaults.filterChipColors(
-            containerColor = Color.White,
+            containerColor = CardSurface,
             labelColor = BamNavy,
-            selectedContainerColor = BamNavy,
-            selectedLabelColor = Color.White
+            selectedContainerColor = BamNavyFill,
+            selectedLabelColor = OnBrand
         ),
         border = FilterChipDefaults.filterChipBorder(
             enabled = true,
             selected = selected,
             borderColor = MaterialTheme.colorScheme.outline,
-            selectedBorderColor = BamNavy
+            selectedBorderColor = BamNavyFill
         )
     )
 }
@@ -632,6 +657,7 @@ private fun QuickFilterChip(
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
+
 internal fun ArticleRow(
     item: StockArticleEntity,
     locked: Boolean,
@@ -646,13 +672,13 @@ internal fun ArticleRow(
     val longPressHaptic = rememberLongPressHaptic()
     val hasEcart = EcartCalculator.hasEcart(article.ecart)
     val notScanned = article.quantiteReelle == null
-    val ecartNegatif = hasEcart && (article.ecart ?: 0.0) < 0.0
-    // Orange si écart négatif (compté < système), rouge si écart positif, vert si conforme,
+    // Rouge si |écart| >= 5, orange si écart plus petit (entre -5 et +5 exclus), vert si conforme,
     // gris si non inventorié.
-    val ecartColor = if (ecartNegatif) StatusNegative else StatusEcart
+    val ecartFaible = hasEcart && !EcartCalculator.isEcartFort(article.ecart)
+    val ecartColor = if (ecartFaible) StatusNegative else StatusEcart
     val cardColor = when {
         notScanned -> StatusPendingBg
-        ecartNegatif -> StatusNegativeBg
+        ecartFaible -> StatusNegativeBg
         hasEcart -> StatusEcartBg
         else -> StatusSuccessBg
     }
@@ -750,7 +776,7 @@ internal fun ArticleRow(
                 )
                 ArticleInfoText("${formatQuantity(article.prixUnitaire)} DH", infoTextColor, infoWeight)
                 if (codesBarres.isNotEmpty()) {
-                    Text("·", fontSize = 12.5.sp, color = Color(0xFFB5BFD1), maxLines = 1, softWrap = false)
+                    Text("·", fontSize = 12.5.sp, color = TextMuted, maxLines = 1, softWrap = false)
                     Icon(
                         painter = painterResource(id = R.drawable.ic_barcode_scan),
                         contentDescription = null,
@@ -796,21 +822,21 @@ internal fun ArticleRow(
                     .padding(top = 6.dp)
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
-                    .background(Color.White.copy(alpha = 0.75f))
+                    .background(CardSurface.copy(alpha = 0.75f))
                     .padding(vertical = 4.dp)
             ) {
                 QuantityCell(label = "Système", modifier = Modifier.weight(1f)) {
                     QuantityValue(formatQuantity(article.quantiteTheorique), TextPrimary)
                 }
                 QuantityCellDivider()
-                QuantityCell(label = "Compté", modifier = Modifier.weight(1f).leftDivider()) {
+                QuantityCell(label = "Compté", modifier = Modifier.weight(1f).leftDivider(QuantityDividerColor)) {
                     QuantityValue(
                         article.quantiteReelle?.let { formatQuantity(it) } ?: "–",
                         if (notScanned) TextPrimary else BamPrimary
                     )
                 }
                 QuantityCellDivider()
-                QuantityCell(label = "Écart", modifier = Modifier.weight(1f).leftDivider()) {
+                QuantityCell(label = "Écart", modifier = Modifier.weight(1f).leftDivider(QuantityDividerColor)) {
                     when {
                         notScanned -> QuantityValue("À compter", ArticleMutedColor, fontSize = 13.5.sp, fontWeight = FontWeight.Normal)
                         hasEcart -> QuantityValue(
@@ -829,7 +855,11 @@ internal fun ArticleRow(
     }
 }
 
-private val ArticleMutedColor = Color(0xFF6B7585)
+/** Saisie avec écart en attente de la popup « Écart détecté » (Valider ou Corriger). */
+private data class PendingEcart(val article: StockArticleEntity, val quantiteReelle: Double, val ecart: Double)
+
+private val ArticleMutedColor: Color
+    @Composable get() = TextSecondary
 
 @Composable
 private fun ArticleInfoText(text: String, color: Color, fontWeight: FontWeight, modifier: Modifier = Modifier) {
@@ -871,16 +901,17 @@ private fun QuantityCellDivider() {
     Spacer(modifier = Modifier.width(1.dp))
 }
 
-private val QuantityDividerColor = TextPrimary.copy(alpha = 0.08f)
+private val QuantityDividerColor: Color
+    @Composable get() = TextPrimary.copy(alpha = 0.08f)
 
 /**
  * Dessine le séparateur fin dans l'espace de 1dp à gauche de la cellule, sur toute sa hauteur.
  * Remplace l'ancien `height(IntrinsicSize.Min)` + `fillMaxHeight()`, dont la mesure intrinsèque
  * doublait le coût de mise en page de chaque carte pendant le défilement.
  */
-private fun Modifier.leftDivider(): Modifier = drawBehind {
+private fun Modifier.leftDivider(color: Color): Modifier = drawBehind {
     val w = 1.dp.toPx()
-    drawRect(QuantityDividerColor, topLeft = Offset(-w, 0f), size = Size(w, size.height))
+    drawRect(color, topLeft = Offset(-w, 0f), size = Size(w, size.height))
 }
 
 @Composable
@@ -910,7 +941,7 @@ private fun RemarqueNote(remarque: String?, modifier: Modifier = Modifier) {
             modifier = modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(9.dp))
-                .background(Color.White)
+                .background(CardSurface)
                 .padding(horizontal = 9.dp, vertical = 7.dp),
             verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.spacedBy(7.dp)

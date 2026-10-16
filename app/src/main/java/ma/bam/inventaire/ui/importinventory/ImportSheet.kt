@@ -56,6 +56,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.SolidColor
+import ma.bam.inventaire.ui.theme.*
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -73,12 +74,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 
-private val SheetTitle = Color(0xFF0F1A33)
-private val Navy = Color(0xFF0B2A6B)
-private val Muted = Color(0xFF55627A)
-private val Accent = Color(0xFF1652D9)
-private val SoftBg = Color(0xFFF4F6FB)
-private val ButtonBorder = Color(0xFFC9D3E6)
+private val SheetTitle: Color @Composable get() = TextPrimary
+private val Navy: Color @Composable get() = BamNavy
+private val Muted: Color @Composable get() = TextSecondary
+private val Accent: Color @Composable get() = BamPrimary
+private val SoftBg: Color @Composable get() = SoftBand
+private val ButtonBorder: Color @Composable get() = ControlBorder
 
 private const val XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 
@@ -127,7 +128,7 @@ fun ImportSheet(
         onDismissRequest = { if (!isLoading) close() },
         sheetState = sheetState,
         shape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp),
-        containerColor = Color.White,
+        containerColor = CardSurface,
         dragHandle = { ImportSheetHandle() }
     ) {
         Column(
@@ -162,7 +163,7 @@ fun ImportSheet(
                                 .height(6.dp)
                                 .clip(RoundedCornerShape(3.dp)),
                             color = Accent,
-                            trackColor = Color(0xFFE1E6F0),
+                            trackColor = TrackColor,
                             strokeCap = StrokeCap.Round,
                             gapSize = 0.dp
                         )
@@ -193,17 +194,17 @@ fun ImportSheet(
                 is ImportUiState.Error -> {
                     FileRow(file = file, onClear = viewModel::reset)
                     StatusHeader(
-                        circleColor = Color(0xFFFDECEC),
+                        circleColor = StatusEcartBg,
                         icon = Icons.Filled.Close,
                         iconSize = 24.dp,
-                        iconTint = Color(0xFFC42B2B),
+                        iconTint = StatusEcart,
                         title = "Import impossible"
                     ) {
                         Text(
                             text = current.message,
                             textAlign = TextAlign.Center,
                             fontSize = 12.5.sp,
-                            color = Color(0xFFC42B2B)
+                            color = StatusEcart
                         )
                     }
                     ColumnChips()
@@ -231,7 +232,7 @@ private fun ImportSheetHandle() {
             .padding(top = 8.dp, bottom = 2.dp)
             .size(width = 36.dp, height = 4.dp)
             .clip(CircleShape)
-            .background(Color(0xFFD5DBE7))
+            .background(BorderColor)
     )
 }
 
@@ -245,12 +246,12 @@ private fun IdleContent(onPick: () -> Unit, onCancel: () -> Unit) {
         color = Muted
     )
 
-    val dashColor = Color(0xFFAFC2E8)
+    val dashColor = BamPrimary.copy(alpha = 0.45f)
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFE6EEFF))
+            .background(BamPrimaryContainer)
             .drawBehind {
                 val stroke = 2.dp.toPx()
                 drawRoundRect(
@@ -373,10 +374,10 @@ private fun SuccessContent(success: ImportUiState.Success) {
     var errorsExpanded by remember { mutableStateOf(false) }
 
     StatusHeader(
-        circleColor = Color(0xFFE3F5EA),
+        circleColor = StatusSuccessBg,
         icon = Icons.Filled.Check,
         iconSize = 26.dp,
-        iconTint = Color(0xFF15803D),
+        iconTint = StatusSuccess,
         title = "Import réussi"
     ) {
         Text(
@@ -392,12 +393,12 @@ private fun SuccessContent(success: ImportUiState.Success) {
     }
 
     if (success.erreurs.isNotEmpty()) {
-        val warn = Color(0xFF9A5B00)
+        val warn = StatusNegative
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(10.dp))
-                .background(Color(0xFFFFF3DC))
+                .background(StatusNegativeBg)
                 .padding(horizontal = 11.dp, vertical = 9.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -491,7 +492,7 @@ private fun PrimaryButton(text: String, modifier: Modifier, onClick: () -> Unit)
         onClick = onClick,
         modifier = modifier.height(46.dp),
         shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Navy, contentColor = Color.White)
+        colors = ButtonDefaults.buttonColors(containerColor = BamNavyFill, contentColor = OnBrand)
     ) {
         Text(text, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }

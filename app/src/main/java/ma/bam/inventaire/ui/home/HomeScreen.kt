@@ -51,6 +51,8 @@ import ma.bam.inventaire.ui.inventorylist.InventoryListViewModel
 import ma.bam.inventaire.ui.inventorylist.SessionListItem
 import ma.bam.inventaire.ui.inventorylist.SwipeableSessionCard
 import ma.bam.inventaire.ui.theme.BamNavy
+import ma.bam.inventaire.ui.theme.BamNavyFill
+import ma.bam.inventaire.ui.theme.CardSurface
 import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.StatusEcart
 import ma.bam.inventaire.ui.theme.StatusSuccess
@@ -278,11 +280,19 @@ fun HomeScreen(
 }
 
 /** Filtres de la liste, un par tuile, dans l'ordre d'affichage. */
-private enum class HomeFilter(val label: String, val color: Color) {
-    ONGOING("En cours", BamPrimary),
-    PENDING("En attente", TextSecondary),
-    ECARTS("Écarts", StatusEcart),
-    FINALIZED("Finalisés", StatusSuccess)
+private enum class HomeFilter(val label: String) {
+    ONGOING("En cours"),
+    PENDING("En attente"),
+    ECARTS("Écarts"),
+    FINALIZED("Finalisés");
+
+    val color: Color
+        @Composable get() = when (this) {
+            ONGOING -> BamPrimary
+            PENDING -> TextSecondary
+            ECARTS -> StatusEcart
+            FINALIZED -> StatusSuccess
+        }
 }
 
 /** Finalisé = tous les articles comptés (carte verte) ou clôturé (cadenas fermé). */
@@ -310,9 +320,9 @@ private fun SummaryTile(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(14.dp),
-        color = if (selected) BamNavy else Color.White,
+        color = if (selected) BamNavyFill else CardSurface,
         shadowElevation = if (selected) 0.dp else 1.dp,
-        border = BorderStroke(1.5.dp, if (selected) BamNavy else Color.Transparent),
+        border = BorderStroke(1.5.dp, if (selected) BamNavyFill else Color.Transparent),
         modifier = modifier
     ) {
         Column(

@@ -9,6 +9,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import ma.bam.inventaire.ui.theme.AppBackground
 import ma.bam.inventaire.ui.theme.BamCyan
 import ma.bam.inventaire.ui.theme.BamNavy
+import ma.bam.inventaire.ui.theme.CardSurface
+import ma.bam.inventaire.ui.theme.LightInventoPalette
+import ma.bam.inventaire.ui.theme.SelectedCardBg
 import ma.bam.inventaire.ui.theme.TextPrimary
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -117,14 +120,14 @@ fun SwipeableSessionCard(
             when (dismissState.dismissDirection) {
                 SwipeToDismissBoxValue.EndToStart -> SwipeActionBackground(
                     alignment = Alignment.CenterEnd,
-                    color = StatusEcart,
+                    color = LightInventoPalette.ecart,
                     progress = progress,
                     icon = Icons.Filled.Delete,
                     label = "Supprimer"
                 )
                 SwipeToDismissBoxValue.StartToEnd -> SwipeActionBackground(
                     alignment = Alignment.CenterStart,
-                    color = StatusSuccess,
+                    color = LightInventoPalette.success,
                     progress = progress,
                     icon = Icons.Filled.Lock,
                     label = "Clôturer"
@@ -217,14 +220,14 @@ fun InventorySessionCard(
             accent = BamNavy,
             ringProgress = StatusSuccess,
             ringPercent = StatusSuccess,
-            track = Color.White,
+            track = CardSurface,
             badgeBackground = StatusSuccess,
-            badgeText = Color.White,
-            emptyChipBackground = Color.White.copy(alpha = 0.6f),
+            badgeText = CardSurface,
+            emptyChipBackground = CardSurface.copy(alpha = 0.6f),
             emptyChipText = TextMuted
         )
         notStarted -> SessionCardColors(
-            background = Color.White,
+            background = CardSurface,
             titleText = BamNavy,
             text = BamNavy,
             dateText = BamNavy,
@@ -239,17 +242,17 @@ fun InventorySessionCard(
         )
         // En cours : fond bleu clair #CEDEFF, textes en bleu Invento, anneau bleu.
         else -> SessionCardColors(
-            background = Color(0xFFCEDEFF),
+            background = SelectedCardBg,
             titleText = BamNavy,
             text = BamNavy,
             dateText = BamNavy,
             accent = BamNavy,
             ringProgress = BamPrimary,
             ringPercent = BamPrimary,
-            track = Color.White,
+            track = CardSurface,
             badgeBackground = BamPrimary,
-            badgeText = Color.White,
-            emptyChipBackground = Color.White.copy(alpha = 0.6f),
+            badgeText = CardSurface,
+            emptyChipBackground = CardSurface.copy(alpha = 0.6f),
             emptyChipText = TextMuted
         )
     }

@@ -75,12 +75,17 @@ import ma.bam.inventaire.ui.theme.StatusNegativeBg
 import ma.bam.inventaire.ui.theme.StatusSuccess
 import ma.bam.inventaire.ui.theme.StatusSuccessBg
 import ma.bam.inventaire.ui.theme.BamNavy
+import ma.bam.inventaire.ui.theme.BamNavyFill
+import ma.bam.inventaire.ui.theme.CardSurface
+import ma.bam.inventaire.ui.theme.ControlBorder
+import ma.bam.inventaire.ui.theme.OnBrand
+import ma.bam.inventaire.ui.theme.SoftBand
 import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.TextSecondary
 import ma.bam.inventaire.util.formatQuantity
 
-internal val StepBorder = Color(0xFFC9D3E6)
-internal val QuantityBand = Color(0xFFF4F6FB)
+internal val StepBorder: Color @Composable get() = ControlBorder
+internal val QuantityBand: Color @Composable get() = SoftBand
 internal val ControlShape = RoundedCornerShape(12.dp)
 internal val Scrim = Color(0xFF0F1A33).copy(alpha = 0.42f)
 
@@ -103,22 +108,6 @@ fun QuantityEntryDialog(
         mutableStateOf(TextFieldValue(initial, selection = TextRange(initial.length)))
     }
     val quantite = field.text.replace(",", ".").toDoubleOrNull()
-    // Écart arrondi à 0 quand il est négligeable, pour distinguer « conforme » / en dessous / au-dessus.
-    val ecart = quantite
-        ?.let { EcartCalculator.compute(article.quantiteTheorique, it) }
-        ?.let { if (EcartCalculator.hasEcart(it)) it else 0.0 }
-    val ecartState = ecart?.let {
-        when {
-            it < 0.0 -> EcartColors(StatusNegative, StatusNegativeBg)
-            it > 0.0 -> EcartColors(StatusEcart, StatusEcartBg)
-            else -> EcartColors(StatusSuccess, StatusSuccessBg)
-        }
-    }
-    fun setQuantity(value: Double) {
-        val formatted = formatQuantity(value)
-        field = TextFieldValue(formatted, selection = TextRange(formatted.length))
-    }
-
     fun confirm() {
         val value = quantite ?: return
         onConfirm(value)
@@ -166,7 +155,7 @@ fun QuantityEntryDialog(
             ) {
                 Surface(
                     shape = RoundedCornerShape(24.dp),
-                    color = Color.White,
+                    color = CardSurface,
                     shadowElevation = 10.dp,
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -228,83 +217,13 @@ fun QuantityEntryDialog(
                                 modifier = Modifier.alignByBaseline().weight(1f)
                             )
                         }
-                        Column {
-                            FieldLabel("Quantité comptée")
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                StepButton(sign = "−", description = "Diminuer") {
-                                    setQuantity(((quantite ?: 0.0) - 1.0).coerceAtLeast(0.0))
-                                }
-                                BasicTextField(
-                                    value = field,
-                                    onValueChange = { field = it },
-                                    singleLine = true,
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = KeyboardType.Decimal,
-                                        imeAction = ImeAction.Done
-                                    ),
-                                    // « OK » ferme seulement le clavier : seul « Valider » enregistre.
-                                    keyboardActions = KeyboardActions(onDone = { closeKeyboard() }),
-                                    textStyle = TextStyle(
-                                        fontSize = 24.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        textAlign = TextAlign.Center,
-                                        fontFeatureSettings = "tnum",
-                                        color = ecartState?.color ?: BamNavy
-                                    ),
-                                    cursorBrush = SolidColor(BamPrimary),
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(52.dp)
-                                        .focusRequester(focusRequester),
-                                    decorationBox = { inner ->
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(52.dp)
-                                                .border(2.dp, BamNavy, ControlShape)
-                                                .padding(horizontal = 8.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) { inner() }
-                                    }
-                                )
-                                StepButton(sign = "+", description = "Augmenter") {
-                                    setQuantity((quantite ?: 0.0) + 1.0)
-                                }
-                            }
-                        }
-                        if (ecartState != null) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(ControlShape)
-                                    .background(ecartState.background)
-                                    .padding(horizontal = 12.dp, vertical = 9.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    if (ecart == 0.0) Icons.Filled.CheckCircleOutline else Icons.Filled.ErrorOutline,
-                                    contentDescription = null,
-                                    tint = ecartState.color,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    if (ecart == 0.0) {
-                                        "Écart conforme par rapport au système"
-                                    } else {
-                                        "Écart de ${formatQuantity(ecart!!, showSign = true)} par rapport au système"
-                                    },
-                                    fontSize = 12.5.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = ecartState.color,
-                                    style = TextStyle(fontFeatureSettings = "tnum")
-                                )
-                            }
-                        }
+                        CountedQuantityInput(
+                            field = field,
+                            onFieldChange = { field = it },
+                            quantiteTheorique = article.quantiteTheorique,
+                            onDone = { closeKeyboard() },
+                            fieldModifier = Modifier.focusRequester(focusRequester)
+                        )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -322,10 +241,10 @@ fun QuantityEntryDialog(
                                 onClick = { confirm() },
                                 shape = ControlShape,
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = BamNavy,
-                                    contentColor = Color.White,
-                                    disabledContainerColor = BamNavy.copy(alpha = 0.4f),
-                                    disabledContentColor = Color.White
+                                    containerColor = BamNavyFill,
+                                    contentColor = OnBrand,
+                                    disabledContainerColor = BamNavyFill.copy(alpha = 0.4f),
+                                    disabledContentColor = OnBrand
                                 ),
                                 modifier = Modifier.weight(1.6f).height(46.dp)
                             ) {
@@ -349,6 +268,115 @@ internal fun FieldLabel(label: String) {
         letterSpacing = 0.525.sp,
         color = TextSecondary
     )
+}
+
+/**
+ * Champ « Quantité comptée » avec − / + et le bandeau d'écart en dessous. Couleurs selon l'écart :
+ * vert si conforme, orange pour un petit écart, rouge à partir de ±[EcartCalculator.SEUIL_ECART_FORT].
+ * Partagé par la popup de saisie et l'étape « Corriger la quantité » de la popup Écart détecté.
+ */
+@Composable
+internal fun CountedQuantityInput(
+    field: TextFieldValue,
+    onFieldChange: (TextFieldValue) -> Unit,
+    quantiteTheorique: Double,
+    onDone: () -> Unit,
+    fieldModifier: Modifier = Modifier
+) {
+    val quantite = field.text.replace(",", ".").toDoubleOrNull()
+    // Écart arrondi à 0 quand il est négligeable, pour distinguer « conforme » / petit écart (orange) / écart ≥ 5 (rouge).
+    val ecart = quantite
+        ?.let { EcartCalculator.compute(quantiteTheorique, it) }
+        ?.let { if (EcartCalculator.hasEcart(it)) it else 0.0 }
+    val ecartState = ecart?.let {
+        when {
+            it == 0.0 -> EcartColors(StatusSuccess, StatusSuccessBg)
+            EcartCalculator.isEcartFort(it) -> EcartColors(StatusEcart, StatusEcartBg)
+            else -> EcartColors(StatusNegative, StatusNegativeBg)
+        }
+    }
+    fun setQuantity(value: Double) {
+        val formatted = formatQuantity(value)
+        onFieldChange(TextFieldValue(formatted, selection = TextRange(formatted.length)))
+    }
+
+    Column {
+        FieldLabel("Quantité comptée")
+        Spacer(modifier = Modifier.height(6.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            StepButton(sign = "−", description = "Diminuer") {
+                setQuantity(((quantite ?: 0.0) - 1.0).coerceAtLeast(0.0))
+            }
+            BasicTextField(
+                value = field,
+                onValueChange = onFieldChange,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Done
+                ),
+                // « OK » ferme seulement le clavier : seul « Valider » enregistre.
+                keyboardActions = KeyboardActions(onDone = { onDone() }),
+                textStyle = TextStyle(
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    textAlign = TextAlign.Center,
+                    fontFeatureSettings = "tnum",
+                    color = ecartState?.color ?: BamNavy
+                ),
+                cursorBrush = SolidColor(BamPrimary),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(52.dp)
+                    .then(fieldModifier),
+                decorationBox = { inner ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                            .border(2.dp, BamNavy, ControlShape)
+                            .padding(horizontal = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) { inner() }
+                }
+            )
+            StepButton(sign = "+", description = "Augmenter") {
+                setQuantity((quantite ?: 0.0) + 1.0)
+            }
+        }
+    }
+    if (ecartState != null) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(ControlShape)
+                .background(ecartState.background)
+                .padding(horizontal = 12.dp, vertical = 9.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                if (ecart == 0.0) Icons.Filled.CheckCircleOutline else Icons.Filled.ErrorOutline,
+                contentDescription = null,
+                tint = ecartState.color,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                if (ecart == 0.0) {
+                    "Écart conforme par rapport au système"
+                } else {
+                    "Écart de ${formatQuantity(ecart!!, showSign = true)} par rapport au système"
+                },
+                fontSize = 12.5.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = ecartState.color,
+                style = TextStyle(fontFeatureSettings = "tnum")
+            )
+        }
+    }
 }
 
 @Composable

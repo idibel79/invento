@@ -38,6 +38,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import ma.bam.inventaire.ui.theme.BamNavy
+import ma.bam.inventaire.ui.theme.BamNavyFill
+import ma.bam.inventaire.ui.theme.CardSurface
+import ma.bam.inventaire.ui.theme.ControlBorder
+import ma.bam.inventaire.ui.theme.LightInventoPalette
+import ma.bam.inventaire.ui.theme.OnBrand
+import ma.bam.inventaire.ui.theme.TrackColor
+import androidx.compose.runtime.ReadOnlyComposable
 import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.BamPrimaryContainer
 import ma.bam.inventaire.ui.theme.StatusEcart
@@ -48,13 +55,21 @@ import ma.bam.inventaire.ui.theme.TextSecondary
 import kotlin.math.roundToInt
 
 /** Couleurs d'une popup : marine pour toutes les actions, rouge seulement pour l'irréversible. */
-enum class ConfirmTone(val accent: Color, val iconBg: Color) {
-    NAVY(BamNavy, BamPrimaryContainer),
-    DANGER(StatusEcart, StatusEcartBg)
+enum class ConfirmTone {
+    NAVY, DANGER;
+
+    /** Icône (sur [iconBg]). */
+    val accent: Color
+        @Composable get() = if (this == NAVY) BamNavy else StatusEcart
+
+    val iconBg: Color
+        @Composable get() = if (this == NAVY) BamPrimaryContainer else StatusEcartBg
+
+    /** Fond du bouton principal, sous texte blanc (reste foncé en mode sombre). */
+    val fill: Color
+        @Composable get() = if (this == NAVY) BamNavyFill else LightInventoPalette.ecart
 }
 
-private val CancelBorder = Color(0xFFC9D3E6)
-private val ProgressTrack = Color(0xFFE1E6F0)
 
 /**
  * Popup de confirmation commune (maquette « Popups de confirmation », ligne A) : icône dans un
@@ -80,7 +95,7 @@ fun ConfirmDialog(
     ) {
         Surface(
             shape = RoundedCornerShape(24.dp),
-            color = Color.White,
+            color = CardSurface,
             shadowElevation = 6.dp,
             modifier = Modifier
                 .padding(horizontal = 24.dp)
@@ -130,7 +145,7 @@ fun ConfirmDialog(
                                 .weight(1f)
                                 .height(6.dp)
                                 .clip(RoundedCornerShape(3.dp))
-                                .background(ProgressTrack)
+                                .background(TrackColor)
                         ) {
                             Box(
                                 modifier = Modifier
@@ -155,8 +170,8 @@ fun ConfirmDialog(
                     OutlinedButton(
                         onClick = onDismiss,
                         shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, CancelBorder),
-                        colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White, contentColor = BamNavy),
+                        border = BorderStroke(1.dp, ControlBorder),
+                        colors = ButtonDefaults.outlinedButtonColors(containerColor = CardSurface, contentColor = BamNavy),
                         contentPadding = PaddingValues(horizontal = 8.dp),
                         modifier = Modifier.weight(1f).height(44.dp)
                     ) {
@@ -165,7 +180,7 @@ fun ConfirmDialog(
                     Button(
                         onClick = onConfirm,
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = tone.accent, contentColor = Color.White),
+                        colors = ButtonDefaults.buttonColors(containerColor = tone.fill, contentColor = OnBrand),
                         contentPadding = PaddingValues(horizontal = 8.dp),
                         modifier = Modifier.weight(1.3f).height(44.dp)
                     ) {
@@ -178,6 +193,8 @@ fun ConfirmDialog(
 }
 
 /** Phrase avec un segment en gras marine (numéro d'inventaire, « N / M »). */
+@Composable
+@ReadOnlyComposable
 fun boldNavy(before: String, bold: String, after: String): AnnotatedString = buildAnnotatedString {
     append(before)
     withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = BamNavy)) { append(bold) }
