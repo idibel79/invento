@@ -56,6 +56,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -199,10 +200,10 @@ private fun ColumnScope.EcartStep(
         QuantityTile("Écart", formatQuantity(ecart, showSign = true), ecartBg, ecartColor, ecartColor)
     }
     DialogButtons(
-        secondaryLabel = "Corriger",
-        onSecondary = onCorrect,
-        primaryLabel = "Valider",
-        onPrimary = onValidate
+        secondaryLabel = "Valider sans corriger",
+        onSecondary = onValidate,
+        primaryLabel = "Corriger et valider",
+        onPrimary = onCorrect
     )
 }
 
@@ -410,9 +411,10 @@ private fun DialogButtons(
             shape = ControlShape,
             border = BorderStroke(1.dp, StepBorder),
             colors = ButtonDefaults.outlinedButtonColors(containerColor = CardSurface),
-            modifier = Modifier.weight(1f).height(44.dp)
+            contentPadding = ButtonPadding,
+            modifier = Modifier.weight(1f).height(50.dp)
         ) {
-            Text(secondaryLabel, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = BamNavy, maxLines = 1)
+            ButtonLabel(secondaryLabel, color = BamNavy)
         }
         Button(
             enabled = primaryEnabled,
@@ -424,9 +426,26 @@ private fun DialogButtons(
                 disabledContainerColor = BamNavyFill.copy(alpha = 0.4f),
                 disabledContentColor = OnBrand
             ),
-            modifier = Modifier.weight(1.3f).height(44.dp)
+            contentPadding = ButtonPadding,
+            modifier = Modifier.weight(1f).height(50.dp)
         ) {
-            Text(primaryLabel, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+            ButtonLabel(primaryLabel)
         }
     }
+}
+
+private val ButtonPadding = PaddingValues(horizontal = 10.dp)
+
+/** Libellé de bouton : passe sur 2 lignes centrées s'il est trop long (« Valider sans corriger »). */
+@Composable
+private fun ButtonLabel(text: String, color: Color = Color.Unspecified) {
+    Text(
+        text,
+        fontSize = 13.sp,
+        lineHeight = 15.sp,
+        fontWeight = FontWeight.Bold,
+        color = color,
+        textAlign = TextAlign.Center,
+        maxLines = 2
+    )
 }
