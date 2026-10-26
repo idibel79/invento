@@ -78,10 +78,6 @@ class InventoryRepositoryImpl @Inject constructor(
         code: String
     ): StockArticleEntity? = articleDao.findByCode(sessionId, code)
 
-    override suspend fun recordScan(articleId: Long, quantiteReelle: Double, ecartValide: Boolean) {
-        updateQuantity(articleId, quantiteReelle, ecartValide)
-    }
-
     override suspend fun recordCorrection(
         articleId: Long,
         quantiteReelle: Double,
@@ -140,6 +136,7 @@ class InventoryRepositoryImpl @Inject constructor(
         sessionDao.deleteById(sessionId)
     }
 
-    override suspend fun getSessionCounters(sessionId: String): SessionCounters =
-        articleDao.countersForSession(sessionId)
+    override suspend fun getSessionCounters(sessionId: String): SessionCounters {
+        return articleDao.countersForSession(sessionId)
+    }
 }

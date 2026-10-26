@@ -48,7 +48,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -110,6 +112,8 @@ private val statusOptions = listOf(
  * Feuille « Filtrer » : statut, zone, catégorie (listes déroulantes) et plage de prix. Les choix
  * restent en brouillon jusqu'au bouton « N produits », qui les applique tous d'un coup.
  * « Réinitialiser » est appliqué immédiatement (via [onReset]), même si la feuille est ensuite fermée.
+ * Le nombre affiché part de [appliedCount] (produits affichés avec les filtres appliqués) puis suit
+ * [previewCount] calculé sur le brouillon.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -124,7 +128,8 @@ fun FilterSheet(
     categoryCounts: Map<String, Int>,
     priceRange: ClosedFloatingPointRange<Float>?,
     priceBounds: ClosedFloatingPointRange<Float>,
-    previewCount: (ArticleFilter, String?, String?, ClosedFloatingPointRange<Float>?) -> Int,
+    appliedCount: Int,
+    previewCount: suspend (ArticleFilter, String?, String?, ClosedFloatingPointRange<Float>?) -> Int,
     onApply: (ArticleFilter, String?, String?, ClosedFloatingPointRange<Float>?) -> Unit,
     onReset: () -> Unit,
     onDismiss: () -> Unit
@@ -137,7 +142,12 @@ fun FilterSheet(
     val hasPriceRange = priceBounds.start < priceBounds.endInclusive
     // Plage égale aux bornes = pas de filtre de prix.
     val effectivePrice = draftPrice.takeIf { hasPriceRange && it != priceBounds }
-    val count = previewCount(draftFilter, draftPosition, draftCategory, effectivePrice)
+    // Recalculé hors du thread principal à chaque changement du brouillon (le calcul précédent
+    // est annulé, par ex. pendant le glissement du curseur de prix).
+    var count by remember { mutableIntStateOf(appliedCount) }
+    LaunchedEffect(draftFilter, draftPosition, draftCategory, effectivePrice) {
+        count = previewCount(draftFilter, draftPosition, draftCategory, effectivePrice)
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -327,7 +337,9 @@ private fun SheetDropdown(
                     },
                     trailingIcon = if (option.selected) {
                         { Icon(Icons.Filled.Check, contentDescription = null, tint = BamPrimary) }
-                    } else null,
+                    } else {
+                        null
+                    },
                     onClick = {
                         option.onSelect()
                         expanded = false

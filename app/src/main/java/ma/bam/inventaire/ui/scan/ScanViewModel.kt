@@ -4,21 +4,23 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.data.repository.InventoryRepository
 import ma.bam.inventaire.data.repository.SessionCounters
+import ma.bam.inventaire.di.DefaultDispatcher
 import ma.bam.inventaire.domain.EcartCalculator
+import ma.bam.inventaire.domain.matchesQuery
 import ma.bam.inventaire.util.ScanFeedback
-import javax.inject.Inject
 
 sealed interface ScanDialogState {
     data object None : ScanDialogState
@@ -41,7 +43,8 @@ data class ScanUiState(
 class ScanViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: InventoryRepository,
-    private val feedbackUtil: ScanFeedback
+    private val feedbackUtil: ScanFeedback,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     val sessionId: String = checkNotNull(savedStateHandle["sessionId"])
@@ -58,14 +61,9 @@ class ScanViewModel @Inject constructor(
             if (query.isBlank()) {
                 emptyList()
             } else {
-                articles.filter {
-                    it.designation.contains(query, ignoreCase = true) ||
-                        it.codeArticle.contains(query, ignoreCase = true) ||
-                        it.codeBarre1.contains(query, ignoreCase = true) ||
-                        it.codeBarre2.contains(query, ignoreCase = true)
-                }.take(20)
+                articles.asSequence().filter { it.matchesQuery(query) }.take(MAX_MANUAL_RESULTS).toList()
             }
-        }.flowOn(Dispatchers.Default).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+        }.flowOn(defaultDispatcher).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
         refreshCounters()
@@ -128,7 +126,7 @@ class ScanViewModel @Inject constructor(
     }
 
     private fun saveQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean) {
-        save { repository.recordScan(articleId, quantiteReelle, ecartValide) }
+        save { repository.updateQuantity(articleId, quantiteReelle, ecartValide) }
     }
 
     private fun save(write: suspend () -> Unit) {
@@ -144,5 +142,9 @@ class ScanViewModel @Inject constructor(
             val counters = repository.getSessionCounters(sessionId)
             _uiState.value = _uiState.value.copy(counters = counters)
         }
+    }
+
+    private companion object {
+        const val MAX_MANUAL_RESULTS = 20
     }
 }

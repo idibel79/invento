@@ -1,5 +1,7 @@
 package ma.bam.inventaire.testutil
 
+import ma.bam.inventaire.data.local.entity.InventorySessionEntity
+import ma.bam.inventaire.data.local.entity.InventoryStatus
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 
 /** Article de test avec des valeurs par défaut neutres ; seuls les champs utiles au test sont précisés. */
@@ -39,4 +41,14 @@ fun testArticle(
     ecart = ecart,
     ecartValide = ecartValide,
     corrige = corrige
+)
+
+/** Session de test, en cours et non verrouillée. */
+fun testSession(id: String = "s1", nomFichierSource: String = "inventaire.xlsx") = InventorySessionEntity(
+    id = id,
+    numero = "INV-TEST-$id",
+    dateCreation = 0L,
+    dateFinalisation = null,
+    statut = InventoryStatus.EN_COURS,
+    nomFichierSource = nomFichierSource
 )

@@ -16,55 +16,32 @@ data class FieldFilters(
 /** Fonctions pures de filtrage et de tri de la page produits (testables hors Android). */
 object ArticleFilters {
 
-    /** Les corrigés gardent leur écart d'origine mais sont rangés dans « Corrigés », pas « Écarts ». */
-    fun isEcartNonCorrige(article: StockArticleEntity): Boolean = !article.corrige && EcartCalculator.hasEcart(article.ecart)
+    /** Vrai si [article] fait partie du filtre rapide [filter]. */
+    fun matches(filter: ArticleFilter, article: StockArticleEntity): Boolean = when (filter) {
+        ArticleFilter.TOUS -> true
+        ArticleFilter.SCANNES -> article.quantiteReelle != null
+        ArticleFilter.ECARTS -> EcartCalculator.isEcartNonCorrige(article)
+        ArticleFilter.CORRIGES -> article.corrige
+        ArticleFilter.NON_SCANNES -> article.quantiteReelle == null
+        ArticleFilter.NEGATIFS -> article.quantiteTheorique < 0
+        ArticleFilter.VIDE -> article.quantiteTheorique == 0.0
+    }
 
     /** Nombre d'articles correspondant à chaque filtre rapide, sur la liste entière. */
-    fun counts(articles: List<StockArticleEntity>): Map<ArticleFilter, Int> = mapOf(
-        ArticleFilter.TOUS to articles.size,
-        ArticleFilter.SCANNES to articles.count { it.quantiteReelle != null },
-        ArticleFilter.ECARTS to articles.count { isEcartNonCorrige(it) },
-        ArticleFilter.CORRIGES to articles.count { it.corrige },
-        ArticleFilter.NON_SCANNES to articles.count { it.quantiteReelle == null },
-        ArticleFilter.NEGATIFS to articles.count { it.quantiteTheorique < 0 },
-        ArticleFilter.VIDE to articles.count { it.quantiteTheorique == 0.0 }
-    )
+    fun counts(articles: List<StockArticleEntity>): Map<ArticleFilter, Int> =
+        ArticleFilter.entries.associateWith { filter -> articles.count { matches(filter, it) } }
 
-    // Logique reprise telle quelle de InventoryDetailViewModel (complexité inchangée).
-    @Suppress("CyclomaticComplexMethod")
     fun applyFilters(
         articles: List<StockArticleEntity>,
         filter: ArticleFilter,
         query: String,
         fields: FieldFilters
-    ): List<StockArticleEntity> {
-        var filtered = when (filter) {
-            ArticleFilter.TOUS -> articles
-            ArticleFilter.SCANNES -> articles.filter { it.quantiteReelle != null }
-            ArticleFilter.ECARTS -> articles.filter { isEcartNonCorrige(it) }
-            ArticleFilter.CORRIGES -> articles.filter { it.corrige }
-            ArticleFilter.NON_SCANNES -> articles.filter { it.quantiteReelle == null }
-            ArticleFilter.NEGATIFS -> articles.filter { it.quantiteTheorique < 0 }
-            ArticleFilter.VIDE -> articles.filter { it.quantiteTheorique == 0.0 }
-        }
-        if (fields.position != null) {
-            filtered = filtered.filter { it.emplacement == fields.position }
-        }
-        if (fields.category != null) {
-            filtered = filtered.filter { it.categorie == fields.category }
-        }
-        if (fields.priceRange != null) {
-            filtered = filtered.filter { it.prixUnitaire.toFloat() in fields.priceRange }
-        }
-        if (query.isNotBlank()) {
-            filtered = filtered.filter {
-                it.codeBarre1.contains(query, ignoreCase = true) ||
-                    it.codeBarre2.contains(query, ignoreCase = true) ||
-                    it.codeArticle.contains(query, ignoreCase = true) ||
-                    it.designation.contains(query, ignoreCase = true)
-            }
-        }
-        return filtered
+    ): List<StockArticleEntity> = articles.filter { article ->
+        matches(filter, article) &&
+            (fields.position == null || article.emplacement == fields.position) &&
+            (fields.category == null || article.categorie == fields.category) &&
+            (fields.priceRange == null || article.prixUnitaire.toFloat() in fields.priceRange) &&
+            article.matchesQuery(query)
     }
 
     fun sort(articles: List<StockArticleEntity>, sort: ArticleSort): List<StockArticleEntity> = when (sort) {

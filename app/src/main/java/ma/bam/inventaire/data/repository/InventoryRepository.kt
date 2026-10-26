@@ -25,16 +25,18 @@ interface InventoryRepository {
     /** Recherche un article par code-barres scanné ou par code_article saisi manuellement. */
     suspend fun findArticleByCode(sessionId: String, code: String): StockArticleEntity?
 
-    suspend fun recordScan(articleId: Long, quantiteReelle: Double, ecartValide: Boolean)
+    /**
+     * Enregistre la quantité comptée (scan ou modification depuis la page produits) et recalcule
+     * l'écart ; [ecartValide] n'est retenu que s'il reste un écart (sinon l'article est conforme).
+     */
+    suspend fun updateQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean)
 
     /**
-     * « Enregistrer » de l'étape « Corriger la quantité » : écart éventuel validé, article marqué
-     * corrigé et [remarque] (vide ou espaces = null) remplaçant la précédente.
+     * « Enregistrer » de l'étape « Corriger la quantité » : enregistre la quantité comptée, remplace
+     * la quantité système par [quantiteSysteme], valide l'écart éventuel, marque l'article corrigé et
+     * remplace la remarque précédente par [remarque] (vide ou espaces = null).
      */
-    /** Enregistre la quantité comptée et remplace la quantité système par [quantiteSysteme]. */
     suspend fun recordCorrection(articleId: Long, quantiteReelle: Double, quantiteSysteme: Double, remarque: String)
-
-    suspend fun updateQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean)
 
     /** Marque la session comme finalisée (fin du comptage) — indépendant du verrouillage. */
     suspend fun finalizeSession(sessionId: String)

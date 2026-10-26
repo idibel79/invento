@@ -7,6 +7,7 @@ import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.data.repository.SessionCounters
+import ma.bam.inventaire.domain.EcartCalculator
 
 @Dao
 interface StockArticleDao {
@@ -38,14 +39,16 @@ interface StockArticleDao {
     suspend fun findByCode(sessionId: String, code: String): StockArticleEntity?
 
     /** Les compteurs d'une session en une seule lecture de la table (au lieu de 6 requêtes). */
-    // Même seuil que EcartCalculator.hasEcart, pour que tous les compteurs d'écarts concordent.
-    // Les corrigés gardent leur écart d'origine mais ne comptent pas comme écarts.
+    // Seuil interpolé depuis EcartCalculator.SEUIL_ECART_NUL ; `ecarts` suit EcartCalculator.isEcartNonCorrige
+    // (les corrigés gardent leur écart d'origine mais ne comptent pas comme écarts), pour que tous les
+    // compteurs d'écarts concordent avec la page produits.
     @Query(
         """
         SELECT COUNT(*) AS total,
             COALESCE(SUM(quantiteReelle IS NOT NULL), 0) AS scanned,
-            COALESCE(SUM(ecart IS NOT NULL AND ABS(ecart) > 1e-9 AND corrige = 0), 0) AS ecarts,
-            COALESCE(SUM(ecart IS NOT NULL AND ABS(ecart) > 1e-9 AND ecartValide = 0), 0) AS pendingEcarts,
+            COALESCE(SUM(ecart IS NOT NULL AND ABS(ecart) > ${EcartCalculator.SEUIL_ECART_NUL} AND corrige = 0), 0) AS ecarts,
+            COALESCE(SUM(ecart IS NOT NULL AND ABS(ecart) > ${EcartCalculator.SEUIL_ECART_NUL} AND ecartValide = 0), 0)
+                AS pendingEcarts,
             COALESCE(SUM(quantiteTheorique < 0), 0) AS negativeStock,
             COALESCE(SUM(quantiteTheorique = 0), 0) AS emptyStock
         FROM stock_article WHERE sessionId = :sessionId

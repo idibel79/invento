@@ -3,6 +3,7 @@ package ma.bam.inventaire.ui.scan
 import androidx.lifecycle.SavedStateHandle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -44,7 +45,12 @@ class ScanViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         repository = FakeInventoryRepository(listOf(article))
         feedback = FakeFeedback()
-        viewModel = ScanViewModel(SavedStateHandle(mapOf("sessionId" to "s1")), repository, feedback)
+        viewModel = ScanViewModel(
+            SavedStateHandle(mapOf("sessionId" to "s1")),
+            repository,
+            feedback,
+            UnconfinedTestDispatcher()
+        )
     }
 
     @After
@@ -85,7 +91,10 @@ class ScanViewModelTest {
 
         viewModel.confirmQuantity(article, 10.0)
 
-        assertEquals(listOf(FakeInventoryRepository.ScanCall(7, 10.0, ecartValide = true)), repository.recordedScans)
+        assertEquals(
+            listOf(FakeInventoryRepository.QuantityCall(7, 10.0, ecartValide = true)),
+            repository.recordedQuantities
+        )
         assertEquals(ScanDialogState.None, viewModel.uiState.value.dialog)
         assertEquals(repository.counters, viewModel.uiState.value.counters)
     }
@@ -97,7 +106,7 @@ class ScanViewModelTest {
         viewModel.confirmQuantity(article, 12.0)
 
         assertEquals(ScanDialogState.EcartConfirm(article, 12.0, 2.0), viewModel.uiState.value.dialog)
-        assertTrue(repository.recordedScans.isEmpty())
+        assertTrue(repository.recordedQuantities.isEmpty())
     }
 
     @Test
@@ -106,7 +115,27 @@ class ScanViewModelTest {
 
         viewModel.validateEcart(article, 12.0)
 
-        assertEquals(listOf(FakeInventoryRepository.ScanCall(7, 12.0, ecartValide = true)), repository.recordedScans)
+        assertEquals(
+            listOf(FakeInventoryRepository.QuantityCall(7, 12.0, ecartValide = true)),
+            repository.recordedQuantities
+        )
         assertEquals(ScanDialogState.None, viewModel.uiState.value.dialog)
+    }
+
+    @Test
+    fun `saisie manuelle filtre par designation, PID ou code-barres`() = runTest {
+        repository.articles.value = listOf(
+            article,
+            testArticle(id = 8, codeArticle = "PID8", designation = "Doliprane"),
+            testArticle(id = 9, codeArticle = "PID9", designation = "Aspirine", codeBarre2 = "999")
+        )
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.manualResults.collect {} }
+
+        viewModel.setManualQuery("doli")
+        assertEquals(listOf(8L), viewModel.manualResults.value.map { it.id })
+        viewModel.setManualQuery("999")
+        assertEquals(listOf(9L), viewModel.manualResults.value.map { it.id })
+        viewModel.setManualQuery("  ")
+        assertTrue(viewModel.manualResults.value.isEmpty())
     }
 }

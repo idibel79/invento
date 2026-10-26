@@ -47,7 +47,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -112,12 +112,12 @@ fun ScanScreen(
     onFinished: (sessionId: String) -> Unit,
     viewModel: ScanViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val tapHaptic = rememberTapHaptic()
     val cameraPermission = rememberPermissionState(Manifest.permission.CAMERA)
     var manualMode by remember { mutableStateOf(false) }
-    val manualQuery by viewModel.manualQuery.collectAsState()
-    val manualResults by viewModel.manualResults.collectAsState()
+    val manualQuery by viewModel.manualQuery.collectAsStateWithLifecycle()
+    val manualResults by viewModel.manualResults.collectAsStateWithLifecycle()
     var showFinalizeConfirm by remember { mutableStateOf(false) }
     var torchOn by remember { mutableStateOf(false) }
 

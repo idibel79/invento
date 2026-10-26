@@ -1,7 +1,6 @@
 package ma.bam.inventaire.ui.inventorydetail
 
 import android.content.Intent
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,14 +8,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,15 +23,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.StickyNote2
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Sell
+import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilterChip
@@ -45,34 +49,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
-import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.WarningAmber
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.automirrored.outlined.StickyNote2
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Sell
-import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -82,14 +69,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
@@ -98,31 +81,30 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ma.bam.inventaire.R
-import ma.bam.inventaire.domain.ArticleFilter
-import ma.bam.inventaire.domain.ArticleSort
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.data.repository.ImportedArticle
+import ma.bam.inventaire.domain.ArticleFilter
+import ma.bam.inventaire.domain.ArticleSort
 import ma.bam.inventaire.domain.EcartCalculator
-import ma.bam.inventaire.ui.components.Pill
-import ma.bam.inventaire.ui.components.PillShape
 import ma.bam.inventaire.ui.components.EllipsisScrollBox
+import ma.bam.inventaire.ui.components.PillShape
 import ma.bam.inventaire.ui.components.rememberLongPressHaptic
 import ma.bam.inventaire.ui.components.rememberTapHaptic
 import ma.bam.inventaire.ui.quantityentry.EcartConfirmDialog
 import ma.bam.inventaire.ui.quantityentry.QuantityEntryDialog
 import ma.bam.inventaire.ui.theme.BamNavy
 import ma.bam.inventaire.ui.theme.BamNavyFill
+import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.BamPrimaryFill
 import ma.bam.inventaire.ui.theme.CardSurface
 import ma.bam.inventaire.ui.theme.OnBrand
 import ma.bam.inventaire.ui.theme.SelectedCardBg
-import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.StatusEcart
 import ma.bam.inventaire.ui.theme.StatusEcartBg
 import ma.bam.inventaire.ui.theme.StatusNegative
 import ma.bam.inventaire.ui.theme.StatusNegativeBg
-import ma.bam.inventaire.ui.theme.StatusPending
 import ma.bam.inventaire.ui.theme.StatusPendingBg
 import ma.bam.inventaire.ui.theme.StatusSuccess
 import ma.bam.inventaire.ui.theme.StatusSuccessBg
@@ -131,12 +113,6 @@ import ma.bam.inventaire.ui.theme.TextMuted
 import ma.bam.inventaire.ui.theme.TextPrimary
 import ma.bam.inventaire.ui.theme.TextSecondary
 import ma.bam.inventaire.util.formatQuantity
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import kotlin.math.ceil
-import kotlin.math.floor
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -147,24 +123,21 @@ fun InventoryDetailScreen(
 ) {
     val context = LocalContext.current
     val tapHaptic = rememberTapHaptic()
-    val session by viewModel.session.collectAsState()
-    val articles by viewModel.visibleArticles.collectAsState()
-    val filter by viewModel.filter.collectAsState()
-    val filterCounts by viewModel.filterCounts.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val positionFilter by viewModel.positionFilter.collectAsState()
-    val availablePositions by viewModel.availablePositions.collectAsState()
-    val categoryFilter by viewModel.categoryFilter.collectAsState()
-    val availableCategories by viewModel.availableCategories.collectAsState()
-    val availableTvas by viewModel.availableTvas.collectAsState()
-    val priceRangeFilter by viewModel.priceRangeFilter.collectAsState()
-    val priceBounds by viewModel.priceBounds.collectAsState()
-    val sort by viewModel.sort.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val session = uiState.session
+    val articles = uiState.articles
+    val filter = uiState.filter
+    val searchQuery = uiState.searchQuery
+    val positionFilter = uiState.positionFilter
+    val categoryFilter = uiState.categoryFilter
+    val priceRangeFilter = uiState.priceRangeFilter
+    val sort = uiState.sort
+    val stats = uiState.stats
+    val filterCounts = stats.filterCounts
+    val snackbarHostState = remember { SnackbarHostState() }
     var editingArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
     var pendingEcart by remember { mutableStateOf<PendingEcart?>(null) }
     var detailArticle by remember { mutableStateOf<StockArticleEntity?>(null) }
-    val positionCounts by viewModel.positionCounts.collectAsState()
-    val categoryCounts by viewModel.categoryCounts.collectAsState()
     var showFilterSheet by remember { mutableStateOf(false) }
     var showSortSheet by remember { mutableStateOf(false) }
     // Pastille du bouton filtre : zone, catégorie et prix (le statut a ses propres puces).
@@ -186,13 +159,23 @@ fun InventoryDetailScreen(
                     }
                     context.startActivity(Intent.createChooser(intent, "Partager l'inventaire"))
                 }
-                is ExportEvent.Error -> { /* affiché via le texte d'état si besoin */ }
+                is ExportEvent.Error -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = {
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    shape = RoundedCornerShape(14.dp),
+                    containerColor = StatusNegativeBg,
+                    contentColor = StatusNegative
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -435,13 +418,14 @@ fun InventoryDetailScreen(
             filter = filter,
             filterCounts = filterCounts,
             position = positionFilter,
-            positions = availablePositions,
-            positionCounts = positionCounts,
+            positions = stats.positions,
+            positionCounts = stats.positionCounts,
             category = categoryFilter,
-            categories = availableCategories,
-            categoryCounts = categoryCounts,
+            categories = stats.categories,
+            categoryCounts = stats.categoryCounts,
             priceRange = priceRangeFilter,
-            priceBounds = priceBounds,
+            priceBounds = stats.priceBounds,
+            appliedCount = articles.size,
             previewCount = viewModel::previewCount,
             onApply = { newFilter, position, category, priceRange ->
                 tapHaptic()
@@ -482,9 +466,9 @@ fun InventoryDetailScreen(
 
     if (showCreateDialog) {
         CreateArticleDialog(
-            availableCategories = availableCategories,
-            availableTvas = availableTvas,
-            availableZones = availablePositions,
+            availableCategories = stats.categories,
+            availableTvas = stats.tvas,
+            availableZones = stats.positions,
             onDismiss = { showCreateDialog = false },
             onConfirm = { article ->
                 viewModel.createArticle(article)
@@ -617,12 +601,7 @@ private fun SquareToolButton(
 /** Filtre rapide en pilule ; sélectionné = fond foncé, texte blanc. Affiche le compteur s'il est connu. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun QuickFilterChip(
-    label: String,
-    count: Int?,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
+private fun QuickFilterChip(label: String, count: Int?, selected: Boolean, onClick: () -> Unit) {
     FilterChip(
         selected = selected,
         onClick = onClick,
@@ -660,7 +639,6 @@ private fun QuickFilterChip(
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-
 internal fun ArticleRow(
     item: StockArticleEntity,
     locked: Boolean,
@@ -698,19 +676,22 @@ internal fun ArticleRow(
         modifier = Modifier
             .fillMaxWidth()
             .then(
-                if (onSelect != null) Modifier.clickable(onClick = onSelect)
-                else Modifier.combinedClickable(
-                    onClick = {
-                        if (notScanned && !locked) {
-                            tapHaptic()
-                            onEdit()
+                if (onSelect != null) {
+                    Modifier.clickable(onClick = onSelect)
+                } else {
+                    Modifier.combinedClickable(
+                        onClick = {
+                            if (notScanned && !locked) {
+                                tapHaptic()
+                                onEdit()
+                            }
+                        },
+                        onLongClick = {
+                            longPressHaptic()
+                            onShowDetail()
                         }
-                    },
-                    onLongClick = {
-                        longPressHaptic()
-                        onShowDetail()
-                    }
-                )
+                    )
+                }
             ),
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
@@ -839,7 +820,10 @@ internal fun ArticleRow(
                     )
                 }
                 QuantityCellDivider()
-                QuantityCell(label = if (article.corrige) "Corrigé" else "Écart", modifier = Modifier.weight(1f).leftDivider(QuantityDividerColor)) {
+                QuantityCell(
+                    label = if (article.corrige) "Corrigé" else "Écart",
+                    modifier = Modifier.weight(1f).leftDivider(QuantityDividerColor)
+                ) {
                     when {
                         notScanned -> QuantityValue("À compter", ArticleMutedColor, fontSize = 13.5.sp, fontWeight = FontWeight.Normal)
                         hasEcart -> QuantityValue(
@@ -953,7 +937,13 @@ private fun RemarqueNote(remarque: String?, modifier: Modifier = Modifier) {
             tint = TextMuted,
             modifier = Modifier.size(13.dp)
         )
-        Text("Quantité système corrigée par l'inventoriste", fontSize = 12.sp, fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold, color = TextMuted)
+        Text(
+            "Quantité système corrigée par l'inventoriste",
+            fontSize = 12.sp,
+            fontStyle = FontStyle.Italic,
+            fontWeight = FontWeight.Bold,
+            color = TextMuted
+        )
     }
     if (remarque != null) {
         Row(

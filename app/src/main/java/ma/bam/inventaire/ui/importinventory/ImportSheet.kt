@@ -41,7 +41,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,9 +56,25 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.SolidColor
+import ma.bam.inventaire.data.importfile.ImportFileInfo
 import ma.bam.inventaire.ui.components.PrimaryActionButton
 import ma.bam.inventaire.ui.components.SecondaryActionButton
-import ma.bam.inventaire.ui.theme.*
+import ma.bam.inventaire.ui.theme.BamNavy
+import ma.bam.inventaire.ui.theme.BamPrimary
+import ma.bam.inventaire.ui.theme.BamPrimaryContainer
+import ma.bam.inventaire.ui.theme.BorderColor
+import ma.bam.inventaire.ui.theme.CardSurface
+import ma.bam.inventaire.ui.theme.ControlBorder
+import ma.bam.inventaire.ui.theme.SoftBand
+import ma.bam.inventaire.ui.theme.StatusEcart
+import ma.bam.inventaire.ui.theme.StatusEcartBg
+import ma.bam.inventaire.ui.theme.StatusNegative
+import ma.bam.inventaire.ui.theme.StatusNegativeBg
+import ma.bam.inventaire.ui.theme.StatusSuccess
+import ma.bam.inventaire.ui.theme.StatusSuccessBg
+import ma.bam.inventaire.ui.theme.TextPrimary
+import ma.bam.inventaire.ui.theme.TextSecondary
+import ma.bam.inventaire.ui.theme.TrackColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -102,8 +118,8 @@ fun ImportSheet(
     onOpenSession: (sessionId: String) -> Unit,
     viewModel: ImportViewModel = hiltViewModel()
 ) {
-    val state by viewModel.state.collectAsState()
-    val file by viewModel.file.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val file by viewModel.file.collectAsStateWithLifecycle()
     val isLoading by rememberUpdatedState(state is ImportUiState.Loading)
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
@@ -122,7 +138,7 @@ fun ImportSheet(
     val filePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { uri ->
-        uri?.let { viewModel.importFile(it) }
+        uri?.let { viewModel.importFile(it.toString()) }
     }
     val pickFile = { filePicker.launch(arrayOf(XLSX_MIME)) }
 
@@ -285,8 +301,11 @@ private fun IdleContent(onPick: () -> Unit, onCancel: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = if (columnsExpanded) Icons.Filled.KeyboardArrowDown
-            else Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            imageVector = if (columnsExpanded) {
+                Icons.Filled.KeyboardArrowDown
+            } else {
+                Icons.AutoMirrored.Filled.KeyboardArrowRight
+            },
             contentDescription = null,
             tint = Accent,
             modifier = Modifier.size(13.dp)
@@ -368,8 +387,7 @@ private fun FileRow(file: ImportFileInfo?, onClear: (() -> Unit)?) {
     }
 }
 
-private fun formatKo(bytes: Long): String =
-    maxOf(1L, (bytes + 512) / 1024).toString()
+private fun formatKo(bytes: Long): String = maxOf(1L, (bytes + 512) / 1024).toString()
 
 @Composable
 private fun SuccessContent(success: ImportUiState.Success) {
@@ -476,12 +494,14 @@ private fun StatusHeader(
 }
 
 @Composable
-private fun CancelButton(modifier: Modifier, onClick: () -> Unit) =
+private fun CancelButton(modifier: Modifier, onClick: () -> Unit) {
     SecondaryActionButton("Annuler", onClick, modifier)
+}
 
 @Composable
-private fun PrimaryButton(text: String, modifier: Modifier, onClick: () -> Unit) =
+private fun PrimaryButton(text: String, modifier: Modifier, onClick: () -> Unit) {
     PrimaryActionButton(text, onClick, modifier)
+}
 
 /** Icône fichier Excel (viewBox 40 × 40), commune à tous les états de la feuille. */
 private val ExcelFileIcon: ImageVector by lazy {

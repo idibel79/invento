@@ -13,22 +13,30 @@ import ma.bam.inventaire.data.repository.SessionCounters
 /** Faux dépôt en mémoire : articles fournis par le test, appels d'écriture enregistrés. */
 class FakeInventoryRepository(articles: List<StockArticleEntity> = emptyList()) : InventoryRepository {
 
-    data class ScanCall(val articleId: Long, val quantiteReelle: Double, val ecartValide: Boolean)
+    data class QuantityCall(val articleId: Long, val quantiteReelle: Double, val ecartValide: Boolean)
 
     val articles = MutableStateFlow(articles)
-    val recordedScans = mutableListOf<ScanCall>()
+    val recordedQuantities = mutableListOf<QuantityCall>()
     val finalizedSessions = mutableListOf<String>()
     var counters = SessionCounters(0, 0, 0, 0, 0, 0)
+    val session = MutableStateFlow<InventorySessionEntity?>(null)
+
+    /** Sessions créées par [createSession] : nom du fichier source et nombre d'articles. */
+    val createdSessions = mutableListOf<Pair<String, Int>>()
 
     override fun observeSessions(): Flow<List<InventorySessionEntity>> = flowOf(emptyList())
 
-    override fun observeSession(sessionId: String): Flow<InventorySessionEntity?> = flowOf(null)
+    override fun observeSession(sessionId: String): Flow<InventorySessionEntity?> {
+        return session.map { it?.takeIf { s -> s.id == sessionId } }
+    }
 
     override fun observeArticles(sessionId: String): Flow<List<StockArticleEntity>> =
         articles.map { list -> list.filter { it.sessionId == sessionId } }
 
-    override suspend fun createSession(fileName: String, articles: List<ImportedArticle>): InventorySessionEntity =
-        throw UnsupportedOperationException()
+    override suspend fun createSession(fileName: String, articles: List<ImportedArticle>): InventorySessionEntity {
+        createdSessions += fileName to articles.size
+        return testSession(id = "session-${createdSessions.size}", nomFichierSource = fileName)
+    }
 
     override suspend fun addArticle(sessionId: String, article: ImportedArticle) = throw UnsupportedOperationException()
 
@@ -36,13 +44,11 @@ class FakeInventoryRepository(articles: List<StockArticleEntity> = emptyList()) 
         it.sessionId == sessionId && (it.codeBarre1 == code || it.codeBarre2 == code || it.codeArticle == code)
     }
 
-    override suspend fun recordScan(articleId: Long, quantiteReelle: Double, ecartValide: Boolean) {
-        recordedScans += ScanCall(articleId, quantiteReelle, ecartValide)
+    override suspend fun updateQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean) {
+        recordedQuantities += QuantityCall(articleId, quantiteReelle, ecartValide)
     }
 
     override suspend fun recordCorrection(articleId: Long, quantiteReelle: Double, quantiteSysteme: Double, remarque: String) = Unit
-
-    override suspend fun updateQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean) = Unit
 
     override suspend fun finalizeSession(sessionId: String) {
         finalizedSessions += sessionId
