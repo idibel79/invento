@@ -394,8 +394,9 @@ private fun RowScope.QuantityTile(
     }
 }
 
+/** Paire de boutons des popups de saisie (Saisir quantité, Écart détecté) : même largeur, 50dp. */
 @Composable
-private fun DialogButtons(
+internal fun DialogButtons(
     secondaryLabel: String,
     onSecondary: () -> Unit,
     primaryLabel: String,

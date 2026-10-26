@@ -1,6 +1,5 @@
 package ma.bam.inventaire.ui.quantityentry
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,10 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -75,10 +71,8 @@ import ma.bam.inventaire.ui.theme.StatusNegativeBg
 import ma.bam.inventaire.ui.theme.StatusSuccess
 import ma.bam.inventaire.ui.theme.StatusSuccessBg
 import ma.bam.inventaire.ui.theme.BamNavy
-import ma.bam.inventaire.ui.theme.BamNavyFill
 import ma.bam.inventaire.ui.theme.CardSurface
 import ma.bam.inventaire.ui.theme.ControlBorder
-import ma.bam.inventaire.ui.theme.OnBrand
 import ma.bam.inventaire.ui.theme.SoftBand
 import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.TextSecondary
@@ -224,33 +218,13 @@ fun QuantityEntryDialog(
                             onDone = { closeKeyboard() },
                             fieldModifier = Modifier.focusRequester(focusRequester)
                         )
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            OutlinedButton(
-                                onClick = onDismiss,
-                                shape = ControlShape,
-                                border = BorderStroke(1.dp, StepBorder),
-                                modifier = Modifier.weight(1f).height(46.dp)
-                            ) {
-                                Text("Annuler", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = BamNavy)
-                            }
-                            Button(
-                                enabled = quantite != null,
-                                onClick = { confirm() },
-                                shape = ControlShape,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = BamNavyFill,
-                                    contentColor = OnBrand,
-                                    disabledContainerColor = BamNavyFill.copy(alpha = 0.4f),
-                                    disabledContentColor = OnBrand
-                                ),
-                                modifier = Modifier.weight(1.6f).height(46.dp)
-                            ) {
-                                Text("Valider", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                            }
-                        }
+                        DialogButtons(
+                            secondaryLabel = "Annuler",
+                            onSecondary = onDismiss,
+                            primaryLabel = "Valider",
+                            onPrimary = { confirm() },
+                            primaryEnabled = quantite != null
+                        )
                     }
                 }
             }
