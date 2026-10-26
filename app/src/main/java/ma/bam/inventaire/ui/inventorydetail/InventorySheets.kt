@@ -61,6 +61,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ma.bam.inventaire.ui.components.DialogButtons
 import ma.bam.inventaire.ui.theme.BamNavy
 import ma.bam.inventaire.ui.theme.BamNavyFill
 import ma.bam.inventaire.ui.theme.BorderColor
@@ -250,29 +251,13 @@ fun FilterSheet(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedButton(
-                    onClick = onDismiss,
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, SheetBorder),
-                    modifier = Modifier.weight(1f).height(48.dp)
-                ) {
-                    Text("Annuler", color = BamNavy, fontWeight = FontWeight.SemiBold)
-                }
-                Button(
-                    onClick = { onApply(draftFilter, draftPosition, draftCategory, effectivePrice) },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = BamNavyFill, contentColor = OnBrand),
-                    modifier = Modifier.weight(1.6f).height(48.dp)
-                ) {
-                    Text(
-                        "$count produit${if (count > 1) "s" else ""}",
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            }
+            DialogButtons(
+                secondaryLabel = "Annuler",
+                onSecondary = onDismiss,
+                primaryLabel = "$count produit${if (count > 1) "s" else ""}",
+                onPrimary = { onApply(draftFilter, draftPosition, draftCategory, effectivePrice) },
+                modifier = Modifier
+            )
             Spacer(modifier = Modifier.height(16.dp))
         }
     }

@@ -76,7 +76,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import ma.bam.inventaire.ui.components.CompactButtonPadding
+import ma.bam.inventaire.ui.components.DialogButtons
+import ma.bam.inventaire.ui.components.PrimaryActionButton
 import ma.bam.inventaire.ui.components.PillShape
 import ma.bam.inventaire.ui.components.ConfirmDialog
 import ma.bam.inventaire.ui.components.ConfirmTone
@@ -160,9 +161,11 @@ fun ScanScreen(
             ) {
                 Text("Autorisation caméra requise pour scanner les codes-barres.")
                 Spacer(modifier = Modifier.height(8.dp))
-                Button(onClick = { cameraPermission.launchPermissionRequest() }) {
-                    Text("Autoriser la caméra")
-                }
+                PrimaryActionButton(
+                    "Autoriser la caméra",
+                    { cameraPermission.launchPermissionRequest() },
+                    Modifier.fillMaxWidth()
+                )
             }
         } else {
             // Saisie manuelle : champ toujours en haut, résultats en cartes produit de la liste.
@@ -331,42 +334,14 @@ fun ScanScreen(
                     )
                 }
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = { manualMode = !manualMode },
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, ButtonOutline),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = BamNavy),
-                    contentPadding = CompactButtonPadding,
-                    modifier = Modifier.weight(1f).height(46.dp)
-                ) {
-                    Icon(
-                        imageVector = if (manualMode) Icons.Outlined.QrCodeScanner else Icons.Filled.Keyboard,
-                        contentDescription = null,
-                        tint = BamNavy,
-                        modifier = Modifier.size(17.dp)
-                    )
-                    Spacer(modifier = Modifier.width(7.dp))
-                    Text(
-                        if (manualMode) "Scanner" else "Saisie",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1
-                    )
-                }
-                Button(
-                    onClick = { showFinalizeConfirm = true },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = BamNavyFill, contentColor = OnBrand),
-                    contentPadding = CompactButtonPadding,
-                    modifier = Modifier.weight(1f).height(46.dp)
-                ) {
-                    Text("Terminer", fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                }
-            }
+            DialogButtons(
+                secondaryLabel = if (manualMode) "Scanner" else "Saisie",
+                secondaryIcon = if (manualMode) Icons.Outlined.QrCodeScanner else Icons.Filled.Keyboard,
+                onSecondary = { manualMode = !manualMode },
+                primaryLabel = "Terminer",
+                onPrimary = { showFinalizeConfirm = true },
+                modifier = Modifier
+            )
         }
     }
 

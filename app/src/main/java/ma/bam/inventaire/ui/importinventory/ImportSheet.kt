@@ -56,6 +56,8 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.SolidColor
+import ma.bam.inventaire.ui.components.PrimaryActionButton
+import ma.bam.inventaire.ui.components.SecondaryActionButton
 import ma.bam.inventaire.ui.theme.*
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -215,7 +217,7 @@ fun ImportSheet(
                         CancelButton(modifier = Modifier.weight(1f), onClick = { hideThen(close) })
                         PrimaryButton(
                             text = "Choisir un autre fichier",
-                            modifier = Modifier.weight(1.6f),
+                            modifier = Modifier.weight(1f),
                             onClick = pickFile
                         )
                     }
@@ -474,29 +476,12 @@ private fun StatusHeader(
 }
 
 @Composable
-private fun CancelButton(modifier: Modifier, onClick: () -> Unit) {
-    OutlinedButton(
-        onClick = onClick,
-        modifier = modifier.height(46.dp),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, ButtonBorder),
-        colors = ButtonDefaults.outlinedButtonColors(contentColor = Navy)
-    ) {
-        Text("Annuler", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Navy, maxLines = 1)
-    }
-}
+private fun CancelButton(modifier: Modifier, onClick: () -> Unit) =
+    SecondaryActionButton("Annuler", onClick, modifier)
 
 @Composable
-private fun PrimaryButton(text: String, modifier: Modifier, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = modifier.height(46.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = BamNavyFill, contentColor = OnBrand)
-    ) {
-        Text(text, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    }
-}
+private fun PrimaryButton(text: String, modifier: Modifier, onClick: () -> Unit) =
+    PrimaryActionButton(text, onClick, modifier)
 
 /** Icône fichier Excel (viewBox 40 × 40), commune à tous les états de la feuille. */
 private val ExcelFileIcon: ImageVector by lazy {

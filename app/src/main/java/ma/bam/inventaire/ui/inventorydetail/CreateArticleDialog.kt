@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import ma.bam.inventaire.ui.components.DialogButtons
 import ma.bam.inventaire.R
 import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.ui.components.StaticLabelTextField
@@ -212,8 +213,12 @@ fun CreateArticleDialog(
             }
         },
         confirmButton = {
-            TextButton(
-                onClick = {
+            DialogButtons(
+                secondaryLabel = "Annuler",
+                onSecondary = onDismiss,
+                primaryLabel = "Créer",
+                modifier = Modifier,
+                onPrimary = {
                     if (isComplete) {
                         onConfirm(
                             ImportedArticle(
@@ -237,14 +242,8 @@ fun CreateArticleDialog(
                     } else {
                         showErrors = true
                     }
-                },
-                colors = ButtonDefaults.textButtonColors(contentColor = BamPrimary)
-            ) {
-                Text("Créer", fontWeight = FontWeight.SemiBold)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Annuler") }
+                }
+            )
         }
     )
 }

@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import ma.bam.inventaire.ui.components.DialogButtons
 import ma.bam.inventaire.ui.components.PopupHaptic
 import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.ui.theme.BamNavy
@@ -115,27 +116,13 @@ fun ArticleCreatedSheet(
                     BandRow("Quantité inventoriée", formatQuantity(it), valueColor = BamPrimary)
                 }
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = { hideThen(onCreateAnother) },
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, ControlBorder),
-                    modifier = Modifier.weight(1f).height(46.dp)
-                ) {
-                    Text("Créer un autre", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = BamNavy)
-                }
-                Button(
-                    onClick = { hideThen(onDismiss) },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = BamNavyFill, contentColor = OnBrand),
-                    modifier = Modifier.weight(1f).height(46.dp)
-                ) {
-                    Text("Terminé", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                }
-            }
+            DialogButtons(
+                secondaryLabel = "Créer un autre",
+                onSecondary = { hideThen(onCreateAnother) },
+                primaryLabel = "Terminé",
+                onPrimary = { hideThen(onDismiss) },
+                modifier = Modifier
+            )
         }
     }
 }

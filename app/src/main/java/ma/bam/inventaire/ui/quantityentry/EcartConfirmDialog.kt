@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
+import ma.bam.inventaire.ui.components.DialogButtons
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.ui.components.PopupHaptic
 import ma.bam.inventaire.ui.theme.BamNavy
@@ -392,63 +393,4 @@ private fun RowScope.QuantityTile(
             maxLines = 1
         )
     }
-}
-
-/** Paire de boutons des popups de saisie (Saisir quantité, Écart détecté) : même largeur, 50dp. */
-@Composable
-internal fun DialogButtons(
-    secondaryLabel: String,
-    onSecondary: () -> Unit,
-    primaryLabel: String,
-    onPrimary: () -> Unit,
-    primaryEnabled: Boolean = true
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        OutlinedButton(
-            onClick = onSecondary,
-            shape = ControlShape,
-            border = BorderStroke(1.dp, StepBorder),
-            colors = ButtonDefaults.outlinedButtonColors(containerColor = CardSurface),
-            contentPadding = ButtonPadding,
-            modifier = Modifier.weight(1f).height(50.dp)
-        ) {
-            ButtonLabel(secondaryLabel, color = BamNavy)
-        }
-        Button(
-            enabled = primaryEnabled,
-            onClick = onPrimary,
-            shape = ControlShape,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = BamNavyFill,
-                contentColor = OnBrand,
-                disabledContainerColor = BamNavyFill.copy(alpha = 0.4f),
-                disabledContentColor = OnBrand
-            ),
-            contentPadding = ButtonPadding,
-            modifier = Modifier.weight(1f).height(50.dp)
-        ) {
-            ButtonLabel(primaryLabel)
-        }
-    }
-}
-
-private val ButtonPadding = PaddingValues(horizontal = 10.dp)
-
-/** Libellé de bouton : passe sur 2 lignes centrées s'il est trop long (« Valider sans corriger »). */
-@Composable
-private fun ButtonLabel(text: String, color: Color = Color.Unspecified) {
-    Text(
-        text,
-        fontSize = 13.sp,
-        lineHeight = 15.sp,
-        fontWeight = FontWeight.Bold,
-        color = color,
-        textAlign = TextAlign.Center,
-        maxLines = 2
-    )
 }

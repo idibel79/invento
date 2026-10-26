@@ -8,7 +8,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import ma.bam.inventaire.ui.components.PrimaryActionButton
 import ma.bam.inventaire.ui.components.SingleLineAutoSizeText
 
 @Composable
@@ -30,7 +33,7 @@ fun UnknownArticleDialog(
             Text("Le code \"$code\" ne correspond à aucun article de cet inventaire. Vérifiez qu'il s'agit du bon article ou saisissez-le manuellement.")
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("OK", fontWeight = FontWeight.SemiBold) }
+            PrimaryActionButton("OK", onDismiss, Modifier.fillMaxWidth())
         }
     )
 }

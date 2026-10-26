@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ma.bam.inventaire.ui.components.SecondaryActionButton
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.ui.theme.BamNavy
 import ma.bam.inventaire.ui.theme.BamPrimaryContainer
@@ -118,14 +119,7 @@ fun ArticleDetailDialog(
                 }
             }
             Spacer(modifier = Modifier.height(14.dp))
-            OutlinedButton(
-                onClick = onDismiss,
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.dp, BandDivider),
-                modifier = Modifier.fillMaxWidth().height(48.dp)
-            ) {
-                Text("Fermer", color = BamNavy, fontWeight = FontWeight.Bold)
-            }
+            SecondaryActionButton("Fermer", onDismiss, Modifier.fillMaxWidth())
             Spacer(modifier = Modifier.height(12.dp))
         }
     }

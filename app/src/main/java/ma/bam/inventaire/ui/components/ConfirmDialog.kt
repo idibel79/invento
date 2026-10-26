@@ -163,30 +163,13 @@ fun ConfirmDialog(
                         )
                     }
                 }
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = onDismiss,
-                        shape = RoundedCornerShape(12.dp),
-                        border = BorderStroke(1.dp, ControlBorder),
-                        colors = ButtonDefaults.outlinedButtonColors(containerColor = CardSurface, contentColor = BamNavy),
-                        contentPadding = PaddingValues(horizontal = 8.dp),
-                        modifier = Modifier.weight(1f).height(44.dp)
-                    ) {
-                        Text(dismissLabel, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                    }
-                    Button(
-                        onClick = onConfirm,
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = tone.fill, contentColor = OnBrand),
-                        contentPadding = PaddingValues(horizontal = 8.dp),
-                        modifier = Modifier.weight(1.3f).height(44.dp)
-                    ) {
-                        Text(confirmLabel, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
-                    }
-                }
+                DialogButtons(
+                    secondaryLabel = dismissLabel,
+                    onSecondary = onDismiss,
+                    primaryLabel = confirmLabel,
+                    onPrimary = onConfirm,
+                    primaryColor = tone.fill
+                )
             }
         }
     }
