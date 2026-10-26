@@ -21,6 +21,8 @@ object DatabaseModule {
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(context, AppDatabase::class.java, AppDatabase.DATABASE_NAME)
             .addMigrations(AppDatabase.MIGRATION_5_6)
+            // TODO : retirer le repli destructif (efface toutes les sessions si une migration
+            // manque) une fois confirmé qu'aucune base installée n'est antérieure à la v5.
             .fallbackToDestructiveMigration()
             .build()
 

@@ -17,7 +17,7 @@ import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.data.repository.InventoryRepository
 import ma.bam.inventaire.data.repository.SessionCounters
 import ma.bam.inventaire.domain.EcartCalculator
-import ma.bam.inventaire.util.FeedbackUtil
+import ma.bam.inventaire.util.ScanFeedback
 import javax.inject.Inject
 
 sealed interface ScanDialogState {
@@ -41,7 +41,7 @@ data class ScanUiState(
 class ScanViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repository: InventoryRepository,
-    private val feedbackUtil: FeedbackUtil
+    private val feedbackUtil: ScanFeedback
 ) : ViewModel() {
 
     val sessionId: String = checkNotNull(savedStateHandle["sessionId"])

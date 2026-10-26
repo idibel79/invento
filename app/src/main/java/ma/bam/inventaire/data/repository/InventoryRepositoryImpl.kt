@@ -40,9 +40,7 @@ class InventoryRepositoryImpl @Inject constructor(
             statut = InventoryStatus.EN_COURS,
             nomFichierSource = fileName
         )
-        sessionDao.insert(session)
-
-        articleDao.insertAll(articles.map { it.toEntity(session.id) })
+        sessionDao.insertWithArticles(session, articles.map { it.toEntity(session.id) })
         return session
     }
 

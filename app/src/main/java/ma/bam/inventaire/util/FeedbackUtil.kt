@@ -15,7 +15,7 @@ import javax.inject.Singleton
 @Singleton
 class FeedbackUtil @Inject constructor(
     @ApplicationContext private val context: Context
-) {
+) : ScanFeedback {
     private val toneGenerator by lazy { ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80) }
 
     private val vibrator: Vibrator by lazy {
@@ -28,12 +28,12 @@ class FeedbackUtil @Inject constructor(
         }
     }
 
-    fun onScanSuccess() {
+    override fun onScanSuccess() {
         toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 120)
         vibrate(80)
     }
 
-    fun onScanError() {
+    override fun onScanError() {
         toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200)
         vibrate(200)
     }

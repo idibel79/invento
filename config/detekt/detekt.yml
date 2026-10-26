@@ -1,0 +1,11 @@
+# Surcharges de la configuration par défaut de detekt (buildUponDefaultConfig = true).
+# Les écarts existants sont absorbés par config/detekt/baseline.xml.
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+style:
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview']
+complexity:
+  LongParameterList:
+    ignoreAnnotated: ['Composable']

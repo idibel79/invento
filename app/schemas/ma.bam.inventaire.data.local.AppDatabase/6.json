@@ -1,0 +1,265 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 6,
+    "identityHash": "13099f8ae12332caad38170eee735138",
+    "entities": [
+      {
+        "tableName": "inventory_session",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `numero` TEXT NOT NULL, `dateCreation` INTEGER NOT NULL, `dateFinalisation` INTEGER, `statut` TEXT NOT NULL, `nomFichierSource` TEXT NOT NULL, `verrouille` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "numero",
+            "columnName": "numero",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateCreation",
+            "columnName": "dateCreation",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateFinalisation",
+            "columnName": "dateFinalisation",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "statut",
+            "columnName": "statut",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nomFichierSource",
+            "columnName": "nomFichierSource",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "verrouille",
+            "columnName": "verrouille",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "stock_article",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sessionId` TEXT NOT NULL, `codeArticle` TEXT NOT NULL, `designation` TEXT NOT NULL, `categorie` TEXT NOT NULL, `tva` TEXT NOT NULL, `emplacement` TEXT NOT NULL, `quantiteTheorique` REAL NOT NULL, `datePeremption` TEXT NOT NULL, `stockMin` REAL NOT NULL, `stockMax` REAL NOT NULL, `codeBarre1` TEXT NOT NULL, `codeBarre2` TEXT NOT NULL, `prixUnitaire` REAL NOT NULL, `pph` REAL NOT NULL, `dateImport` INTEGER NOT NULL, `quantiteReelle` REAL, `ecart` REAL, `ecartValide` INTEGER NOT NULL, `dateScan` INTEGER, `remarque` TEXT, `corrige` INTEGER NOT NULL, FOREIGN KEY(`sessionId`) REFERENCES `inventory_session`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sessionId",
+            "columnName": "sessionId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "codeArticle",
+            "columnName": "codeArticle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "designation",
+            "columnName": "designation",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categorie",
+            "columnName": "categorie",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tva",
+            "columnName": "tva",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "emplacement",
+            "columnName": "emplacement",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantiteTheorique",
+            "columnName": "quantiteTheorique",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "datePeremption",
+            "columnName": "datePeremption",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stockMin",
+            "columnName": "stockMin",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stockMax",
+            "columnName": "stockMax",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "codeBarre1",
+            "columnName": "codeBarre1",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "codeBarre2",
+            "columnName": "codeBarre2",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "prixUnitaire",
+            "columnName": "prixUnitaire",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pph",
+            "columnName": "pph",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateImport",
+            "columnName": "dateImport",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantiteReelle",
+            "columnName": "quantiteReelle",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ecart",
+            "columnName": "ecart",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ecartValide",
+            "columnName": "ecartValide",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateScan",
+            "columnName": "dateScan",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "remarque",
+            "columnName": "remarque",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "corrige",
+            "columnName": "corrige",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_stock_article_sessionId",
+            "unique": false,
+            "columnNames": [
+              "sessionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_article_sessionId` ON `${TABLE_NAME}` (`sessionId`)"
+          },
+          {
+            "name": "index_stock_article_codeArticle",
+            "unique": false,
+            "columnNames": [
+              "codeArticle"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_article_codeArticle` ON `${TABLE_NAME}` (`codeArticle`)"
+          },
+          {
+            "name": "index_stock_article_codeBarre1",
+            "unique": false,
+            "columnNames": [
+              "codeBarre1"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_article_codeBarre1` ON `${TABLE_NAME}` (`codeBarre1`)"
+          },
+          {
+            "name": "index_stock_article_codeBarre2",
+            "unique": false,
+            "columnNames": [
+              "codeBarre2"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_article_codeBarre2` ON `${TABLE_NAME}` (`codeBarre2`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "inventory_session",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "sessionId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '13099f8ae12332caad38170eee735138')"
+    ]
+  }
+}

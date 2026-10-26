@@ -16,7 +16,7 @@ import ma.bam.inventaire.data.local.entity.StockArticleEntity
         StockArticleEntity::class
     ],
     version = 6,
-    exportSchema = false
+    exportSchema = true
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

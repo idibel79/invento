@@ -25,16 +25,15 @@ import kotlinx.coroutines.withContext
 import ma.bam.inventaire.data.local.entity.InventorySessionEntity
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.data.repository.ExcelImportExportRepository
-import ma.bam.inventaire.domain.EcartCalculator
+import ma.bam.inventaire.domain.ArticleFilter
+import ma.bam.inventaire.domain.ArticleFilters
+import ma.bam.inventaire.domain.ArticleSort
+import ma.bam.inventaire.domain.FieldFilters
 import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.data.repository.InventoryRepository
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
-
-enum class ArticleFilter { TOUS, SCANNES, ECARTS, CORRIGES, NON_SCANNES, NEGATIFS, VIDE }
-
-enum class ArticleSort { DEFAUT, TITRE_AZ, TITRE_ZA, PRIX_ASC, PRIX_DESC, QUANTITE_ASC, QUANTITE_DESC }
 
 sealed interface ExportEvent {
     data class Ready(val uri: Uri) : ExportEvent
@@ -106,24 +105,8 @@ class InventoryDetailViewModel @Inject constructor(
      * l'affichage des compteurs et de l'avancement.
      */
     val filterCounts: StateFlow<Map<ArticleFilter, Int>> = allArticles
-        .map { articles ->
-            mapOf(
-                ArticleFilter.TOUS to articles.size,
-                ArticleFilter.SCANNES to articles.count { it.quantiteReelle != null },
-                ArticleFilter.ECARTS to articles.count { isEcartNonCorrige(it) },
-                ArticleFilter.CORRIGES to articles.count { it.corrige },
-                ArticleFilter.NON_SCANNES to articles.count { it.quantiteReelle == null },
-                ArticleFilter.NEGATIFS to articles.count { it.quantiteTheorique < 0 },
-                ArticleFilter.VIDE to articles.count { it.quantiteTheorique == 0.0 }
-            )
-        }
+        .map { articles -> ArticleFilters.counts(articles) }
         .flowOn(Dispatchers.Default).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
-
-    private data class FieldFilters(
-        val position: String?,
-        val category: String?,
-        val priceRange: ClosedFloatingPointRange<Float>?
-    )
 
     private val fieldFilters: Flow<FieldFilters> =
         combine(_positionFilter, _categoryFilter, _priceRangeFilter) { position, category, priceRange ->
@@ -140,45 +123,6 @@ class InventoryDetailViewModel @Inject constructor(
         .map { articles -> articles.filter { it.categorie.isNotBlank() }.groupingBy { it.categorie }.eachCount() }
         .flowOn(Dispatchers.Default).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
-    /** Les corrigés gardent leur écart d'origine mais sont rangés dans « Corrigés », pas « Écarts ». */
-    private fun isEcartNonCorrige(article: StockArticleEntity): Boolean =
-        !article.corrige && EcartCalculator.hasEcart(article.ecart)
-
-    private fun applyFilters(
-        articles: List<StockArticleEntity>,
-        filter: ArticleFilter,
-        query: String,
-        fields: FieldFilters
-    ): List<StockArticleEntity> {
-        var filtered = when (filter) {
-            ArticleFilter.TOUS -> articles
-            ArticleFilter.SCANNES -> articles.filter { it.quantiteReelle != null }
-            ArticleFilter.ECARTS -> articles.filter { isEcartNonCorrige(it) }
-            ArticleFilter.CORRIGES -> articles.filter { it.corrige }
-            ArticleFilter.NON_SCANNES -> articles.filter { it.quantiteReelle == null }
-            ArticleFilter.NEGATIFS -> articles.filter { it.quantiteTheorique < 0 }
-            ArticleFilter.VIDE -> articles.filter { it.quantiteTheorique == 0.0 }
-        }
-        if (fields.position != null) {
-            filtered = filtered.filter { it.emplacement == fields.position }
-        }
-        if (fields.category != null) {
-            filtered = filtered.filter { it.categorie == fields.category }
-        }
-        if (fields.priceRange != null) {
-            filtered = filtered.filter { it.prixUnitaire.toFloat() in fields.priceRange }
-        }
-        if (query.isNotBlank()) {
-            filtered = filtered.filter {
-                it.codeBarre1.contains(query, ignoreCase = true) ||
-                    it.codeBarre2.contains(query, ignoreCase = true) ||
-                    it.codeArticle.contains(query, ignoreCase = true) ||
-                    it.designation.contains(query, ignoreCase = true)
-            }
-        }
-        return filtered
-    }
-
     /**
      * Nombre de produits qu'afficherait la liste avec ces filtres (recherche en cours comprise),
      * pour le bouton « Afficher N produits » de la feuille de filtre, avant de les appliquer.
@@ -188,26 +132,13 @@ class InventoryDetailViewModel @Inject constructor(
         position: String?,
         category: String?,
         priceRange: ClosedFloatingPointRange<Float>?
-    ): Int = applyFilters(
+    ): Int = ArticleFilters.applyFilters(
         allArticles.value, filter, _searchQuery.value, FieldFilters(position, category, priceRange)
     ).size
 
     val visibleArticles: StateFlow<List<StockArticleEntity>> =
         combine(allArticles, _filter, _searchQuery, fieldFilters, _sort) { articles, filter, query, fields, sort ->
-            val filtered = applyFilters(articles, filter, query, fields)
-            when (sort) {
-                ArticleSort.DEFAUT -> filtered
-                ArticleSort.TITRE_AZ -> filtered.sortedWith(
-                    compareBy(String.CASE_INSENSITIVE_ORDER) { it.designation.ifBlank { it.codeArticle } }
-                )
-                ArticleSort.TITRE_ZA -> filtered.sortedWith(
-                    compareByDescending(String.CASE_INSENSITIVE_ORDER) { it.designation.ifBlank { it.codeArticle } }
-                )
-                ArticleSort.PRIX_ASC -> filtered.sortedBy { it.prixUnitaire }
-                ArticleSort.PRIX_DESC -> filtered.sortedByDescending { it.prixUnitaire }
-                ArticleSort.QUANTITE_ASC -> filtered.sortedBy { it.quantiteTheorique }
-                ArticleSort.QUANTITE_DESC -> filtered.sortedByDescending { it.quantiteTheorique }
-            }
+            ArticleFilters.sort(ArticleFilters.applyFilters(articles, filter, query, fields), sort)
         }.flowOn(Dispatchers.Default).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     private val _exportEvents = Channel<ExportEvent>(Channel.BUFFERED)

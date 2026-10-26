@@ -1,0 +1,184 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>CyclomaticComplexMethod:CreateArticleDialog.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun CreateArticleDialog( availableCategories: List&lt;String&gt;, availableTvas: List&lt;String&gt;, availableZones: List&lt;String&gt;, onDismiss: () -&gt; Unit, onConfirm: (ImportedArticle) -&gt; Unit )</ID>
+    <ID>CyclomaticComplexMethod:HomeScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun HomeScreen( onOpenSession: (sessionId: String) -&gt; Unit, viewModel: InventoryListViewModel = hiltViewModel() )</ID>
+    <ID>CyclomaticComplexMethod:InventoryDetailScreen.kt$@OptIn(ExperimentalFoundationApi::class) @Composable internal fun ArticleRow( item: StockArticleEntity, locked: Boolean, onEdit: () -&gt; Unit, onShowDetail: () -&gt; Unit, onSelect: (() -&gt; Unit)? = null, /** Article corrigé : affiche la remarque (ou la mention de correction) sous les quantités. */ showRemarque: Boolean = false )</ID>
+    <ID>CyclomaticComplexMethod:InventoryDetailScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun InventoryDetailScreen( onBack: () -&gt; Unit, onScan: (sessionId: String) -&gt; Unit, viewModel: InventoryDetailViewModel = hiltViewModel() )</ID>
+    <ID>CyclomaticComplexMethod:QuantityEntryDialog.kt$@Composable internal fun CountedQuantityInput( field: TextFieldValue, onFieldChange: (TextFieldValue) -&gt; Unit, quantiteTheorique: Double, onDone: () -&gt; Unit, fieldModifier: Modifier = Modifier )</ID>
+    <ID>CyclomaticComplexMethod:ScanScreen.kt$@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class) @Composable fun ScanScreen( onBack: () -&gt; Unit, onFinished: (sessionId: String) -&gt; Unit, viewModel: ScanViewModel = hiltViewModel() )</ID>
+    <ID>LongMethod:ArticleDetailDialog.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ArticleDetailDialog( article: StockArticleEntity, onDismiss: () -&gt; Unit )</ID>
+    <ID>LongMethod:CameraPreview.kt$@Composable fun CameraPreview( modifier: Modifier = Modifier, torchEnabled: Boolean = false, onBarcodeDetected: (String) -&gt; Unit )</ID>
+    <ID>LongMethod:ConfirmDialog.kt$@Composable fun ConfirmDialog( icon: ImageVector, tone: ConfirmTone, title: String, message: AnnotatedString, confirmLabel: String, onConfirm: () -&gt; Unit, onDismiss: () -&gt; Unit, dismissLabel: String = "Annuler", progress: Float? = null )</ID>
+    <ID>LongMethod:CreateArticleDialog.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun CreateArticleDialog( availableCategories: List&lt;String&gt;, availableTvas: List&lt;String&gt;, availableZones: List&lt;String&gt;, onDismiss: () -&gt; Unit, onConfirm: (ImportedArticle) -&gt; Unit )</ID>
+    <ID>LongMethod:CreateArticleDialog.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun DropdownField( label: String, options: List&lt;String&gt;, selected: String?, onSelect: (String) -&gt; Unit, isError: Boolean = false )</ID>
+    <ID>LongMethod:EcartConfirmDialog.kt$@Composable fun EcartConfirmDialog( article: StockArticleEntity, quantiteReelle: Double, ecart: Double, onDismiss: () -&gt; Unit, onValidate: () -&gt; Unit, onSaveCorrection: (nouvelleQuantiteSysteme: Double, remarque: String) -&gt; Unit )</ID>
+    <ID>LongMethod:EcartConfirmDialog.kt$@Composable private fun RemarqueField(value: String, onValueChange: (String) -&gt; Unit)</ID>
+    <ID>LongMethod:HomeScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun HomeScreen( onOpenSession: (sessionId: String) -&gt; Unit, viewModel: InventoryListViewModel = hiltViewModel() )</ID>
+    <ID>LongMethod:ImportSheet.kt$@Composable private fun IdleContent(onPick: () -&gt; Unit, onCancel: () -&gt; Unit)</ID>
+    <ID>LongMethod:ImportSheet.kt$@Composable private fun SuccessContent(success: ImportUiState.Success)</ID>
+    <ID>LongMethod:ImportSheet.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ImportSheet( onDismiss: () -&gt; Unit, onOpenSession: (sessionId: String) -&gt; Unit, viewModel: ImportViewModel = hiltViewModel() )</ID>
+    <ID>LongMethod:InventoryDetailScreen.kt$@OptIn(ExperimentalFoundationApi::class) @Composable internal fun ArticleRow( item: StockArticleEntity, locked: Boolean, onEdit: () -&gt; Unit, onShowDetail: () -&gt; Unit, onSelect: (() -&gt; Unit)? = null, /** Article corrigé : affiche la remarque (ou la mention de correction) sous les quantités. */ showRemarque: Boolean = false )</ID>
+    <ID>LongMethod:InventoryDetailScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun InventoryDetailScreen( onBack: () -&gt; Unit, onScan: (sessionId: String) -&gt; Unit, viewModel: InventoryDetailViewModel = hiltViewModel() )</ID>
+    <ID>LongMethod:InventoryListScreen.kt$@Composable fun InventorySessionCard( item: SessionListItem, dateLabel: String, onClick: () -&gt; Unit, onLockClick: () -&gt; Unit = {} )</ID>
+    <ID>LongMethod:InventorySheets.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun FilterSheet( filter: ArticleFilter, filterCounts: Map&lt;ArticleFilter, Int&gt;, position: String?, positions: List&lt;String&gt;, positionCounts: Map&lt;String, Int&gt;, category: String?, categories: List&lt;String&gt;, categoryCounts: Map&lt;String, Int&gt;, priceRange: ClosedFloatingPointRange&lt;Float&gt;?, priceBounds: ClosedFloatingPointRange&lt;Float&gt;, previewCount: (ArticleFilter, String?, String?, ClosedFloatingPointRange&lt;Float&gt;?) -&gt; Int, onApply: (ArticleFilter, String?, String?, ClosedFloatingPointRange&lt;Float&gt;?) -&gt; Unit, onReset: () -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
+    <ID>LongMethod:InventorySheets.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun SortSheet( sort: ArticleSort, onSelect: (ArticleSort) -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
+    <ID>LongMethod:InventorySheets.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun SheetDropdown( label: String, active: Boolean, selectedText: String, options: List&lt;DropdownOption&gt; )</ID>
+    <ID>LongMethod:QuantityEntryDialog.kt$@Composable fun QuantityEntryDialog( article: StockArticleEntity, onDismiss: () -&gt; Unit, onConfirm: (Double) -&gt; Unit )</ID>
+    <ID>LongMethod:QuantityEntryDialog.kt$@Composable internal fun CountedQuantityInput( field: TextFieldValue, onFieldChange: (TextFieldValue) -&gt; Unit, quantiteTheorique: Double, onDone: () -&gt; Unit, fieldModifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:ScanScreen.kt$@Composable private fun ManualSearchField( value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:ScanScreen.kt$@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class) @Composable fun ScanScreen( onBack: () -&gt; Unit, onFinished: (sessionId: String) -&gt; Unit, viewModel: ScanViewModel = hiltViewModel() )</ID>
+    <ID>MagicNumber:AppDatabase.kt$AppDatabase.Companion.&lt;no name provided&gt;$5</ID>
+    <ID>MagicNumber:AppDatabase.kt$AppDatabase.Companion.&lt;no name provided&gt;$6</ID>
+    <ID>MagicNumber:ArticleDetailDialog.kt$12f</ID>
+    <ID>MagicNumber:ArticleDetailDialog.kt$15f</ID>
+    <ID>MagicNumber:ArticleDetailDialog.kt$19f</ID>
+    <ID>MagicNumber:ArticleDetailDialog.kt$4f</ID>
+    <ID>MagicNumber:ArticleDetailDialog.kt$5f</ID>
+    <ID>MagicNumber:ArticleDetailDialog.kt$8f</ID>
+    <ID>MagicNumber:BarcodeAnalyzer.kt$BarcodeAnalyzer$0.5f</ID>
+    <ID>MagicNumber:BarcodeAnalyzer.kt$BarcodeAnalyzer$270</ID>
+    <ID>MagicNumber:BarcodeAnalyzer.kt$BarcodeAnalyzer$90</ID>
+    <ID>MagicNumber:CameraPreview.kt$0.82f</ID>
+    <ID>MagicNumber:CameraPreview.kt$1.7f</ID>
+    <ID>MagicNumber:CameraPreview.kt$1280</ID>
+    <ID>MagicNumber:CameraPreview.kt$720</ID>
+    <ID>MagicNumber:Color.kt$0xFF07152F</ID>
+    <ID>MagicNumber:Color.kt$0xFF0B2A6B</ID>
+    <ID>MagicNumber:Color.kt$0xFF0E1F44</ID>
+    <ID>MagicNumber:Color.kt$0xFF0F1A33</ID>
+    <ID>MagicNumber:Color.kt$0xFF0F3A26</ID>
+    <ID>MagicNumber:Color.kt$0xFF15295A</ID>
+    <ID>MagicNumber:Color.kt$0xFF15803D</ID>
+    <ID>MagicNumber:Color.kt$0xFF1652D9</ID>
+    <ID>MagicNumber:Color.kt$0xFF1B336E</ID>
+    <ID>MagicNumber:Color.kt$0xFF1C2B4F</ID>
+    <ID>MagicNumber:Color.kt$0xFF213F86</ID>
+    <ID>MagicNumber:Color.kt$0xFF243866</ID>
+    <ID>MagicNumber:Color.kt$0xFF2A3D6B</ID>
+    <ID>MagicNumber:Color.kt$0xFF2E4170</ID>
+    <ID>MagicNumber:Color.kt$0xFF2F66E8</ID>
+    <ID>MagicNumber:Color.kt$0xFF3A4C78</ID>
+    <ID>MagicNumber:Color.kt$0xFF3D2C0A</ID>
+    <ID>MagicNumber:Color.kt$0xFF3FD0F5</ID>
+    <ID>MagicNumber:Color.kt$0xFF4A1B22</ID>
+    <ID>MagicNumber:Color.kt$0xFF4ADE80</ID>
+    <ID>MagicNumber:Color.kt$0xFF55627A</ID>
+    <ID>MagicNumber:Color.kt$0xFF7C89A3</ID>
+    <ID>MagicNumber:Color.kt$0xFF8A95AB</ID>
+    <ID>MagicNumber:Color.kt$0xFF8DB0FF</ID>
+    <ID>MagicNumber:Color.kt$0xFF9A5B00</ID>
+    <ID>MagicNumber:Color.kt$0xFFA9B6CE</ID>
+    <ID>MagicNumber:Color.kt$0xFFC42B2B</ID>
+    <ID>MagicNumber:Color.kt$0xFFC9D3E6</ID>
+    <ID>MagicNumber:Color.kt$0xFFCEDEFF</ID>
+    <ID>MagicNumber:Color.kt$0xFFD5DCEA</ID>
+    <ID>MagicNumber:Color.kt$0xFFDCE6FF</ID>
+    <ID>MagicNumber:Color.kt$0xFFE1E6F0</ID>
+    <ID>MagicNumber:Color.kt$0xFFE3F5EA</ID>
+    <ID>MagicNumber:Color.kt$0xFFE6E9F0</ID>
+    <ID>MagicNumber:Color.kt$0xFFE6ECF8</ID>
+    <ID>MagicNumber:Color.kt$0xFFE6EEFF</ID>
+    <ID>MagicNumber:Color.kt$0xFFEEF0F4</ID>
+    <ID>MagicNumber:Color.kt$0xFFF4F6FB</ID>
+    <ID>MagicNumber:Color.kt$0xFFF5B544</ID>
+    <ID>MagicNumber:Color.kt$0xFFFDECEC</ID>
+    <ID>MagicNumber:Color.kt$0xFFFF8A80</ID>
+    <ID>MagicNumber:Color.kt$0xFFFFF3DC</ID>
+    <ID>MagicNumber:Color.kt$0xFFFFFFFF</ID>
+    <ID>MagicNumber:EcartCalculator.kt$EcartCalculator$1e-9</ID>
+    <ID>MagicNumber:FadingEdge.kt$0.99f</ID>
+    <ID>MagicNumber:FeedbackUtil.kt$FeedbackUtil$120</ID>
+    <ID>MagicNumber:FeedbackUtil.kt$FeedbackUtil$200</ID>
+    <ID>MagicNumber:FeedbackUtil.kt$FeedbackUtil$80</ID>
+    <ID>MagicNumber:Haptics.kt$255</ID>
+    <ID>MagicNumber:Haptics.kt$40L</ID>
+    <ID>MagicNumber:Haptics.kt$70L</ID>
+    <ID>MagicNumber:ImportSheet.kt$0xFF1D6F42</ID>
+    <ID>MagicNumber:ImportSheet.kt$0xFFE3F5EA</ID>
+    <ID>MagicNumber:ImportSheet.kt$1024</ID>
+    <ID>MagicNumber:ImportSheet.kt$18f</ID>
+    <ID>MagicNumber:ImportSheet.kt$20f</ID>
+    <ID>MagicNumber:ImportSheet.kt$22f</ID>
+    <ID>MagicNumber:ImportSheet.kt$24f</ID>
+    <ID>MagicNumber:ImportSheet.kt$29f</ID>
+    <ID>MagicNumber:ImportSheet.kt$31f</ID>
+    <ID>MagicNumber:ImportSheet.kt$4f</ID>
+    <ID>MagicNumber:ImportSheet.kt$512</ID>
+    <ID>MagicNumber:ImportSheet.kt$6f</ID>
+    <ID>MagicNumber:InventoryDetailScreen.kt$0.38f</ID>
+    <ID>MagicNumber:InventoryDetailScreen.kt$100</ID>
+    <ID>MagicNumber:InventoryDetailViewModel.kt$InventoryDetailViewModel$5000</ID>
+    <ID>MagicNumber:InventoryListScreen.kt$0.15f</ID>
+    <ID>MagicNumber:InventoryListScreen.kt$0.85f</ID>
+    <ID>MagicNumber:InventoryListScreen.kt$100</ID>
+    <ID>MagicNumber:InventoryListViewModel.kt$InventoryListViewModel$5000</ID>
+    <ID>MagicNumber:InventorySheets.kt$10f</ID>
+    <ID>MagicNumber:QuantityEntryDialog.kt$0xFF0F1A33</ID>
+    <ID>MagicNumber:QuantityEntryDialog.kt$100</ID>
+    <ID>MagicNumber:QuantityFormatter.kt$100</ID>
+    <ID>MagicNumber:QuantityFormatter.kt$100.0</ID>
+    <ID>MagicNumber:ScanViewModel.kt$ScanViewModel$20</ID>
+    <ID>MagicNumber:ScanViewModel.kt$ScanViewModel$5000</ID>
+    <ID>MagicNumber:Theme.kt$0xFF0C3B4A</ID>
+    <ID>MagicNumber:Theme.kt$0xFF3B0000</ID>
+    <ID>MagicNumber:Theme.kt$0xFFBDEFFC</ID>
+    <ID>MagicNumber:Theme.kt$0xFFDDF6FD</ID>
+    <ID>MagicNumber:Theme.kt$0xFFE6EAF2</ID>
+    <ID>MagicNumber:Theme.kt$0xFFE9EDF5</ID>
+    <ID>MagicNumber:XlsxReader.kt$XlsxReader$0xFF</ID>
+    <ID>MagicNumber:XlsxReader.kt$XlsxReader$26</ID>
+    <ID>MagicNumber:XlsxWriter.kt$XlsxWriter$26</ID>
+    <ID>MatchingDeclarationName:Color.kt$InventoPalette</ID>
+    <ID>MatchingDeclarationName:ConfirmDialog.kt$ConfirmTone</ID>
+    <ID>MaxLineLength:ApiService.kt$ApiService$*</ID>
+    <ID>MaxLineLength:ArticleFilters.kt$ArticleFilters$fun</ID>
+    <ID>MaxLineLength:ArticleFiltersTest.kt$ArticleFiltersTest$testArticle(id = 4, quantiteTheorique = 8.0, quantiteReelle = 8.0, ecart = -1.0, ecartValide = true, corrige = true)</ID>
+    <ID>MaxLineLength:FakeInventoryRepository.kt$FakeInventoryRepository$override suspend</ID>
+    <ID>MaxLineLength:FakeInventoryRepository.kt$FakeInventoryRepository$override suspend fun recordCorrection(articleId: Long, quantiteReelle: Double, quantiteSysteme: Double, remarque: String)</ID>
+    <ID>MaxLineLength:InventoryDetailScreen.kt$"$totalCount article${if (totalCount &gt; 1) "s" else ""} · ${if (locked) "clôturé" else "ouvert"}"</ID>
+    <ID>MaxLineLength:InventoryDetailScreen.kt$/** Carte d'avancement (fond bleu clair #CEDEFF comme les cartes En cours) : articles inventoriés / total, pourcentage et barre. */</ID>
+    <ID>MaxLineLength:InventoryDetailScreen.kt$QuantityCell</ID>
+    <ID>MaxLineLength:InventoryDetailScreen.kt$Text("Quantité système corrigée par l'inventoriste", fontSize = 12.sp, fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold, color = TextMuted)</ID>
+    <ID>MaxLineLength:InventoryDetailScreen.kt$if (active) MaterialTheme.colorScheme.primary.copy(alpha = 0.35f) else MaterialTheme.colorScheme.outline</ID>
+    <ID>MaxLineLength:InventoryDetailScreen.kt$notScanned -&gt; QuantityValue("À compter", ArticleMutedColor, fontSize = 13.5.sp, fontWeight = FontWeight.Normal)</ID>
+    <ID>MaxLineLength:InventoryDetailScreen.kt$val activeFieldFilters = listOf(positionFilter != null, categoryFilter != null, priceRangeFilter != null).count { it }</ID>
+    <ID>MaxLineLength:InventoryListScreen.kt$contentDescription = if (closed) "Inventaire clôturé, toucher pour déclôturer" else "Inventaire non clôturé"</ID>
+    <ID>MaxLineLength:InventorySheets.kt$DropdownOption(withCount(cat, categoryCounts[cat]), draftCategory == cat) { draftCategory = cat }</ID>
+    <ID>MaxLineLength:InventorySheets.kt$DropdownOption(withCount(zone, positionCounts[zone]), draftPosition == zone) { draftPosition = zone }</ID>
+    <ID>MaxLineLength:InventorySheets.kt$Icon(Icons.Filled.Check, contentDescription = null, tint = BamNavy, modifier = Modifier.size(20.dp))</ID>
+    <ID>MaxLineLength:InventorySheets.kt$SortRow("Quantité", Icons.Outlined.Inventory2, listOf("Min" to ArticleSort.QUANTITE_ASC, "Max" to ArticleSort.QUANTITE_DESC))</ID>
+    <ID>MaxLineLength:InventorySheets.kt$options</ID>
+    <ID>MaxLineLength:InventorySheets.kt$val active = if (row.options.isEmpty()) sort == ArticleSort.DEFAUT else row.options.any { it.second == sort }</ID>
+    <ID>MaxLineLength:QuantityEntryDialog.kt$// Écart arrondi à 0 quand il est négligeable, pour distinguer « conforme » / petit écart (orange) / écart ≥ 5 (rouge).</ID>
+    <ID>MaxLineLength:Type.kt$bodyLarge = TextStyle(fontFamily = PlusJakartaSans, fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 24.sp)</ID>
+    <ID>MaxLineLength:Type.kt$labelLarge = TextStyle(fontFamily = PlusJakartaSans, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, lineHeight = 20.sp)</ID>
+    <ID>MaxLineLength:Type.kt$titleLarge = TextStyle(fontFamily = PlusJakartaSans, fontWeight = FontWeight.Bold, fontSize = 20.sp, lineHeight = 26.sp)</ID>
+    <ID>MaxLineLength:UnknownArticleDialog.kt$Text("Le code \"$code\" ne correspond à aucun article de cet inventaire. Vérifiez qu'il s'agit du bon article ou saisissez-le manuellement.")</ID>
+    <ID>MaxLineLength:XlsxReader.kt$XlsxReader.&lt;no name provided&gt;$"s" -&gt; valueBuffer.toString().trim().toIntOrNull()?.let { sharedStrings.getOrNull(it) } ?: ""</ID>
+    <ID>MaxLineLength:XlsxWriter.kt$XlsxWriter$"&lt;Override PartName=\"/xl/styles.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml\"/&gt;"</ID>
+    <ID>MaxLineLength:XlsxWriter.kt$XlsxWriter$"&lt;Override PartName=\"/xl/workbook.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml\"/&gt;"</ID>
+    <ID>MaxLineLength:XlsxWriter.kt$XlsxWriter$"&lt;Override PartName=\"/xl/worksheets/sheet1.xml\" ContentType=\"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml\"/&gt;"</ID>
+    <ID>MaxLineLength:XlsxWriter.kt$XlsxWriter$"&lt;Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument\" Target=\"xl/workbook.xml\"/&gt;"</ID>
+    <ID>MaxLineLength:XlsxWriter.kt$XlsxWriter$"&lt;Relationship Id=\"rId1\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet\" Target=\"worksheets/sheet1.xml\"/&gt;"</ID>
+    <ID>MaxLineLength:XlsxWriter.kt$XlsxWriter$"&lt;Relationship Id=\"rId2\" Type=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles\" Target=\"styles.xml\"/&gt;"</ID>
+    <ID>NestedBlockDepth:ImportViewModel.kt$ImportViewModel$private fun queryFileInfo(uri: Uri): ImportFileInfo</ID>
+    <ID>ReturnCount:BarcodeAnalyzer.kt$BarcodeAnalyzer$private fun handleResults( barcodes: List&lt;Barcode&gt;, rotationDegrees: Int, imageWidth: Int, imageHeight: Int )</ID>
+    <ID>SwallowedException:XlsxReader.kt$XlsxReader$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ExcelImportExportRepository.kt$ExcelImportExportRepository$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:ImportViewModel.kt$ImportViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:InventoryDetailViewModel.kt$InventoryDetailViewModel$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:XlsxReader.kt$XlsxReader$e: Exception</ID>
+    <ID>TooManyFunctions:InventoryDetailScreen.kt$ma.bam.inventaire.ui.inventorydetail.InventoryDetailScreen.kt</ID>
+    <ID>TooManyFunctions:InventoryDetailViewModel.kt$InventoryDetailViewModel : ViewModel</ID>
+    <ID>TooManyFunctions:InventoryRepository.kt$InventoryRepository</ID>
+    <ID>TooManyFunctions:InventoryRepositoryImpl.kt$InventoryRepositoryImpl : InventoryRepository</ID>
+    <ID>TooManyFunctions:ScanViewModel.kt$ScanViewModel : ViewModel</ID>
+    <ID>TopLevelPropertyNaming:EcartConfirmDialog.kt$private const val RemarqueMaxLength = 200</ID>
+    <ID>TopLevelPropertyNaming:Type.kt$/** Chiffres à chasse fixe, pour que les compteurs ne « sautent » pas quand ils changent. */ const val TabularNums = "tnum"</ID>
+    <ID>UnusedPrivateProperty:ImportSheet.kt$private val ButtonBorder: Color @Composable get() = ControlBorder</ID>
+    <ID>UnusedPrivateProperty:ScanScreen.kt$private val ButtonOutline: Color @Composable get() = ControlBorder</ID>
+    <ID>WildcardImport:ImportSheet.kt$import ma.bam.inventaire.ui.theme.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

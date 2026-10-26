@@ -61,6 +61,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ma.bam.inventaire.domain.ArticleFilter
+import ma.bam.inventaire.domain.ArticleSort
 import ma.bam.inventaire.ui.components.DialogButtons
 import ma.bam.inventaire.ui.theme.BamNavy
 import ma.bam.inventaire.ui.theme.BamNavyFill

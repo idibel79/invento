@@ -99,6 +99,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ma.bam.inventaire.R
+import ma.bam.inventaire.domain.ArticleFilter
+import ma.bam.inventaire.domain.ArticleSort
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.domain.EcartCalculator
