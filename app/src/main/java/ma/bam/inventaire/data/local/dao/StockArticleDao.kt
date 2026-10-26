@@ -39,11 +39,12 @@ interface StockArticleDao {
 
     /** Les compteurs d'une session en une seule lecture de la table (au lieu de 6 requêtes). */
     // Même seuil que EcartCalculator.hasEcart, pour que tous les compteurs d'écarts concordent.
+    // Les corrigés gardent leur écart d'origine mais ne comptent pas comme écarts.
     @Query(
         """
         SELECT COUNT(*) AS total,
             COALESCE(SUM(quantiteReelle IS NOT NULL), 0) AS scanned,
-            COALESCE(SUM(ecart IS NOT NULL AND ABS(ecart) > 1e-9), 0) AS ecarts,
+            COALESCE(SUM(ecart IS NOT NULL AND ABS(ecart) > 1e-9 AND corrige = 0), 0) AS ecarts,
             COALESCE(SUM(ecart IS NOT NULL AND ABS(ecart) > 1e-9 AND ecartValide = 0), 0) AS pendingEcarts,
             COALESCE(SUM(quantiteTheorique < 0), 0) AS negativeStock,
             COALESCE(SUM(quantiteTheorique = 0), 0) AS emptyStock

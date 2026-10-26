@@ -57,6 +57,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.StickyNote2
@@ -386,7 +387,7 @@ fun InventoryDetailScreen(
                         locked = locked,
                         onEdit = { editingArticle = item },
                         onShowDetail = { detailArticle = item },
-                        showRemarque = filter == ArticleFilter.CORRIGES
+                        showRemarque = item.corrige
                     )
                 }
             }
@@ -420,8 +421,8 @@ fun InventoryDetailScreen(
                 viewModel.updateQuantity(pending.article.id, pending.quantiteReelle, ecartValide = true)
                 pendingEcart = null
             },
-            onSaveCorrection = { quantite, remarque ->
-                viewModel.saveCorrection(pending.article.id, quantite, remarque)
+            onSaveCorrection = { quantiteSysteme, remarque ->
+                viewModel.saveCorrection(pending.article.id, pending.quantiteReelle, quantiteSysteme, remarque)
                 pendingEcart = null
             }
         )
@@ -664,7 +665,7 @@ internal fun ArticleRow(
     onEdit: () -> Unit,
     onShowDetail: () -> Unit,
     onSelect: (() -> Unit)? = null,
-    /** Rubrique « Corrigés » : affiche la remarque (ou « Aucune remarque ») sous les quantités. */
+    /** Article corrigé : affiche la remarque (ou la mention de correction) sous les quantités. */
     showRemarque: Boolean = false
 ) {
     val article = item
@@ -836,7 +837,7 @@ internal fun ArticleRow(
                     )
                 }
                 QuantityCellDivider()
-                QuantityCell(label = "Écart", modifier = Modifier.weight(1f).leftDivider(QuantityDividerColor)) {
+                QuantityCell(label = if (article.corrige) "Corrigé" else "Écart", modifier = Modifier.weight(1f).leftDivider(QuantityDividerColor)) {
                     when {
                         notScanned -> QuantityValue("À compter", ArticleMutedColor, fontSize = 13.5.sp, fontWeight = FontWeight.Normal)
                         hasEcart -> QuantityValue(
@@ -933,12 +934,29 @@ private fun QuantityValue(
     )
 }
 
-/** Remarque d'un article corrigé : encadré blanc avec le texte entier, sinon « Aucune remarque ». */
+/**
+ * Article corrigé : mention « Quantité système corrigée par l'inventoriste » toujours affichée,
+ * suivie de la remarque éventuelle dans un encadré blanc avec le texte entier.
+ */
 @Composable
 private fun RemarqueNote(remarque: String?, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Icon(
+            Icons.Outlined.WarningAmber,
+            contentDescription = null,
+            tint = TextMuted,
+            modifier = Modifier.size(13.dp)
+        )
+        Text("Quantité système corrigée par l'inventoriste", fontSize = 12.sp, fontStyle = FontStyle.Italic, fontWeight = FontWeight.Bold, color = TextMuted)
+    }
     if (remarque != null) {
         Row(
-            modifier = modifier
+            modifier = Modifier
+                .padding(top = 6.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(9.dp))
                 .background(CardSurface)
@@ -953,20 +971,6 @@ private fun RemarqueNote(remarque: String?, modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(top = 1.dp).size(14.dp)
             )
             Text(remarque, fontSize = 12.5.sp, lineHeight = 17.5.sp, color = TextPrimary)
-        }
-    } else {
-        Row(
-            modifier = modifier,
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Icon(
-                Icons.AutoMirrored.Outlined.StickyNote2,
-                contentDescription = null,
-                tint = TextMuted,
-                modifier = Modifier.size(13.dp)
-            )
-            Text("Aucune remarque", fontSize = 12.sp, fontStyle = FontStyle.Italic, color = TextMuted)
         }
     }
 }

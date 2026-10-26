@@ -112,8 +112,8 @@ class ScanViewModel @Inject constructor(
     }
 
     /** « Enregistrer » de l'étape « Corriger la quantité » : un écart restant est enregistré comme validé. */
-    fun saveCorrection(article: StockArticleEntity, quantiteReelle: Double, remarque: String) {
-        save { repository.recordCorrection(article.id, quantiteReelle, remarque) }
+    fun saveCorrection(article: StockArticleEntity, quantiteReelle: Double, quantiteSysteme: Double, remarque: String) {
+        save { repository.recordCorrection(article.id, quantiteReelle, quantiteSysteme, remarque) }
     }
 
     fun dismissDialog() {

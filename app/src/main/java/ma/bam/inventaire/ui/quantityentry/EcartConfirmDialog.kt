@@ -26,6 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -53,6 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -77,6 +79,8 @@ import ma.bam.inventaire.ui.theme.StatusEcart
 import ma.bam.inventaire.ui.theme.StatusNegative
 import ma.bam.inventaire.ui.theme.StatusNegativeBg
 import ma.bam.inventaire.ui.theme.StatusEcartBg
+import ma.bam.inventaire.ui.theme.StatusSuccess
+import ma.bam.inventaire.ui.theme.StatusSuccessBg
 import ma.bam.inventaire.ui.theme.TextMuted
 import ma.bam.inventaire.ui.theme.TextPrimary
 import ma.bam.inventaire.ui.theme.TextSecondary
@@ -88,7 +92,8 @@ private val Tabular = TextStyle(fontFeatureSettings = "tnum")
 /**
  * Popup « Écart détecté » à 2 étapes (maquette « Écart détecté · 3 propositions », colonnes
  * A · Écart et A · Après « Corriger ») : 1) Système / Compté / Écart avec « Corriger » et
- * « Valider » ; 2) « Corriger la quantité » avec remarque facultative.
+ * « Valider » ; 2) « Corriger la quantité système ? » : la quantité système prend la valeur
+ * comptée (lecture seule), avec remarque facultative.
  */
 @Composable
 fun EcartConfirmDialog(
@@ -97,7 +102,7 @@ fun EcartConfirmDialog(
     ecart: Double,
     onDismiss: () -> Unit,
     onValidate: () -> Unit,
-    onSaveCorrection: (quantite: Double, remarque: String) -> Unit
+    onSaveCorrection: (nouvelleQuantiteSysteme: Double, remarque: String) -> Unit
 ) {
     PopupHaptic()
     var correcting by remember { mutableStateOf(false) }
@@ -143,6 +148,8 @@ fun EcartConfirmDialog(
                         if (correcting) {
                             CorrectionStep(
                                 article = article,
+                                quantiteReelle = quantiteReelle,
+                                ecart = ecart,
                                 onCancel = { correcting = false },
                                 onSave = onSaveCorrection
                             )
@@ -170,10 +177,7 @@ private fun ColumnScope.EcartStep(
     onCorrect: () -> Unit,
     onValidate: () -> Unit
 ) {
-    // Même règle que les cartes produit : rouge à partir de ±5, orange en dessous.
-    val fort = EcartCalculator.isEcartFort(ecart)
-    val ecartColor = if (fort) StatusEcart else StatusNegative
-    val ecartBg = if (fort) StatusEcartBg else StatusNegativeBg
+    val (ecartColor, ecartBg) = ecartColors(ecart)
     Box(
         modifier = Modifier
             .align(Alignment.CenterHorizontally)
@@ -191,86 +195,84 @@ private fun ColumnScope.EcartStep(
     }
     DialogTitle("Écart détecté")
     ProductName(article)
+    EcartTiles(article.quantiteTheorique, quantiteReelle, ecart)
+    DialogButtons(
+        secondaryLabel = "Valider sans corriger",
+        onSecondary = onValidate,
+        primaryLabel = "Corriger puis valider",
+        onPrimary = onCorrect
+    )
+}
+
+/** Même règle que les cartes produit : rouge à partir de ±5, orange en dessous. */
+@Composable
+private fun ecartColors(ecart: Double): Pair<Color, Color> =
+    if (EcartCalculator.isEcartFort(ecart)) StatusEcart to StatusEcartBg
+    else StatusNegative to StatusNegativeBg
+
+/** Système / Compté / Écart, avec la quantité système d'avant toute correction. */
+@Composable
+private fun EcartTiles(quantiteSysteme: Double, quantiteReelle: Double, ecart: Double) {
+    val (ecartColor, ecartBg) = ecartColors(ecart)
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        QuantityTile("Système", formatQuantity(article.quantiteTheorique), QuantityBand, TextSecondary, BamNavy)
+        QuantityTile("Système", formatQuantity(quantiteSysteme), QuantityBand, TextSecondary, BamNavy)
         QuantityTile("Compté", formatQuantity(quantiteReelle), QuantityBand, TextSecondary, BamNavy)
         QuantityTile("Écart", formatQuantity(ecart, showSign = true), ecartBg, ecartColor, ecartColor)
     }
-    DialogButtons(
-        secondaryLabel = "Valider sans corriger",
-        onSecondary = onValidate,
-        primaryLabel = "Corriger et valider",
-        onPrimary = onCorrect
-    )
 }
 
 @Composable
 private fun ColumnScope.CorrectionStep(
     article: StockArticleEntity,
+    quantiteReelle: Double,
+    ecart: Double,
     onCancel: () -> Unit,
     onSave: (Double, String) -> Unit
 ) {
     // Nouvelle correction : on repart de la remarque existante, que « Enregistrer » remplace.
     var remarque by remember { mutableStateOf(article.remarque.orEmpty()) }
-    // Préremplie avec la quantité système (écart nul), modifiable avec − / + ou au clavier.
-    var field by remember {
-        val initial = formatQuantity(article.quantiteTheorique)
-        mutableStateOf(TextFieldValue(initial, selection = TextRange(initial.length)))
-    }
-    val quantite = field.text.replace(",", ".").toDoubleOrNull()
-    val keyboard = LocalSoftwareKeyboardController.current
-    val focusManager = LocalFocusManager.current
-
-    DialogTitle("Corriger la quantité")
+    DialogTitle("Corriger la quantité système ?")
     ProductName(article)
-    QuantityBandRow("Quantité système", article.quantiteTheorique)
-    CountedQuantityInput(
-        field = field,
-        onFieldChange = { field = it },
-        quantiteTheorique = article.quantiteTheorique,
-        onDone = {
-            keyboard?.hide()
-            focusManager.clearFocus()
-        }
-    )
+    // Rappel de l'écart d'origine, avant correction.
+    EcartTiles(article.quantiteTheorique, quantiteReelle, ecart)
+    // La quantité système (fichier importé) prend la quantité saisie, sans ajustement possible.
+    SystemQuantityDisplay(quantiteReelle)
     RemarqueField(value = remarque, onValueChange = { remarque = it })
     DialogButtons(
         secondaryLabel = "Annuler",
         onSecondary = onCancel,
         primaryLabel = "Enregistrer",
-        onPrimary = { quantite?.let { onSave(it, remarque) } },
-        primaryEnabled = quantite != null
+        onPrimary = { onSave(quantiteReelle, remarque) }
     )
 }
 
+/** « Nouvelle quantité système » en vert, en lecture seule : elle vaut la quantité saisie. */
 @Composable
-private fun QuantityBandRow(label: String, value: Double) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(ControlShape)
-            .background(QuantityBand)
-            .padding(horizontal = 12.dp, vertical = 9.dp)
-    ) {
-        Text(
-            label,
-            fontSize = 13.5.sp,
-            fontWeight = FontWeight.Bold,
-            color = BamNavy,
-            modifier = Modifier.alignByBaseline().padding(end = 10.dp)
-        )
-        Text(
-            formatQuantity(value),
-            fontSize = 15.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = BamNavy,
-            textAlign = TextAlign.End,
-            style = Tabular,
-            modifier = Modifier.alignByBaseline().weight(1f)
-        )
+private fun SystemQuantityDisplay(quantite: Double) {
+    Column {
+        FieldLabel("Nouvelle quantité système", color = StatusSuccess)
+        Spacer(modifier = Modifier.height(6.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .clip(ControlShape)
+                .background(StatusSuccessBg)
+                .border(2.dp, StatusSuccess, ControlShape)
+                .padding(horizontal = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                formatQuantity(quantite),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = StatusSuccess,
+                style = Tabular
+            )
+        }
     }
 }
 

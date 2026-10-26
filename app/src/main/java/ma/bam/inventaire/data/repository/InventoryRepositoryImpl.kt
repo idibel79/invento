@@ -84,11 +84,18 @@ class InventoryRepositoryImpl @Inject constructor(
         updateQuantity(articleId, quantiteReelle, ecartValide)
     }
 
-    override suspend fun recordCorrection(articleId: Long, quantiteReelle: Double, remarque: String) {
+    override suspend fun recordCorrection(
+        articleId: Long,
+        quantiteReelle: Double,
+        quantiteSysteme: Double,
+        remarque: String
+    ) {
         val article = articleDao.getById(articleId) ?: return
+        // On corrige la quantité système (fichier importé). L'écart d'origine (saisie − système
+        // avant correction) reste affiché sur la carte, rangée dans « Corrigés » et non « Écarts ».
         articleDao.update(
             withQuantity(article, quantiteReelle, ecartValide = true)
-                .copy(corrige = true, remarque = remarque.trim().ifEmpty { null })
+                .copy(quantiteTheorique = quantiteSysteme, corrige = true, remarque = remarque.trim().ifEmpty { null })
         )
     }
 

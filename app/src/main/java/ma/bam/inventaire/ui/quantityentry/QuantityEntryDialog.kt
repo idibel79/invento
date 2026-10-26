@@ -259,14 +259,14 @@ fun QuantityEntryDialog(
 }
 
 @Composable
-internal fun FieldLabel(label: String) {
+internal fun FieldLabel(label: String, color: Color = TextSecondary) {
     Text(
         label.uppercase(),
         fontSize = 10.5.sp,
         lineHeight = 14.sp,
         fontWeight = FontWeight.Bold,
         letterSpacing = 0.525.sp,
-        color = TextSecondary
+        color = color
     )
 }
 

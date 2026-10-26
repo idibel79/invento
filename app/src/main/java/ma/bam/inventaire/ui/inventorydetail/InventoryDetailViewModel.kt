@@ -110,7 +110,7 @@ class InventoryDetailViewModel @Inject constructor(
             mapOf(
                 ArticleFilter.TOUS to articles.size,
                 ArticleFilter.SCANNES to articles.count { it.quantiteReelle != null },
-                ArticleFilter.ECARTS to articles.count { EcartCalculator.hasEcart(it.ecart) },
+                ArticleFilter.ECARTS to articles.count { isEcartNonCorrige(it) },
                 ArticleFilter.CORRIGES to articles.count { it.corrige },
                 ArticleFilter.NON_SCANNES to articles.count { it.quantiteReelle == null },
                 ArticleFilter.NEGATIFS to articles.count { it.quantiteTheorique < 0 },
@@ -140,6 +140,10 @@ class InventoryDetailViewModel @Inject constructor(
         .map { articles -> articles.filter { it.categorie.isNotBlank() }.groupingBy { it.categorie }.eachCount() }
         .flowOn(Dispatchers.Default).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
+    /** Les corrigés gardent leur écart d'origine mais sont rangés dans « Corrigés », pas « Écarts ». */
+    private fun isEcartNonCorrige(article: StockArticleEntity): Boolean =
+        !article.corrige && EcartCalculator.hasEcart(article.ecart)
+
     private fun applyFilters(
         articles: List<StockArticleEntity>,
         filter: ArticleFilter,
@@ -149,7 +153,7 @@ class InventoryDetailViewModel @Inject constructor(
         var filtered = when (filter) {
             ArticleFilter.TOUS -> articles
             ArticleFilter.SCANNES -> articles.filter { it.quantiteReelle != null }
-            ArticleFilter.ECARTS -> articles.filter { EcartCalculator.hasEcart(it.ecart) }
+            ArticleFilter.ECARTS -> articles.filter { isEcartNonCorrige(it) }
             ArticleFilter.CORRIGES -> articles.filter { it.corrige }
             ArticleFilter.NON_SCANNES -> articles.filter { it.quantiteReelle == null }
             ArticleFilter.NEGATIFS -> articles.filter { it.quantiteTheorique < 0 }
@@ -240,9 +244,9 @@ class InventoryDetailViewModel @Inject constructor(
     }
 
     /** « Enregistrer » de l'étape « Corriger la quantité » : un écart restant est enregistré comme validé. */
-    fun saveCorrection(articleId: Long, quantiteReelle: Double, remarque: String) {
+    fun saveCorrection(articleId: Long, quantiteReelle: Double, quantiteSysteme: Double, remarque: String) {
         viewModelScope.launch {
-            repository.recordCorrection(articleId, quantiteReelle, remarque)
+            repository.recordCorrection(articleId, quantiteReelle, quantiteSysteme, remarque)
         }
     }
 

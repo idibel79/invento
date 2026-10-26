@@ -382,8 +382,8 @@ fun ScanScreen(
             ecart = dialog.ecart,
             onDismiss = viewModel::dismissDialog,
             onValidate = { viewModel.validateEcart(dialog.article, dialog.quantiteReelle) },
-            onSaveCorrection = { quantite, remarque ->
-                viewModel.saveCorrection(dialog.article, quantite, remarque)
+            onSaveCorrection = { quantiteSysteme, remarque ->
+                viewModel.saveCorrection(dialog.article, dialog.quantiteReelle, quantiteSysteme, remarque)
             }
         )
         is ScanDialogState.UnknownArticle -> UnknownArticleDialog(
