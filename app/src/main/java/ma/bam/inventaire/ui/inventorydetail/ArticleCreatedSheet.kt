@@ -39,6 +39,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
+import ma.bam.inventaire.R
 import ma.bam.inventaire.ui.components.DialogButtons
 import ma.bam.inventaire.ui.components.PopupHaptic
 import ma.bam.inventaire.data.repository.ImportedArticle
@@ -98,28 +100,28 @@ fun ArticleCreatedSheet(
                 color = BamNavy
             )
             Column(modifier = Modifier.fillMaxWidth()) {
-                CreatedField("PID") { FieldValue(article.codeArticle) }
-                CreatedField("Catégorie") { FieldValue(article.categorie) }
+                CreatedField(stringResource(R.string.field_pid)) { FieldValue(article.codeArticle) }
+                CreatedField(stringResource(R.string.field_category)) { FieldValue(article.categorie) }
                 val codes = listOf(article.codeBarre1, article.codeBarre2).filter { it.isNotBlank() }
                 if (codes.isNotEmpty()) {
-                    CreatedField("Code-barres") { codes.forEach { CreatedBarcodeLine(it) } }
+                    CreatedField(stringResource(R.string.field_barcode)) { codes.forEach { CreatedBarcodeLine(it) } }
                 }
-                CreatedField("Zone") { FieldValue(article.emplacement) }
+                CreatedField(stringResource(R.string.field_zone)) { FieldValue(article.emplacement) }
             }
             Band(color = BamPrimaryContainer) {
-                BandRow("PPV", "${formatQuantity(article.prixUnitaire)} DH")
-                BandRow("PPH", "${formatQuantity(article.pph)} DH")
+                BandRow(stringResource(R.string.field_ppv), stringResource(R.string.price_dh, formatQuantity(article.prixUnitaire)))
+                BandRow(stringResource(R.string.field_pph), stringResource(R.string.price_dh, formatQuantity(article.pph)))
             }
             Band(color = SoftBand) {
-                BandRow("Quantité système", formatQuantity(article.quantiteTheorique))
+                BandRow(stringResource(R.string.field_system_qty), formatQuantity(article.quantiteTheorique))
                 article.quantiteReelle?.let {
-                    BandRow("Quantité inventoriée", formatQuantity(it), valueColor = BamPrimary)
+                    BandRow(stringResource(R.string.field_inventoried_qty), formatQuantity(it), valueColor = BamPrimary)
                 }
             }
             DialogButtons(
-                secondaryLabel = "Créer un autre",
+                secondaryLabel = stringResource(R.string.created_create_another),
                 onSecondary = { hideThen(onCreateAnother) },
-                primaryLabel = "Terminé",
+                primaryLabel = stringResource(R.string.created_done),
                 onPrimary = { hideThen(onDismiss) },
                 modifier = Modifier
             )
@@ -146,7 +148,7 @@ private fun SuccessBanner() {
             )
         }
         Spacer(modifier = Modifier.width(10.dp))
-        Text("Produit créé", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = StatusSuccess)
+        Text(stringResource(R.string.created_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = StatusSuccess)
     }
 }
 

@@ -44,6 +44,8 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.compose.ui.res.stringResource
+import ma.bam.inventaire.R
 import ma.bam.inventaire.ui.theme.LightInventoPalette
 
 @Composable
@@ -112,7 +114,7 @@ fun CameraPreview(
         // Consigne juste sous la fenêtre de visée (mêmes proportions que ScanWindowOverlay).
         val windowHeight = maxWidth * 0.82f / 1.7f
         Text(
-            "Placez le code-barres dans le cadre",
+            stringResource(R.string.scan_viewfinder_hint),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
             color = Color.White,

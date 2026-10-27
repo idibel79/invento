@@ -22,11 +22,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ma.bam.inventaire.BuildConfig
+import ma.bam.inventaire.R
 import ma.bam.inventaire.ui.components.InventoMark
 import ma.bam.inventaire.ui.components.InventoWordmark
 import ma.bam.inventaire.ui.theme.BamPrimary
@@ -60,7 +62,7 @@ fun SplashScreen(durationMs: Long) {
             InventoWordmark(fontSize = 40.sp)
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "Gestion d'inventaire",
+                text = stringResource(R.string.splash_tagline),
                 style = TextStyle(
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Medium,
@@ -85,7 +87,7 @@ fun SplashScreen(durationMs: Long) {
             }
         }
         Text(
-            text = "v${BuildConfig.VERSION_NAME}",
+            text = stringResource(R.string.splash_version, BuildConfig.VERSION_NAME),
             style = TextStyle(fontFamily = PlusJakartaSans, fontSize = 12.sp, color = TextMuted),
             modifier = Modifier
                 .align(Alignment.BottomCenter)

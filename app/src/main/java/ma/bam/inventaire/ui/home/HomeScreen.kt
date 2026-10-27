@@ -1,5 +1,6 @@
 package ma.bam.inventaire.ui.home
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,11 +37,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ma.bam.inventaire.R
 import ma.bam.inventaire.ui.components.ConfirmDialog
 import ma.bam.inventaire.ui.components.ConfirmTone
 import ma.bam.inventaire.ui.components.InventoLockup
@@ -108,7 +111,7 @@ fun HomeScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 icon = { Icon(Icons.Filled.Add, contentDescription = null) },
-                text = { Text("Nouvel inventaire", fontWeight = FontWeight.Bold) }
+                text = { Text(stringResource(R.string.import_title), fontWeight = FontWeight.Bold) }
             )
         }
     ) { padding ->
@@ -132,7 +135,7 @@ fun HomeScreen(
             ) {
                 HomeFilter.entries.forEach { tile ->
                     SummaryTile(
-                        label = tile.label,
+                        label = stringResource(tile.labelRes),
                         value = when (tile) {
                             HomeFilter.ONGOING -> ongoingCount
                             HomeFilter.PENDING -> pendingCount
@@ -154,7 +157,8 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = filter?.let { "Mes inventaires · ${it.label}" } ?: "Mes inventaires",
+                    text = filter?.let { stringResource(R.string.home_my_inventories_filtered, stringResource(it.labelRes)) }
+                        ?: stringResource(R.string.home_my_inventories),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = TextPrimary,
@@ -163,7 +167,7 @@ fun HomeScreen(
                 )
                 if (filter != null) {
                     Text(
-                        text = "Tout afficher",
+                        text = stringResource(R.string.home_show_all),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = BamPrimary,
@@ -176,7 +180,7 @@ fun HomeScreen(
 
             if (visibleSessions.isEmpty() && filter != null) {
                 Text(
-                    text = "Aucun inventaire",
+                    text = stringResource(R.string.home_no_inventory),
                     fontSize = 13.sp,
                     color = TextMuted,
                     textAlign = TextAlign.Center,
@@ -187,7 +191,7 @@ fun HomeScreen(
             } else if (visibleSessions.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        "Aucun inventaire pour le moment.",
+                        stringResource(R.string.home_empty),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -228,12 +232,12 @@ fun HomeScreen(
         ConfirmDialog(
             icon = Icons.Outlined.Delete,
             tone = ConfirmTone.DANGER,
-            title = "Supprimer cet inventaire ?",
+            title = stringResource(R.string.home_delete_title),
             message = boldNavy(
-                "L'inventaire ", item.session.numero,
-                " sera définitivement supprimé, avec tous ses articles. Cette action est irréversible."
+                stringResource(R.string.inventory_prefix), item.session.numero,
+                stringResource(R.string.home_delete_message)
             ),
-            confirmLabel = "Supprimer",
+            confirmLabel = stringResource(R.string.action_delete),
             onConfirm = {
                 viewModel.deleteSession(item.session.id)
                 pendingDelete = null
@@ -246,12 +250,12 @@ fun HomeScreen(
         ConfirmDialog(
             icon = Icons.Outlined.Lock,
             tone = ConfirmTone.NAVY,
-            title = "Clôturer cet inventaire ?",
+            title = stringResource(R.string.home_close_title),
             message = boldNavy(
-                "L'inventaire ", item.session.numero,
-                " sera verrouillé : plus aucune modification ne sera possible."
+                stringResource(R.string.inventory_prefix), item.session.numero,
+                stringResource(R.string.home_close_message)
             ),
-            confirmLabel = "Clôturer",
+            confirmLabel = stringResource(R.string.action_close),
             onConfirm = {
                 viewModel.closeSession(item.session.id)
                 pendingClose = null
@@ -264,12 +268,12 @@ fun HomeScreen(
         ConfirmDialog(
             icon = Icons.Outlined.LockOpen,
             tone = ConfirmTone.NAVY,
-            title = "Reprendre les modifications ?",
+            title = stringResource(R.string.home_reopen_title),
             message = boldNavy(
-                "L'inventaire ", item.session.numero,
-                " sera déverrouillé et ses articles pourront à nouveau être modifiés."
+                stringResource(R.string.inventory_prefix), item.session.numero,
+                stringResource(R.string.home_reopen_message)
             ),
-            confirmLabel = "Reprendre",
+            confirmLabel = stringResource(R.string.home_reopen_confirm),
             onConfirm = {
                 viewModel.reopenSession(item.session.id)
                 pendingReopen = null
@@ -280,11 +284,11 @@ fun HomeScreen(
 }
 
 /** Filtres de la liste, un par tuile, dans l'ordre d'affichage. */
-private enum class HomeFilter(val label: String) {
-    ONGOING("En cours"),
-    PENDING("En attente"),
-    ECARTS("Écarts"),
-    FINALIZED("Finalisés");
+private enum class HomeFilter(@StringRes val labelRes: Int) {
+    ONGOING(R.string.status_ongoing),
+    PENDING(R.string.status_pending),
+    ECARTS(R.string.filter_ecarts),
+    FINALIZED(R.string.home_finalized);
 
     val color: Color
         @Composable get() = when (this) {

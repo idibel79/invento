@@ -16,16 +16,20 @@ android {
         applicationId = "ma.bam.inventaire"
         minSdk = 24
         targetSdk = 35
-        versionCode = 170
-        versionName = "2.6.103"
+        versionCode = 171
+        versionName = "2.6.104"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // Pas encore de keystore de publication : la release est signée avec la clé de debug
+            // pour pouvoir être installée et testée. À remplacer par une vraie signingConfig.
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 

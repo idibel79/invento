@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.res.stringResource
+import ma.bam.inventaire.R
 import ma.bam.inventaire.ui.theme.BamNavy
 import ma.bam.inventaire.ui.theme.BamNavyFill
 import ma.bam.inventaire.ui.theme.CardSurface
@@ -85,7 +87,7 @@ fun ConfirmDialog(
     confirmLabel: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    dismissLabel: String = "Annuler",
+    dismissLabel: String = stringResource(R.string.common_cancel),
     progress: Float? = null
 ) {
     PopupHaptic()

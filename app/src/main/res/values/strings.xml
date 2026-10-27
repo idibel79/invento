@@ -1,3 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Libellés de l'interface. Les nombres sont passés en texte (%1$s) et non en %d, pour garder
+    les chiffres latins quelle que soit la langue du téléphone. Les pluriels sont choisis par
+    ui/components/Plurals.kt (règle française : singulier pour 0 et 1).
+-->
 <resources>
     <string name="app_name">Invento</string>
+
+    <!-- Commun -->
+    <string name="common_back">Retour</string>
+    <string name="common_cancel">Annuler</string>
+    <string name="common_clear">Effacer</string>
+    <string name="action_filter">Filtrer</string>
+    <string name="action_sort">Trier</string>
+    <string name="price_dh">%1$s DH</string>
+
+    <plurals name="articles_count">
+        <item quantity="one">%1$s article</item>
+        <item quantity="other">%1$s articles</item>
+    </plurals>
+    <plurals name="products_count">
+        <item quantity="one">%1$s produit</item>
+        <item quantity="other">%1$s produits</item>
+    </plurals>
+
+    <string name="action_delete">Supprimer</string>
+    <string name="action_close">Clôturer</string>
+
+    <!-- Accueil -->
+    <string name="home_my_inventories">Mes inventaires</string>
+    <string name="home_my_inventories_filtered">Mes inventaires · %1$s</string>
+    <string name="home_show_all">Tout afficher</string>
+    <string name="home_no_inventory">Aucun inventaire</string>
+    <string name="home_empty">Aucun inventaire pour le moment.</string>
+    <string name="home_finalized">Finalisés</string>
+    <string name="status_ongoing">En cours</string>
+    <string name="status_pending">En attente</string>
+    <string name="status_finalized">Finalisé</string>
+    <!-- Les messages des confirmations s'écrivent « L'inventaire » + numéro en gras + suite. -->
+    <string name="inventory_prefix">"L'inventaire "</string>
+    <string name="home_delete_title">Supprimer cet inventaire ?</string>
+    <string name="home_delete_message">" sera définitivement supprimé, avec tous ses articles. Cette action est irréversible."</string>
+    <string name="home_close_title">Clôturer cet inventaire ?</string>
+    <string name="home_close_message">" sera verrouillé : plus aucune modification ne sera possible."</string>
+    <string name="home_reopen_title">Reprendre les modifications ?</string>
+    <string name="home_reopen_message">" sera déverrouillé et ses articles pourront à nouveau être modifiés."</string>
+    <string name="home_reopen_confirm">Reprendre</string>
+
+    <!-- Carte d'inventaire (accueil) -->
+    <string name="list_scanned_of_total">%1$s / %2$s articles</string>
+    <string name="list_locked_description">Inventaire clôturé, toucher pour déclôturer</string>
+    <string name="list_unlocked_description">Inventaire non clôturé</string>
+    <!-- Cases du bas de la carte : singulier pour 1, pluriel sinon (y compris 0). -->
+    <plurals name="list_ecarts">
+        <item quantity="one">écart</item>
+        <item quantity="other">écarts</item>
+    </plurals>
+    <plurals name="list_negatives">
+        <item quantity="one">négatif</item>
+        <item quantity="other">négatifs</item>
+    </plurals>
+    <plurals name="list_empties">
+        <item quantity="one">vide</item>
+        <item quantity="other">vides</item>
+    </plurals>
+
+    <!-- Page produits -->
+    <string name="detail_title_fallback">Inventaire</string>
+    <string name="detail_subtitle">%1$s · %2$s</string>
+    <string name="detail_state_locked">clôturé</string>
+    <string name="detail_state_open">ouvert</string>
+    <string name="detail_create_product">Créer un produit</string>
+    <string name="detail_export">Exporter</string>
+    <string name="detail_scan">Scanner</string>
+    <string name="detail_share_inventory">Partager l\'inventaire</string>
+    <string name="detail_search_placeholder">Code ou titre</string>
+    <string name="detail_progress">Avancement</string>
+
+    <!-- Filtres (puces et feuille « Filtrer ») -->
+    <string name="filter_all">Tous</string>
+    <string name="filter_counted">Inventoriés</string>
+    <string name="filter_ecarts">Écarts</string>
+    <string name="filter_corrected">Corrigés</string>
+    <string name="filter_not_counted">Non inventoriés</string>
+    <string name="filter_negative">Négatifs</string>
+    <string name="filter_empty_chip">Vides</string>
+    <string name="filter_empty">Vide</string>
+    <string name="filter_reset">Réinitialiser</string>
+    <string name="filter_status">Statut</string>
+    <string name="filter_zone">Zone</string>
+    <string name="filter_all_zones">Toutes les zones</string>
+    <string name="filter_category">Catégorie</string>
+    <string name="filter_all_categories">Toutes les catégories</string>
+    <string name="filter_unit_price">PRIX UNITAIRE</string>
+    <string name="filter_single_price">Un seul prix disponible</string>
+    <string name="filter_price_min">Min</string>
+    <string name="filter_price_max">Max</string>
+
+    <!-- Feuille « Trier par » -->
+    <string name="sort_title_sheet">Trier par</string>
+    <string name="sort_original">Ordre d\'origine</string>
+    <string name="sort_title">Titre</string>
+    <string name="sort_price">Prix</string>
+    <string name="sort_quantity">Quantité</string>
+    <string name="sort_az">A-Z</string>
+    <string name="sort_za">Z-A</string>
+    <string name="sort_min">Min</string>
+    <string name="sort_max">Max</string>
+
+    <!-- Feuille « Nouvel inventaire » (import) -->
+    <string name="import_title">Nouvel inventaire</string>
+    <string name="import_intro">Importez la liste du stock système exportée depuis votre logiciel de gestion.</string>
+    <string name="import_pick">Choisir un fichier Excel</string>
+    <string name="import_format">Format .xlsx uniquement</string>
+    <string name="import_expected_columns">Colonnes attendues dans le fichier</string>
+    <string name="import_loading">Import en cours…</string>
+    <string name="import_success">Import réussi</string>
+    <string name="import_open">Ouvrir l’inventaire</string>
+    <string name="import_failed">Import impossible</string>
+    <string name="import_pick_other">Choisir un autre fichier</string>
+    <string name="import_remove_file">Retirer le fichier</string>
+    <string name="import_size_ko">%1$s Ko</string>
+    <string name="import_show_details">Voir le détail</string>
+    <string name="import_hide_details">Masquer</string>
+    <!-- Le nombre, en gras, est affiché devant ce libellé. -->
+    <plurals name="import_articles_imported">
+        <item quantity="one">article importé</item>
+        <item quantity="other">articles importés</item>
+    </plurals>
+    <plurals name="import_ignored_lines">
+        <item quantity="one">%1$s ligne ignorée</item>
+        <item quantity="other">%1$s lignes ignorées</item>
+    </plurals>
+    <!-- Colonnes attendues dans le fichier Excel, dans l'ordre de l'export. -->
+    <string-array name="import_expected_columns">
+        <item>PID</item>
+        <item>Produit</item>
+        <item>Catégorie</item>
+        <item>TVA</item>
+        <item>PPV</item>
+        <item>PPH</item>
+        <item>Zone</item>
+        <item>Stock</item>
+        <item>Code barre 1</item>
+        <item>Code barre 2</item>
+        <item>Stock min</item>
+        <item>Stock max</item>
+        <item>Date de péremption</item>
+    </string-array>
+
+    <!-- Écran de scan -->
+    <string name="scan_title">Scan inventaire</string>
+    <string name="scan_torch_on">Activer le flash</string>
+    <string name="scan_torch_off">Désactiver le flash</string>
+    <string name="scan_camera_required">Autorisation caméra requise pour scanner les codes-barres.</string>
+    <string name="scan_allow_camera">Autoriser la caméra</string>
+    <string name="scan_search_placeholder">Code-barres, PID ou titre</string>
+    <string name="scan_manual_hint">Tapez un code ou un titre pour retrouver un produit.</string>
+    <string name="scan_no_result">Aucun produit trouvé.</string>
+    <!-- Le nombre, en gras, est affiché devant ce libellé. -->
+    <plurals name="scan_products_found">
+        <item quantity="one">produit trouvé</item>
+        <item quantity="other">produits trouvés</item>
+    </plurals>
+    <!-- Suivi du nombre scanné « N / T » en gras. -->
+    <string name="scan_scanned">Scannés</string>
+    <plurals name="scan_pending_ecarts">
+        <item quantity="one">%1$s écart à valider</item>
+        <item quantity="other">%1$s écarts à valider</item>
+    </plurals>
+    <string name="scan_mode_camera">Scanner</string>
+    <string name="scan_mode_manual">Saisie</string>
+    <string name="scan_finish">Terminer</string>
+    <string name="scan_finalize_title">Terminer cet inventaire ?</string>
+    <!-- Précédé de « N / T » en gras. -->
+    <string name="scan_finalize_scanned">articles scannés.</string>
+    <string name="scan_finalize_pending">%1$s écart(s) restent à valider.</string>
+    <string name="scan_finalize_saved">L\'inventaire sera enregistré dans l\'historique.</string>
+    <string name="scan_finalize_confirm">Oui, terminer</string>
+    <string name="scan_finalize_continue">Continuer</string>
+
+    <!-- Popups de saisie de quantité -->
+    <string name="common_ok">OK</string>
+    <string name="action_validate">Valider</string>
+    <string name="action_save">Enregistrer</string>
+    <string name="field_zone">Zone</string>
+    <string name="field_barcode">Code-barres</string>
+    <string name="field_system_qty">Quantité système</string>
+    <string name="field_counted_qty">Quantité comptée</string>
+    <string name="qty_decrease">Diminuer</string>
+    <string name="qty_increase">Augmenter</string>
+    <string name="qty_ecart_conforme">Écart conforme par rapport au système</string>
+    <string name="qty_ecart_of">Écart de %1$s par rapport au système</string>
+    <string name="ecart_detected_title">Écart détecté</string>
+    <string name="ecart_validate_without">Valider sans corriger</string>
+    <string name="ecart_correct_then_validate">Corriger puis valider</string>
+    <string name="ecart_correct_title">Corriger la quantité système ?</string>
+    <string name="ecart_new_system_qty">Nouvelle quantité système</string>
+    <string name="ecart_remark">Remarque (facultatif)</string>
+    <string name="ecart_remark_placeholder">Ex. : 2 boîtes abîmées en réserve</string>
+    <string name="unknown_article_title">Article non reconnu</string>
+    <string name="unknown_article_message">Le code \"%1$s\" ne correspond à aucun article de cet inventaire. Vérifiez qu\'il s\'agit du bon article ou saisissez-le manuellement.</string>
+
+    <!-- Champs d'un produit (détail, création, produit créé) -->
+    <string name="field_pid">PID</string>
+    <string name="field_category">Catégorie</string>
+    <string name="field_tva">TVA</string>
+    <string name="field_ppv">PPV</string>
+    <string name="field_pph">PPH</string>
+    <string name="field_inventoried_qty">Quantité inventoriée</string>
+    <string name="field_barcode_caps">CODE-BARRES</string>
+    <string name="action_close_dialog">Fermer</string>
+    <string name="create_title">Nouveau produit</string>
+    <string name="create_field_title">Titre du produit</string>
+    <string name="create_field_pid">Code article (PID)</string>
+    <string name="create_field_barcode1">Code-barres 1</string>
+    <string name="create_field_barcode2">Code-barres 2 (optionnel)</string>
+    <string name="create_field_system_qty">Quantité système (optionnel)</string>
+    <string name="create_field_counted_qty">Quantité inventaire (optionnel)</string>
+    <string name="create_confirm">Créer</string>
+    <string name="create_open_list">Ouvrir la liste</string>
+    <string name="create_no_value">Aucune valeur disponible</string>
+    <string name="created_title">Produit créé</string>
+    <string name="created_create_another">Créer un autre</string>
+    <string name="created_done">Terminé</string>
+
+    <!-- Caméra et démarrage -->
+    <string name="scan_viewfinder_hint">Placez le code-barres dans le cadre</string>
+    <string name="splash_tagline">Gestion d\'inventaire</string>
+    <string name="splash_version">v%1$s</string>
+
+    <!-- Carte produit -->
+    <string name="article_edit_quantity">Modifier la quantité</string>
+    <string name="article_corrected_note">Quantité système corrigée par l\'inventoriste</string>
+    <string name="qty_system">Système</string>
+    <string name="qty_counted">Compté</string>
+    <string name="qty_ecart">Écart</string>
+    <string name="qty_corrected">Corrigé</string>
+    <string name="qty_to_count">À compter</string>
+    <string name="qty_conforme">Conforme</string>
 </resources>

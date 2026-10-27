@@ -1,11 +1,13 @@
 package ma.bam.inventaire.ui.inventorylist
 
+import androidx.annotation.PluralsRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
+import ma.bam.inventaire.R
 import ma.bam.inventaire.ui.theme.AppBackground
 import ma.bam.inventaire.ui.theme.BamCyan
 import ma.bam.inventaire.ui.theme.BamNavy
@@ -40,6 +42,8 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import kotlin.math.abs
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -123,14 +127,14 @@ fun SwipeableSessionCard(
                     color = LightInventoPalette.ecart,
                     progress = progress,
                     icon = Icons.Filled.Delete,
-                    label = "Supprimer"
+                    label = stringResource(R.string.action_delete)
                 )
                 SwipeToDismissBoxValue.StartToEnd -> SwipeActionBackground(
                     alignment = Alignment.CenterStart,
                     color = LightInventoPalette.success,
                     progress = progress,
                     icon = Icons.Filled.Lock,
-                    label = "Clôturer"
+                    label = stringResource(R.string.action_close)
                 )
                 SwipeToDismissBoxValue.Settled -> Unit
             }
@@ -297,9 +301,9 @@ fun InventorySessionCard(
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = when {
-                                allScanned -> "Finalisé"
-                                notStarted -> "En attente"
-                                else -> "En cours"
+                                allScanned -> stringResource(R.string.status_finalized)
+                                notStarted -> stringResource(R.string.status_pending)
+                                else -> stringResource(R.string.status_ongoing)
                             },
                             fontSize = 11.sp,
                             lineHeight = 17.sp,
@@ -327,7 +331,11 @@ fun InventorySessionCard(
                                 modifier = Modifier.padding(top = 2.dp)
                             )
                             Text(
-                                "${item.counters.scanned} / ${item.counters.total} articles",
+                                stringResource(
+                                    R.string.list_scanned_of_total,
+                                    item.counters.scanned.toString(),
+                                    item.counters.total.toString()
+                                ),
                                 fontSize = 12.5.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = colors.text,
@@ -350,7 +358,9 @@ fun InventorySessionCard(
                         ) {
                             Icon(
                                 imageVector = if (closed) Icons.Filled.Lock else Icons.Filled.LockOpen,
-                                contentDescription = if (closed) "Inventaire clôturé, toucher pour déclôturer" else "Inventaire non clôturé",
+                                contentDescription = stringResource(
+                                    if (closed) R.string.list_locked_description else R.string.list_unlocked_description
+                                ),
                                 tint = colors.accent,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -367,7 +377,7 @@ fun InventorySessionCard(
             ) {
                 CounterChip(
                     count = item.counters.ecarts,
-                    singular = "écart",
+                    label = R.plurals.list_ecarts,
                     color = StatusEcart,
                     background = StatusEcartBg,
                     emptyBackground = colors.emptyChipBackground,
@@ -376,7 +386,7 @@ fun InventorySessionCard(
                 )
                 CounterChip(
                     count = item.counters.negativeStock,
-                    singular = "négatif",
+                    label = R.plurals.list_negatives,
                     color = StatusNegative,
                     background = StatusNegativeBg,
                     emptyBackground = colors.emptyChipBackground,
@@ -385,7 +395,7 @@ fun InventorySessionCard(
                 )
                 CounterChip(
                     count = item.counters.emptyStock,
-                    singular = "vide",
+                    label = R.plurals.list_empties,
                     color = StatusPending,
                     background = StatusPendingBg,
                     emptyBackground = colors.emptyChipBackground,
@@ -443,7 +453,7 @@ private fun ProgressRing(progress: Float, percent: Int, color: Color, trackColor
 @Composable
 private fun CounterChip(
     count: Int,
-    singular: String,
+    @PluralsRes label: Int,
     color: Color,
     background: Color,
     emptyBackground: Color,
@@ -470,7 +480,7 @@ private fun CounterChip(
         )
         Spacer(modifier = Modifier.width(5.dp))
         Text(
-            if (count == 1) singular else "${singular}s",
+            pluralStringResource(label, if (count == 1) 1 else 2),
             fontSize = 11.sp,
             color = if (empty) emptyText else color,
             maxLines = 1,

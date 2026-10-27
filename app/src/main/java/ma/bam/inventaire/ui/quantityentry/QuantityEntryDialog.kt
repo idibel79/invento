@@ -61,6 +61,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import kotlinx.coroutines.delay
+import androidx.compose.ui.res.stringResource
+import ma.bam.inventaire.R
 import ma.bam.inventaire.ui.components.DialogButtons
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.domain.EcartCalculator
@@ -170,7 +172,7 @@ fun QuantityEntryDialog(
                         )
                         if (article.emplacement.isNotBlank()) {
                             Column {
-                                FieldLabel("Zone")
+                                FieldLabel(stringResource(R.string.field_zone))
                                 Text(
                                     article.emplacement,
                                     fontSize = 13.5.sp,
@@ -184,7 +186,7 @@ fun QuantityEntryDialog(
                         val codes = listOf(article.codeBarre1, article.codeBarre2).filter { it.isNotBlank() }
                         if (codes.isNotEmpty()) {
                             Column {
-                                FieldLabel("Code-barres")
+                                FieldLabel(stringResource(R.string.field_barcode))
                                 codes.forEach { BarcodeLine(it) }
                             }
                         }
@@ -196,7 +198,7 @@ fun QuantityEntryDialog(
                                 .padding(horizontal = 12.dp, vertical = 9.dp)
                         ) {
                             Text(
-                                "Quantité système",
+                                stringResource(R.string.field_system_qty),
                                 fontSize = 13.5.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = BamNavy,
@@ -220,9 +222,9 @@ fun QuantityEntryDialog(
                             fieldModifier = Modifier.focusRequester(focusRequester)
                         )
                         DialogButtons(
-                            secondaryLabel = "Annuler",
+                            secondaryLabel = stringResource(R.string.common_cancel),
                             onSecondary = onDismiss,
-                            primaryLabel = "Valider",
+                            primaryLabel = stringResource(R.string.action_validate),
                             onPrimary = { confirm() },
                             primaryEnabled = quantite != null
                         )
@@ -276,13 +278,13 @@ internal fun CountedQuantityInput(
     }
 
     Column {
-        FieldLabel("Quantité comptée")
+        FieldLabel(stringResource(R.string.field_counted_qty))
         Spacer(modifier = Modifier.height(6.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            StepButton(sign = "−", description = "Diminuer") {
+            StepButton(sign = "−", description = stringResource(R.string.qty_decrease)) {
                 setQuantity(((quantite ?: 0.0) - 1.0).coerceAtLeast(0.0))
             }
             BasicTextField(
@@ -318,7 +320,7 @@ internal fun CountedQuantityInput(
                     ) { inner() }
                 }
             )
-            StepButton(sign = "+", description = "Augmenter") {
+            StepButton(sign = "+", description = stringResource(R.string.qty_increase)) {
                 setQuantity((quantite ?: 0.0) + 1.0)
             }
         }
@@ -341,9 +343,9 @@ internal fun CountedQuantityInput(
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 if (ecart == 0.0) {
-                    "Écart conforme par rapport au système"
+                    stringResource(R.string.qty_ecart_conforme)
                 } else {
-                    "Écart de ${formatQuantity(ecart!!, showSign = true)} par rapport au système"
+                    stringResource(R.string.qty_ecart_of, formatQuantity(ecart!!, showSign = true))
                 },
                 fontSize = 12.5.sp,
                 fontWeight = FontWeight.SemiBold,

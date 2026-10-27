@@ -4,8 +4,11 @@ naming:
   FunctionNaming:
     ignoreAnnotated: ['Composable']
 style:
+  # Même limite que max_line_length de .editorconfig (ktlint), pour que les deux outils s'accordent.
+  MaxLineLength:
+    maxLineLength: 140
   UnusedPrivateMember:
-    ignoreAnnotated: ['Preview']
+    ignoreAnnotated: ['Preview', 'LightDarkPreviews']
 complexity:
   LongParameterList:
     ignoreAnnotated: ['Composable']

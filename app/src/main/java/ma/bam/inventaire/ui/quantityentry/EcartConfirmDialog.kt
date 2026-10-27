@@ -65,6 +65,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
+import androidx.compose.ui.res.stringResource
+import ma.bam.inventaire.R
 import ma.bam.inventaire.ui.components.DialogButtons
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.ui.components.PopupHaptic
@@ -194,13 +196,13 @@ private fun ColumnScope.EcartStep(
             modifier = Modifier.size(26.dp)
         )
     }
-    DialogTitle("Écart détecté")
+    DialogTitle(stringResource(R.string.ecart_detected_title))
     ProductName(article)
     EcartTiles(article.quantiteTheorique, quantiteReelle, ecart)
     DialogButtons(
-        secondaryLabel = "Valider sans corriger",
+        secondaryLabel = stringResource(R.string.ecart_validate_without),
         onSecondary = onValidate,
-        primaryLabel = "Corriger puis valider",
+        primaryLabel = stringResource(R.string.ecart_correct_then_validate),
         onPrimary = onCorrect
     )
 }
@@ -219,9 +221,9 @@ private fun EcartTiles(quantiteSysteme: Double, quantiteReelle: Double, ecart: D
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        QuantityTile("Système", formatQuantity(quantiteSysteme), QuantityBand, TextSecondary, BamNavy)
-        QuantityTile("Compté", formatQuantity(quantiteReelle), QuantityBand, TextSecondary, BamNavy)
-        QuantityTile("Écart", formatQuantity(ecart, showSign = true), ecartBg, ecartColor, ecartColor)
+        QuantityTile(stringResource(R.string.qty_system), formatQuantity(quantiteSysteme), QuantityBand, TextSecondary, BamNavy)
+        QuantityTile(stringResource(R.string.qty_counted), formatQuantity(quantiteReelle), QuantityBand, TextSecondary, BamNavy)
+        QuantityTile(stringResource(R.string.qty_ecart), formatQuantity(ecart, showSign = true), ecartBg, ecartColor, ecartColor)
     }
 }
 
@@ -235,7 +237,7 @@ private fun ColumnScope.CorrectionStep(
 ) {
     // Nouvelle correction : on repart de la remarque existante, que « Enregistrer » remplace.
     var remarque by remember { mutableStateOf(article.remarque.orEmpty()) }
-    DialogTitle("Corriger la quantité système ?")
+    DialogTitle(stringResource(R.string.ecart_correct_title))
     ProductName(article)
     // Rappel de l'écart d'origine, avant correction.
     EcartTiles(article.quantiteTheorique, quantiteReelle, ecart)
@@ -243,9 +245,9 @@ private fun ColumnScope.CorrectionStep(
     SystemQuantityDisplay(quantiteReelle)
     RemarqueField(value = remarque, onValueChange = { remarque = it })
     DialogButtons(
-        secondaryLabel = "Annuler",
+        secondaryLabel = stringResource(R.string.common_cancel),
         onSecondary = onCancel,
-        primaryLabel = "Enregistrer",
+        primaryLabel = stringResource(R.string.action_save),
         onPrimary = { onSave(quantiteReelle, remarque) }
     )
 }
@@ -254,7 +256,7 @@ private fun ColumnScope.CorrectionStep(
 @Composable
 private fun SystemQuantityDisplay(quantite: Double) {
     Column {
-        FieldLabel("Nouvelle quantité système", color = StatusSuccess)
+        FieldLabel(stringResource(R.string.ecart_new_system_qty), color = StatusSuccess)
         Spacer(modifier = Modifier.height(6.dp))
         Box(
             modifier = Modifier
@@ -290,7 +292,7 @@ private fun RemarqueField(value: String, onValueChange: (String) -> Unit) {
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(6.dp))
-            FieldLabel("Remarque (facultatif)")
+            FieldLabel(stringResource(R.string.ecart_remark))
         }
         Spacer(modifier = Modifier.height(6.dp))
         BasicTextField(
@@ -319,7 +321,7 @@ private fun RemarqueField(value: String, onValueChange: (String) -> Unit) {
                 ) {
                     if (value.isEmpty()) {
                         Text(
-                            "Ex. : 2 boîtes abîmées en réserve",
+                            stringResource(R.string.ecart_remark_placeholder),
                             fontSize = 13.5.sp,
                             lineHeight = 19.575.sp,
                             color = TextMuted

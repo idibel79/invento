@@ -43,10 +43,10 @@
         <error line="17" column="1" source="standard:no-unused-imports" />
         <error line="18" column="1" source="standard:no-unused-imports" />
         <error line="20" column="1" source="standard:no-unused-imports" />
-        <error line="43" column="1" source="standard:no-unused-imports" />
         <error line="45" column="1" source="standard:no-unused-imports" />
-        <error line="59" column="11" source="standard:enum-wrapping" />
-        <error line="73" column="1" source="standard:no-consecutive-blank-lines" />
+        <error line="47" column="1" source="standard:no-unused-imports" />
+        <error line="61" column="11" source="standard:enum-wrapping" />
+        <error line="75" column="1" source="standard:no-consecutive-blank-lines" />
     </file>
     <file name="src/main/java/ma/bam/inventaire/ui/components/FadingEdge.kt">
         <error line="19" column="85" source="standard:function-signature" />
@@ -64,32 +64,21 @@
     </file>
     <file name="src/main/java/ma/bam/inventaire/ui/home/HomeScreen.kt">
         <error line="3" column="1" source="standard:import-ordering" />
-        <error line="53" column="1" source="standard:no-unused-imports" />
-        <error line="70" column="5" source="standard:function-signature" />
-        <error line="71" column="5" source="standard:function-signature" />
-        <error line="71" column="56" source="standard:function-signature" />
-        <error line="233" column="34" source="standard:argument-list-wrapping" />
-        <error line="251" column="34" source="standard:argument-list-wrapping" />
-        <error line="269" column="34" source="standard:argument-list-wrapping" />
-        <error line="299" column="53" source="standard:function-signature" />
-        <error line="313" column="5" source="standard:function-signature" />
-        <error line="314" column="5" source="standard:function-signature" />
-        <error line="315" column="5" source="standard:function-signature" />
-        <error line="316" column="5" source="standard:function-signature" />
+        <error line="56" column="1" source="standard:no-unused-imports" />
+        <error line="73" column="5" source="standard:function-signature" />
+        <error line="74" column="5" source="standard:function-signature" />
+        <error line="74" column="56" source="standard:function-signature" />
+        <error line="237" column="60" source="standard:argument-list-wrapping" />
+        <error line="255" column="60" source="standard:argument-list-wrapping" />
+        <error line="273" column="60" source="standard:argument-list-wrapping" />
+        <error line="303" column="53" source="standard:function-signature" />
         <error line="317" column="5" source="standard:function-signature" />
         <error line="318" column="5" source="standard:function-signature" />
-        <error line="318" column="34" source="standard:function-signature" />
-    </file>
-    <file name="src/main/java/ma/bam/inventaire/ui/importinventory/ImportSheet.kt">
-        <error line="3" column="1" source="standard:import-ordering" />
-        <error line="5" column="1" source="standard:no-unused-imports" />
-        <error line="33" column="1" source="standard:no-unused-imports" />
-        <error line="34" column="1" source="standard:no-unused-imports" />
-        <error line="39" column="1" source="standard:no-unused-imports" />
-        <error line="117" column="5" source="standard:function-signature" />
-        <error line="118" column="5" source="standard:function-signature" />
-        <error line="119" column="5" source="standard:function-signature" />
-        <error line="119" column="49" source="standard:function-signature" />
+        <error line="319" column="5" source="standard:function-signature" />
+        <error line="320" column="5" source="standard:function-signature" />
+        <error line="321" column="5" source="standard:function-signature" />
+        <error line="322" column="5" source="standard:function-signature" />
+        <error line="322" column="34" source="standard:function-signature" />
     </file>
     <file name="src/main/java/ma/bam/inventaire/ui/inventorydetail/ArticleCreatedSheet.kt">
         <error line="3" column="1" source="standard:import-ordering" />
@@ -98,21 +87,21 @@
         <error line="21" column="1" source="standard:no-unused-imports" />
         <error line="22" column="1" source="standard:no-unused-imports" />
         <error line="27" column="1" source="standard:no-unused-imports" />
-        <error line="46" column="1" source="standard:no-unused-imports" />
-        <error line="49" column="1" source="standard:no-unused-imports" />
+        <error line="48" column="1" source="standard:no-unused-imports" />
         <error line="51" column="1" source="standard:no-unused-imports" />
-        <error line="67" column="5" source="standard:function-signature" />
-        <error line="68" column="5" source="standard:function-signature" />
+        <error line="53" column="1" source="standard:no-unused-imports" />
         <error line="69" column="5" source="standard:function-signature" />
-        <error line="69" column="26" source="standard:function-signature" />
+        <error line="70" column="5" source="standard:function-signature" />
+        <error line="71" column="5" source="standard:function-signature" />
+        <error line="71" column="26" source="standard:function-signature" />
     </file>
     <file name="src/main/java/ma/bam/inventaire/ui/inventorydetail/ArticleDetailDialog.kt">
         <error line="3" column="1" source="standard:import-ordering" />
         <error line="3" column="1" source="standard:no-unused-imports" />
         <error line="22" column="1" source="standard:no-unused-imports" />
-        <error line="60" column="5" source="standard:function-signature" />
-        <error line="61" column="5" source="standard:function-signature" />
-        <error line="61" column="26" source="standard:function-signature" />
+        <error line="62" column="5" source="standard:function-signature" />
+        <error line="63" column="5" source="standard:function-signature" />
+        <error line="63" column="26" source="standard:function-signature" />
     </file>
     <file name="src/main/java/ma/bam/inventaire/ui/inventorydetail/CreateArticleDialog.kt">
         <error line="3" column="1" source="standard:import-ordering" />
@@ -120,53 +109,25 @@
         <error line="8" column="1" source="standard:no-unused-imports" />
         <error line="23" column="1" source="standard:no-unused-imports" />
         <error line="31" column="1" source="standard:no-unused-imports" />
-        <error line="49" column="1" source="standard:no-unused-imports" />
-        <error line="259" column="5" source="standard:function-signature" />
+        <error line="50" column="1" source="standard:no-unused-imports" />
         <error line="260" column="5" source="standard:function-signature" />
         <error line="261" column="5" source="standard:function-signature" />
         <error line="262" column="5" source="standard:function-signature" />
         <error line="263" column="5" source="standard:function-signature" />
-        <error line="263" column="29" source="standard:function-signature" />
-    </file>
-    <file name="src/main/java/ma/bam/inventaire/ui/inventorydetail/InventoryDetailScreen.kt">
-        <error line="120" column="5" source="standard:function-signature" />
-        <error line="121" column="5" source="standard:function-signature" />
-        <error line="122" column="5" source="standard:function-signature" />
-        <error line="122" column="58" source="standard:function-signature" />
-        <error line="549" column="5" source="standard:function-signature" />
-        <error line="550" column="5" source="standard:function-signature" />
-        <error line="551" column="5" source="standard:function-signature" />
-        <error line="552" column="5" source="standard:function-signature" />
-        <error line="552" column="44" source="standard:function-signature" />
-    </file>
-    <file name="src/main/java/ma/bam/inventaire/ui/inventorydetail/InventorySheets.kt">
-        <error line="3" column="1" source="standard:import-ordering" />
-        <error line="3" column="1" source="standard:no-unused-imports" />
-        <error line="33" column="1" source="standard:no-unused-imports" />
-        <error line="34" column="1" source="standard:no-unused-imports" />
-        <error line="42" column="1" source="standard:no-unused-imports" />
-        <error line="286" column="5" source="standard:function-signature" />
-        <error line="287" column="5" source="standard:function-signature" />
-        <error line="288" column="5" source="standard:function-signature" />
-        <error line="289" column="5" source="standard:function-signature" />
-        <error line="289" column="34" source="standard:function-signature" />
-        <error line="406" column="5" source="standard:function-signature" />
-        <error line="407" column="5" source="standard:function-signature" />
-        <error line="408" column="5" source="standard:function-signature" />
-        <error line="408" column="26" source="standard:function-signature" />
+        <error line="264" column="5" source="standard:function-signature" />
+        <error line="264" column="29" source="standard:function-signature" />
     </file>
     <file name="src/main/java/ma/bam/inventaire/ui/inventorylist/InventoryListScreen.kt">
         <error line="3" column="1" source="standard:import-ordering" />
-        <error line="10" column="1" source="standard:no-unused-imports" />
-        <error line="15" column="1" source="standard:no-unused-imports" />
-        <error line="59" column="1" source="standard:no-unused-imports" />
-        <error line="186" column="1" source="standard:no-consecutive-blank-lines" />
-        <error line="205" column="5" source="standard:function-signature" />
-        <error line="206" column="5" source="standard:function-signature" />
-        <error line="207" column="5" source="standard:function-signature" />
-        <error line="208" column="5" source="standard:function-signature" />
-        <error line="208" column="33" source="standard:function-signature" />
-        <error line="353" column="1" source="standard:max-line-length" />
+        <error line="12" column="1" source="standard:no-unused-imports" />
+        <error line="17" column="1" source="standard:no-unused-imports" />
+        <error line="63" column="1" source="standard:no-unused-imports" />
+        <error line="190" column="1" source="standard:no-consecutive-blank-lines" />
+        <error line="209" column="5" source="standard:function-signature" />
+        <error line="210" column="5" source="standard:function-signature" />
+        <error line="211" column="5" source="standard:function-signature" />
+        <error line="212" column="5" source="standard:function-signature" />
+        <error line="212" column="33" source="standard:function-signature" />
     </file>
     <file name="src/main/java/ma/bam/inventaire/ui/inventorylist/InventoryListViewModel.kt">
         <error line="3" column="1" source="standard:import-ordering" />
@@ -184,38 +145,35 @@
         <error line="57" column="1" source="standard:no-unused-imports" />
         <error line="60" column="1" source="standard:no-unused-imports" />
         <error line="61" column="1" source="standard:no-unused-imports" />
-        <error line="72" column="1" source="standard:no-unused-imports" />
         <error line="74" column="1" source="standard:no-unused-imports" />
-        <error line="75" column="1" source="standard:no-unused-imports" />
         <error line="76" column="1" source="standard:no-unused-imports" />
-        <error line="90" column="19" source="standard:property-naming" />
-        <error line="210" column="61" source="standard:function-signature" />
-        <error line="211" column="45" source="standard:multiline-if-else" />
-        <error line="212" column="10" source="standard:multiline-if-else" />
-        <error line="371" column="5" source="standard:function-signature" />
-        <error line="372" column="5" source="standard:function-signature" />
+        <error line="77" column="1" source="standard:no-unused-imports" />
+        <error line="78" column="1" source="standard:no-unused-imports" />
+        <error line="92" column="19" source="standard:property-naming" />
+        <error line="212" column="61" source="standard:function-signature" />
+        <error line="213" column="45" source="standard:multiline-if-else" />
+        <error line="214" column="10" source="standard:multiline-if-else" />
         <error line="373" column="5" source="standard:function-signature" />
         <error line="374" column="5" source="standard:function-signature" />
         <error line="375" column="5" source="standard:function-signature" />
-        <error line="375" column="22" source="standard:function-signature" />
+        <error line="376" column="5" source="standard:function-signature" />
+        <error line="377" column="5" source="standard:function-signature" />
+        <error line="377" column="22" source="standard:function-signature" />
     </file>
     <file name="src/main/java/ma/bam/inventaire/ui/quantityentry/QuantityEntryDialog.kt">
         <error line="3" column="1" source="standard:import-ordering" />
-        <error line="97" column="5" source="standard:function-signature" />
-        <error line="98" column="5" source="standard:function-signature" />
         <error line="99" column="5" source="standard:function-signature" />
-        <error line="99" column="32" source="standard:function-signature" />
+        <error line="100" column="5" source="standard:function-signature" />
+        <error line="101" column="5" source="standard:function-signature" />
+        <error line="101" column="32" source="standard:function-signature" />
     </file>
     <file name="src/main/java/ma/bam/inventaire/ui/quantityentry/UnknownArticleDialog.kt">
         <error line="3" column="1" source="standard:import-ordering" />
         <error line="9" column="1" source="standard:no-unused-imports" />
         <error line="13" column="1" source="standard:no-unused-imports" />
-        <error line="19" column="5" source="standard:function-signature" />
-        <error line="20" column="5" source="standard:function-signature" />
-        <error line="20" column="26" source="standard:function-signature" />
-        <error line="33" column="1" source="standard:max-line-length" />
-        <error line="33" column="18" source="standard:argument-list-wrapping" />
-        <error line="33" column="153" source="standard:argument-list-wrapping" />
+        <error line="21" column="5" source="standard:function-signature" />
+        <error line="22" column="5" source="standard:function-signature" />
+        <error line="22" column="26" source="standard:function-signature" />
     </file>
     <file name="src/main/java/ma/bam/inventaire/ui/scan/BarcodeAnalyzer.kt">
         <error line="68" column="9" source="standard:function-signature" />
@@ -231,34 +189,10 @@
     </file>
     <file name="src/main/java/ma/bam/inventaire/ui/scan/CameraPreview.kt">
         <error line="3" column="1" source="standard:import-ordering" />
-        <error line="51" column="5" source="standard:function-signature" />
-        <error line="52" column="5" source="standard:function-signature" />
         <error line="53" column="5" source="standard:function-signature" />
-        <error line="53" column="40" source="standard:function-signature" />
-    </file>
-    <file name="src/main/java/ma/bam/inventaire/ui/scan/ScanScreen.kt">
-        <error line="3" column="1" source="standard:import-ordering" />
-        <error line="4" column="1" source="standard:no-unused-imports" />
-        <error line="40" column="1" source="standard:no-unused-imports" />
-        <error line="41" column="1" source="standard:no-unused-imports" />
-        <error line="46" column="1" source="standard:no-unused-imports" />
-        <error line="91" column="1" source="standard:no-unused-imports" />
-        <error line="94" column="1" source="standard:no-unused-imports" />
-        <error line="111" column="5" source="standard:function-signature" />
-        <error line="112" column="5" source="standard:function-signature" />
-        <error line="113" column="5" source="standard:function-signature" />
-        <error line="113" column="47" source="standard:function-signature" />
-        <error line="378" column="21" source="standard:argument-list-wrapping" />
-        <error line="381" column="25" source="standard:multiline-if-else" />
-        <error line="382" column="26" source="standard:multiline-if-else" />
-        <error line="402" column="5" source="standard:function-signature" />
-        <error line="403" column="5" source="standard:function-signature" />
-        <error line="404" column="5" source="standard:function-signature" />
-        <error line="404" column="34" source="standard:function-signature" />
-        <error line="485" column="5" source="standard:function-signature" />
-        <error line="486" column="5" source="standard:function-signature" />
-        <error line="487" column="5" source="standard:function-signature" />
-        <error line="487" column="44" source="standard:function-signature" />
+        <error line="54" column="5" source="standard:function-signature" />
+        <error line="55" column="5" source="standard:function-signature" />
+        <error line="55" column="40" source="standard:function-signature" />
     </file>
     <file name="src/main/java/ma/bam/inventaire/ui/theme/Color.kt">
         <error line="17" column="21" source="standard:parameter-list-spacing" />

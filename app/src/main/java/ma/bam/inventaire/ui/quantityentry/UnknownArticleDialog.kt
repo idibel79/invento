@@ -11,6 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
+import ma.bam.inventaire.R
 import ma.bam.inventaire.ui.components.PrimaryActionButton
 import ma.bam.inventaire.ui.components.SingleLineAutoSizeText
 
@@ -28,12 +30,12 @@ fun UnknownArticleDialog(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         },
-        title = { SingleLineAutoSizeText("Article non reconnu", style = MaterialTheme.typography.titleMedium) },
+        title = { SingleLineAutoSizeText(stringResource(R.string.unknown_article_title), style = MaterialTheme.typography.titleMedium) },
         text = {
-            Text("Le code \"$code\" ne correspond à aucun article de cet inventaire. Vérifiez qu'il s'agit du bon article ou saisissez-le manuellement.")
+            Text(stringResource(R.string.unknown_article_message, code))
         },
         confirmButton = {
-            PrimaryActionButton("OK", onDismiss, Modifier.fillMaxWidth())
+            PrimaryActionButton(stringResource(R.string.common_ok), onDismiss, Modifier.fillMaxWidth())
         }
     )
 }

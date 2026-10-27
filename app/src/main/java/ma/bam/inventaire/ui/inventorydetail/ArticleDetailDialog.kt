@@ -37,6 +37,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import ma.bam.inventaire.R
 import ma.bam.inventaire.ui.components.SecondaryActionButton
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.ui.theme.BamNavy
@@ -83,13 +85,13 @@ fun ArticleDetailDialog(
                 color = BamNavy,
                 modifier = Modifier.padding(top = 4.dp, bottom = 6.dp)
             )
-            FieldRow("PID", article.codeArticle)
+            FieldRow(stringResource(R.string.field_pid), article.codeArticle)
             HorizontalDivider(thickness = 1.dp, color = FieldDivider)
-            FieldRow("Catégorie", article.categorie)
+            FieldRow(stringResource(R.string.field_category), article.categorie)
             HorizontalDivider(thickness = 1.dp, color = FieldDivider)
             BarcodeField(article.codeBarre1, article.codeBarre2)
             HorizontalDivider(thickness = 1.dp, color = FieldDivider)
-            FieldRow("Zone", article.emplacement)
+            FieldRow(stringResource(R.string.field_zone), article.emplacement)
             Spacer(modifier = Modifier.height(10.dp))
             Column(
                 modifier = Modifier
@@ -99,10 +101,10 @@ fun ArticleDetailDialog(
                     .padding(12.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                AmountRow("PPV", "${formatQuantity(article.prixUnitaire)} DH")
-                AmountRow("PPH", "${formatQuantity(article.pph)} DH")
+                AmountRow(stringResource(R.string.field_ppv), stringResource(R.string.price_dh, formatQuantity(article.prixUnitaire)))
+                AmountRow(stringResource(R.string.field_pph), stringResource(R.string.price_dh, formatQuantity(article.pph)))
                 HorizontalDivider(thickness = 1.dp, color = BandDivider)
-                AmountRow("TVA", article.tva)
+                AmountRow(stringResource(R.string.field_tva), article.tva)
             }
             Spacer(modifier = Modifier.height(8.dp))
             Column(
@@ -113,13 +115,13 @@ fun ArticleDetailDialog(
                     .padding(horizontal = 12.dp, vertical = 9.dp),
                 verticalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                AmountRow("Quantité système", formatQuantity(article.quantiteTheorique))
+                AmountRow(stringResource(R.string.field_system_qty), formatQuantity(article.quantiteTheorique))
                 article.quantiteReelle?.let {
-                    AmountRow("Quantité inventoriée", formatQuantity(it), valueColor = BamPrimary)
+                    AmountRow(stringResource(R.string.field_inventoried_qty), formatQuantity(it), valueColor = BamPrimary)
                 }
             }
             Spacer(modifier = Modifier.height(14.dp))
-            SecondaryActionButton("Fermer", onDismiss, Modifier.fillMaxWidth())
+            SecondaryActionButton(stringResource(R.string.action_close_dialog), onDismiss, Modifier.fillMaxWidth())
             Spacer(modifier = Modifier.height(12.dp))
         }
     }
@@ -156,7 +158,7 @@ internal val BarcodeIcon: ImageVector = ImageVector.Builder(
 private fun BarcodeField(code1: String, code2: String) {
     Column(modifier = Modifier.fillMaxWidth().padding(vertical = 9.dp)) {
         Text(
-            "CODE-BARRES",
+            stringResource(R.string.field_barcode_caps),
             fontSize = 10.5.sp,
             lineHeight = 14.sp,
             fontWeight = FontWeight.Bold,

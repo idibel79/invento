@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import ma.bam.inventaire.ui.components.DialogButtons
 import ma.bam.inventaire.R
 import ma.bam.inventaire.data.repository.ImportedArticle
@@ -98,7 +99,7 @@ fun CreateArticleDialog(
                 tint = androidx.compose.ui.graphics.Color.Unspecified
             )
         },
-        title = { Text("Nouveau produit", fontWeight = FontWeight.SemiBold) },
+        title = { Text(stringResource(R.string.create_title), fontWeight = FontWeight.SemiBold) },
         text = {
             Column(
                 modifier = Modifier
@@ -109,7 +110,7 @@ fun CreateArticleDialog(
                 StaticLabelTextField(
                     value = designation,
                     onValueChange = { designation = it },
-                    label = "Titre du produit",
+                    label = stringResource(R.string.create_field_title),
                     containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     isError = showErrors && designation.isBlank(),
@@ -119,7 +120,7 @@ fun CreateArticleDialog(
                 StaticLabelTextField(
                     value = codeArticle,
                     onValueChange = { codeArticle = it },
-                    label = "Code article (PID)",
+                    label = stringResource(R.string.create_field_pid),
                     containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     isError = showErrors && codeArticle.isBlank(),
@@ -129,7 +130,7 @@ fun CreateArticleDialog(
                 StaticLabelTextField(
                     value = codeBarre1,
                     onValueChange = { codeBarre1 = it },
-                    label = "Code-barres 1",
+                    label = stringResource(R.string.create_field_barcode1),
                     containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     isError = showErrors && codeBarre1.isBlank(),
@@ -139,14 +140,14 @@ fun CreateArticleDialog(
                 StaticLabelTextField(
                     value = codeBarre2,
                     onValueChange = { codeBarre2 = it },
-                    label = "Code-barres 2 (optionnel)",
+                    label = stringResource(R.string.create_field_barcode2),
                     containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
                 FieldSpacer()
                 DropdownField(
-                    label = "Catégorie",
+                    label = stringResource(R.string.field_category),
                     options = availableCategories,
                     selected = categorie,
                     onSelect = { categorie = it },
@@ -154,7 +155,7 @@ fun CreateArticleDialog(
                 )
                 FieldSpacer()
                 DropdownField(
-                    label = "TVA",
+                    label = stringResource(R.string.field_tva),
                     options = availableTvas,
                     selected = tva,
                     onSelect = { tva = it },
@@ -162,7 +163,7 @@ fun CreateArticleDialog(
                 )
                 FieldSpacer()
                 DropdownField(
-                    label = "Zone",
+                    label = stringResource(R.string.field_zone),
                     options = availableZones,
                     selected = zone,
                     onSelect = { zone = it },
@@ -172,7 +173,7 @@ fun CreateArticleDialog(
                 StaticLabelTextField(
                     value = quantiteText,
                     onValueChange = { quantiteText = it },
-                    label = "Quantité système (optionnel)",
+                    label = stringResource(R.string.create_field_system_qty),
                     containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -182,7 +183,7 @@ fun CreateArticleDialog(
                 StaticLabelTextField(
                     value = quantiteInventaireText,
                     onValueChange = { quantiteInventaireText = it },
-                    label = "Quantité inventaire (optionnel)",
+                    label = stringResource(R.string.create_field_counted_qty),
                     containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -192,7 +193,7 @@ fun CreateArticleDialog(
                 StaticLabelTextField(
                     value = prixText,
                     onValueChange = { prixText = it },
-                    label = "PPV",
+                    label = stringResource(R.string.field_ppv),
                     containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -203,7 +204,7 @@ fun CreateArticleDialog(
                 StaticLabelTextField(
                     value = pphText,
                     onValueChange = { pphText = it },
-                    label = "PPH",
+                    label = stringResource(R.string.field_pph),
                     containerColor = AlertDialogDefaults.containerColor,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -214,9 +215,9 @@ fun CreateArticleDialog(
         },
         confirmButton = {
             DialogButtons(
-                secondaryLabel = "Annuler",
+                secondaryLabel = stringResource(R.string.common_cancel),
                 onSecondary = onDismiss,
-                primaryLabel = "Créer",
+                primaryLabel = stringResource(R.string.create_confirm),
                 modifier = Modifier,
                 onPrimary = {
                     if (isComplete) {
@@ -275,7 +276,7 @@ private fun DropdownField(
             readOnly = true,
             trailingIcon = {
                 IconButton(onClick = { expanded = true }) {
-                    Icon(Icons.Filled.ArrowDropDown, contentDescription = "Ouvrir la liste")
+                    Icon(Icons.Filled.ArrowDropDown, contentDescription = stringResource(R.string.create_open_list))
                 }
             },
             singleLine = true,
@@ -319,7 +320,7 @@ private fun DropdownField(
         ) {
             if (options.isEmpty()) {
                 DropdownMenuItem(
-                    text = { Text("Aucune valeur disponible", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                    text = { Text(stringResource(R.string.create_no_value), color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     onClick = { expanded = false },
                     enabled = false
                 )
