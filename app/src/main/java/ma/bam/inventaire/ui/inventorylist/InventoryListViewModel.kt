@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ma.bam.inventaire.data.local.entity.InventorySessionEntity
@@ -23,9 +23,12 @@ class InventoryListViewModel @Inject constructor(
     private val repository: InventoryRepository
 ) : ViewModel() {
 
-    val sessions: StateFlow<List<SessionListItem>> = repository.observeSessions()
-        .map { sessions -> sessions.map { SessionListItem(it, repository.getSessionCounters(it.id)) } }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    /** Sessions (ordre du dépôt : dateCreation DESC) et leurs compteurs, mis à jour à chaque modification d'article. */
+    val sessions: StateFlow<List<SessionListItem>> =
+        combine(repository.observeSessions(), repository.observeCountersBySession()) { sessions, rows ->
+            val counters = rows.associate { it.sessionId to it.counters }
+            sessions.map { SessionListItem(it, counters[it.id] ?: SessionCounters.ZERO) }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun deleteSession(sessionId: String) {
         viewModelScope.launch {

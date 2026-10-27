@@ -7,6 +7,7 @@ import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.data.repository.SessionCounters
+import ma.bam.inventaire.data.repository.SessionCountersRow
 import ma.bam.inventaire.domain.EcartCalculator
 
 @Dao
@@ -38,21 +39,27 @@ interface StockArticleDao {
     )
     suspend fun findByCode(sessionId: String, code: String): StockArticleEntity?
 
-    /** Les compteurs d'une session en une seule lecture de la table (au lieu de 6 requêtes). */
-    // Seuil interpolé depuis EcartCalculator.SEUIL_ECART_NUL ; `ecarts` suit EcartCalculator.isEcartNonCorrige
-    // (les corrigés gardent leur écart d'origine mais ne comptent pas comme écarts), pour que tous les
-    // compteurs d'écarts concordent avec la page produits.
-    @Query(
-        """
-        SELECT COUNT(*) AS total,
-            COALESCE(SUM(quantiteReelle IS NOT NULL), 0) AS scanned,
-            COALESCE(SUM(ecart IS NOT NULL AND ABS(ecart) > ${EcartCalculator.SEUIL_ECART_NUL} AND corrige = 0), 0) AS ecarts,
-            COALESCE(SUM(ecart IS NOT NULL AND ABS(ecart) > ${EcartCalculator.SEUIL_ECART_NUL} AND ecartValide = 0), 0)
-                AS pendingEcarts,
-            COALESCE(SUM(quantiteTheorique < 0), 0) AS negativeStock,
-            COALESCE(SUM(quantiteTheorique = 0), 0) AS emptyStock
-        FROM stock_article WHERE sessionId = :sessionId
-        """
-    )
-    suspend fun countersForSession(sessionId: String): SessionCounters
+    /** Les compteurs d'une session en une seule lecture de la table, réémis à chaque modification d'article. */
+    @Query("SELECT $COUNTER_COLUMNS FROM stock_article WHERE sessionId = :sessionId")
+    fun observeCountersForSession(sessionId: String): Flow<SessionCounters>
+
+    /**
+     * Les compteurs de toutes les sessions en une seule requête (liste des sessions).
+     * Les sessions sans article n'ont pas de ligne : la liste les complète à zéro.
+     */
+    @Query("SELECT sessionId, $COUNTER_COLUMNS FROM stock_article GROUP BY sessionId")
+    fun observeCountersBySession(): Flow<List<SessionCountersRow>>
 }
+
+// Colonnes communes aux deux requêtes de compteurs. Seuil interpolé depuis EcartCalculator.SEUIL_ECART_NUL ;
+// `ecarts` suit EcartCalculator.isEcartNonCorrige (les corrigés gardent leur écart d'origine mais ne comptent
+// pas comme écarts), pour que tous les compteurs d'écarts concordent avec la page produits.
+private const val COUNTER_COLUMNS = """
+    COUNT(*) AS total,
+    COALESCE(SUM(quantiteReelle IS NOT NULL), 0) AS scanned,
+    COALESCE(SUM(ecart IS NOT NULL AND ABS(ecart) > ${EcartCalculator.SEUIL_ECART_NUL} AND corrige = 0), 0) AS ecarts,
+    COALESCE(SUM(ecart IS NOT NULL AND ABS(ecart) > ${EcartCalculator.SEUIL_ECART_NUL} AND ecartValide = 0), 0)
+        AS pendingEcarts,
+    COALESCE(SUM(quantiteTheorique < 0), 0) AS negativeStock,
+    COALESCE(SUM(quantiteTheorique = 0), 0) AS emptyStock
+"""

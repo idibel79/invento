@@ -6,7 +6,7 @@ object EcartCalculator {
 
     /**
      * En dessous de ce seuil (en valeur absolue), un écart est considéré nul (arrondis des Double).
-     * Seule définition du seuil : la requête SQL des compteurs (StockArticleDao.countersForSession)
+     * Seule définition du seuil : la requête SQL des compteurs (StockArticleDao, COUNTER_COLUMNS)
      * l'interpole directement.
      */
     const val SEUIL_ECART_NUL = 1e-9

@@ -2,13 +2,14 @@ package ma.bam.inventaire.testutil
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import ma.bam.inventaire.data.local.entity.InventorySessionEntity
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.data.repository.InventoryRepository
 import ma.bam.inventaire.data.repository.SessionCounters
+import ma.bam.inventaire.data.repository.SessionCountersRow
+import ma.bam.inventaire.domain.EcartCalculator
 
 /** Faux dépôt en mémoire : articles fournis par le test, appels d'écriture enregistrés. */
 class FakeInventoryRepository(articles: List<StockArticleEntity> = emptyList()) : InventoryRepository {
@@ -18,13 +19,13 @@ class FakeInventoryRepository(articles: List<StockArticleEntity> = emptyList()) 
     val articles = MutableStateFlow(articles)
     val recordedQuantities = mutableListOf<QuantityCall>()
     val finalizedSessions = mutableListOf<String>()
-    var counters = SessionCounters(0, 0, 0, 0, 0, 0)
+    val sessions = MutableStateFlow<List<InventorySessionEntity>>(emptyList())
     val session = MutableStateFlow<InventorySessionEntity?>(null)
 
     /** Sessions créées par [createSession] : nom du fichier source et nombre d'articles. */
     val createdSessions = mutableListOf<Pair<String, Int>>()
 
-    override fun observeSessions(): Flow<List<InventorySessionEntity>> = flowOf(emptyList())
+    override fun observeSessions(): Flow<List<InventorySessionEntity>> = sessions
 
     override fun observeSession(sessionId: String): Flow<InventorySessionEntity?> {
         return session.map { it?.takeIf { s -> s.id == sessionId } }
@@ -46,6 +47,15 @@ class FakeInventoryRepository(articles: List<StockArticleEntity> = emptyList()) 
 
     override suspend fun updateQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean) {
         recordedQuantities += QuantityCall(articleId, quantiteReelle, ecartValide)
+        articles.value = articles.value.map { article ->
+            if (article.id != articleId) return@map article
+            val ecart = EcartCalculator.compute(article.quantiteTheorique, quantiteReelle)
+            article.copy(
+                quantiteReelle = quantiteReelle,
+                ecart = ecart,
+                ecartValide = ecartValide || !EcartCalculator.hasEcart(ecart)
+            )
+        }
     }
 
     override suspend fun recordCorrection(articleId: Long, quantiteReelle: Double, quantiteSysteme: Double, remarque: String) = Unit
@@ -60,5 +70,22 @@ class FakeInventoryRepository(articles: List<StockArticleEntity> = emptyList()) 
 
     override suspend fun deleteSession(sessionId: String) = Unit
 
-    override suspend fun getSessionCounters(sessionId: String): SessionCounters = counters
+    // Compteurs recalculés depuis [articles] (mêmes règles que la requête SQL), réémis à chaque modification.
+    override fun observeSessionCounters(sessionId: String): Flow<SessionCounters> =
+        articles.map { list -> countersOf(list.filter { it.sessionId == sessionId }) }
+
+    override fun observeCountersBySession(): Flow<List<SessionCountersRow>> {
+        return articles.map { list ->
+            list.groupBy { it.sessionId }.map { (sessionId, group) -> SessionCountersRow(sessionId, countersOf(group)) }
+        }
+    }
+
+    private fun countersOf(articles: List<StockArticleEntity>) = SessionCounters(
+        total = articles.size,
+        scanned = articles.count { it.quantiteReelle != null },
+        ecarts = articles.count { EcartCalculator.isEcartNonCorrige(it) },
+        pendingEcarts = articles.count { EcartCalculator.hasEcart(it.ecart) && !it.ecartValide },
+        negativeStock = articles.count { it.quantiteTheorique < 0 },
+        emptyStock = articles.count { it.quantiteTheorique == 0.0 }
+    )
 }

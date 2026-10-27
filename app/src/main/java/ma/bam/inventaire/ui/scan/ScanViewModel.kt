@@ -34,7 +34,7 @@ sealed interface ScanDialogState {
 }
 
 data class ScanUiState(
-    val counters: SessionCounters = SessionCounters(0, 0, 0, 0, 0, 0),
+    val counters: SessionCounters = SessionCounters.ZERO,
     val dialog: ScanDialogState = ScanDialogState.None,
     val finalized: Boolean = false
 )
@@ -49,8 +49,14 @@ class ScanViewModel @Inject constructor(
 
     val sessionId: String = checkNotNull(savedStateHandle["sessionId"])
 
+    /** État propre à l'écran (dialog, finalisation) ; les compteurs viennent du dépôt. */
     private val _uiState = MutableStateFlow(ScanUiState())
-    val uiState: StateFlow<ScanUiState> = _uiState.asStateFlow()
+
+    /** Compteurs réémis par la base à chaque enregistrement : plus de rafraîchissement manuel. */
+    val uiState: StateFlow<ScanUiState> =
+        combine(_uiState, repository.observeSessionCounters(sessionId)) { state, counters ->
+            state.copy(counters = counters)
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, ScanUiState())
 
     private val _manualQuery = MutableStateFlow("")
     val manualQuery: StateFlow<String> = _manualQuery.asStateFlow()
@@ -64,10 +70,6 @@ class ScanViewModel @Inject constructor(
                 articles.asSequence().filter { it.matchesQuery(query) }.take(MAX_MANUAL_RESULTS).toList()
             }
         }.flowOn(defaultDispatcher).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    init {
-        refreshCounters()
-    }
 
     fun onCodeDetected(code: String) {
         if (_uiState.value.dialog != ScanDialogState.None) return // un dialog est déjà ouvert
@@ -133,14 +135,6 @@ class ScanViewModel @Inject constructor(
         viewModelScope.launch {
             write()
             _uiState.value = _uiState.value.copy(dialog = ScanDialogState.None)
-            refreshCounters()
-        }
-    }
-
-    private fun refreshCounters() {
-        viewModelScope.launch {
-            val counters = repository.getSessionCounters(sessionId)
-            _uiState.value = _uiState.value.copy(counters = counters)
         }
     }
 

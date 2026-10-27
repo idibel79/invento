@@ -136,7 +136,9 @@ class InventoryRepositoryImpl @Inject constructor(
         sessionDao.deleteById(sessionId)
     }
 
-    override suspend fun getSessionCounters(sessionId: String): SessionCounters {
-        return articleDao.countersForSession(sessionId)
+    override fun observeSessionCounters(sessionId: String): Flow<SessionCounters> {
+        return articleDao.observeCountersForSession(sessionId)
     }
+
+    override fun observeCountersBySession(): Flow<List<SessionCountersRow>> = articleDao.observeCountersBySession()
 }

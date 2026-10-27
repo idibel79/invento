@@ -9,6 +9,7 @@ import ma.bam.inventaire.data.local.AppDatabase
 import ma.bam.inventaire.data.local.entity.InventorySessionEntity
 import ma.bam.inventaire.data.local.entity.InventoryStatus
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
+import ma.bam.inventaire.data.repository.SessionCounters
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -100,7 +101,7 @@ class InventoryDaoTest {
     }
 
     @Test
-    fun countersForSession_counts_each_category() = runTest {
+    fun observeCountersForSession_counts_each_category() = runTest {
         sessionDao.insertWithArticles(
             session("s1"),
             listOf(
@@ -112,7 +113,7 @@ class InventoryDaoTest {
             )
         )
 
-        val counters = articleDao.countersForSession("s1")
+        val counters = articleDao.observeCountersForSession("s1").first()
 
         assertEquals(5, counters.total)
         assertEquals(2, counters.scanned)
@@ -120,5 +121,21 @@ class InventoryDaoTest {
         assertEquals(1, counters.pendingEcarts)
         assertEquals(1, counters.negativeStock)
         assertEquals(1, counters.emptyStock)
+    }
+
+    @Test
+    fun observeCountersBySession_groups_counters_by_session() = runTest {
+        sessionDao.insertWithArticles(
+            session("s1"),
+            listOf(article("s1", "A", ecart = 2.0), article("s1", "B", quantiteTheorique = 0.0))
+        )
+        sessionDao.insertWithArticles(session("s2"), listOf(article("s2", "C", quantiteTheorique = -3.0)))
+        sessionDao.insertWithArticles(session("vide"), emptyList())
+
+        val counters = articleDao.observeCountersBySession().first().associate { it.sessionId to it.counters }
+
+        assertEquals(setOf("s1", "s2"), counters.keys) // une session sans article n'a pas de ligne
+        assertEquals(SessionCounters(2, 1, 1, 1, 0, 1), counters["s1"])
+        assertEquals(SessionCounters(1, 0, 0, 0, 1, 0), counters["s2"])
     }
 }

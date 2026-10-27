@@ -1,5 +1,6 @@
 package ma.bam.inventaire.data.repository
 
+import androidx.room.Embedded
 import kotlinx.coroutines.flow.Flow
 import ma.bam.inventaire.data.local.entity.InventorySessionEntity
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
@@ -49,7 +50,14 @@ interface InventoryRepository {
 
     suspend fun deleteSession(sessionId: String)
 
-    suspend fun getSessionCounters(sessionId: String): SessionCounters
+    /** Compteurs d'une session, réémis à chaque modification de ses articles. */
+    fun observeSessionCounters(sessionId: String): Flow<SessionCounters>
+
+    /**
+     * Compteurs de toutes les sessions en une seule requête. Une session sans article n'a pas
+     * de ligne (compteurs à [SessionCounters.ZERO]).
+     */
+    fun observeCountersBySession(): Flow<List<SessionCountersRow>>
 }
 
 data class SessionCounters(
@@ -61,6 +69,16 @@ data class SessionCounters(
     val pendingEcarts: Int,
     val negativeStock: Int,
     val emptyStock: Int
+) {
+    companion object {
+        val ZERO = SessionCounters(0, 0, 0, 0, 0, 0)
+    }
+}
+
+/** Compteurs d'une session, ligne de la requête groupée [InventoryRepository.observeCountersBySession]. */
+data class SessionCountersRow(
+    val sessionId: String,
+    @Embedded val counters: SessionCounters
 )
 
 /** Article tel que décodé depuis le fichier Excel importé (export Sobrus), avant persistance. */

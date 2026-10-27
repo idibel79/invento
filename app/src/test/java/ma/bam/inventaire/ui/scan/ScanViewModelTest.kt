@@ -86,7 +86,6 @@ class ScanViewModelTest {
 
     @Test
     fun `quantite sans ecart enregistree comme validee et dialog ferme`() = runTest {
-        repository.counters = SessionCounters(1, 1, 0, 0, 0, 0)
         viewModel.onCodeDetected("6111000000007")
 
         viewModel.confirmQuantity(article, 10.0)
@@ -96,7 +95,28 @@ class ScanViewModelTest {
             repository.recordedQuantities
         )
         assertEquals(ScanDialogState.None, viewModel.uiState.value.dialog)
-        assertEquals(repository.counters, viewModel.uiState.value.counters)
+    }
+
+    @Test
+    fun `compteurs issus du flux du depot, mis a jour apres chaque enregistrement`() = runTest {
+        assertEquals(SessionCounters(1, 0, 0, 0, 0, 0), viewModel.uiState.value.counters)
+
+        viewModel.confirmQuantity(article, 10.0)
+        assertEquals(SessionCounters(1, 1, 0, 0, 0, 0), viewModel.uiState.value.counters)
+
+        viewModel.confirmQuantity(article, 12.0)
+        viewModel.validateEcart(article, 12.0)
+        assertEquals(SessionCounters(1, 1, 1, 0, 0, 0), viewModel.uiState.value.counters)
+    }
+
+    @Test
+    fun `l'etat du dialog est conserve quand les compteurs changent`() = runTest {
+        viewModel.onCodeDetected("6111000000007")
+
+        repository.articles.value = listOf(article, testArticle(id = 8, quantiteTheorique = 0.0))
+
+        assertEquals(ScanDialogState.QuantityEntry(article), viewModel.uiState.value.dialog)
+        assertEquals(SessionCounters(2, 0, 0, 0, 0, 1), viewModel.uiState.value.counters)
     }
 
     @Test
