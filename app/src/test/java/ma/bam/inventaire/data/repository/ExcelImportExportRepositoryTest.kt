@@ -1,10 +1,10 @@
 package ma.bam.inventaire.data.repository
 
+import java.io.ByteArrayInputStream
 import ma.bam.inventaire.testutil.SampleInventoryFixture
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.io.ByteArrayInputStream
 
 class ExcelImportExportRepositoryTest {
 

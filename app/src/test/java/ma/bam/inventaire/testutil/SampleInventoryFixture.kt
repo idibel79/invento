@@ -1,8 +1,8 @@
 package ma.bam.inventaire.testutil
 
-import ma.bam.inventaire.util.xlsx.XlsxWriter
 import java.io.ByteArrayOutputStream
 import java.io.File
+import ma.bam.inventaire.util.xlsx.XlsxWriter
 
 /**
  * Construit un classeur .xlsx représentatif d'un export Sobrus - Stocks (mêmes colonnes que

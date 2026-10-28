@@ -7,10 +7,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 import ma.bam.inventaire.data.local.AppDatabase
 import ma.bam.inventaire.data.local.dao.InventorySessionDao
 import ma.bam.inventaire.data.local.dao.StockArticleDao
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)

@@ -1,6 +1,5 @@
 package ma.bam.inventaire.ui.inventorydetail
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,7 +18,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -32,22 +31,24 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import ma.bam.inventaire.R
-import ma.bam.inventaire.ui.components.SecondaryActionButton
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
+import ma.bam.inventaire.ui.components.SecondaryActionButton
 import ma.bam.inventaire.ui.theme.BamNavy
+import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.BamPrimaryContainer
 import ma.bam.inventaire.ui.theme.CardSurface
 import ma.bam.inventaire.ui.theme.ControlBorder
 import ma.bam.inventaire.ui.theme.Hairline
+import ma.bam.inventaire.ui.theme.LightDarkPreviews
+import ma.bam.inventaire.ui.theme.PreviewSurface
 import ma.bam.inventaire.ui.theme.SoftBand
-import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.TextSecondary
 import ma.bam.inventaire.util.formatQuantity
 
@@ -58,10 +59,7 @@ import ma.bam.inventaire.util.formatQuantity
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArticleDetailDialog(
-    article: StockArticleEntity,
-    onDismiss: () -> Unit
-) {
+fun ArticleDetailDialog(article: StockArticleEntity, onDismiss: () -> Unit) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -70,59 +68,87 @@ fun ArticleDetailDialog(
         containerColor = CardSurface,
         dragHandle = { SheetHandle() }
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp)
-                .navigationBarsPadding()
-        ) {
-            Text(
-                article.designation.ifBlank { article.codeArticle },
-                fontSize = 16.sp,
-                lineHeight = 21.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = BamNavy,
-                modifier = Modifier.padding(top = 4.dp, bottom = 6.dp)
-            )
-            FieldRow(stringResource(R.string.field_pid), article.codeArticle)
-            HorizontalDivider(thickness = 1.dp, color = FieldDivider)
-            FieldRow(stringResource(R.string.field_category), article.categorie)
-            HorizontalDivider(thickness = 1.dp, color = FieldDivider)
-            BarcodeField(article.codeBarre1, article.codeBarre2)
-            HorizontalDivider(thickness = 1.dp, color = FieldDivider)
-            FieldRow(stringResource(R.string.field_zone), article.emplacement)
-            Spacer(modifier = Modifier.height(10.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(PriceBand)
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                AmountRow(stringResource(R.string.field_ppv), stringResource(R.string.price_dh, formatQuantity(article.prixUnitaire)))
-                AmountRow(stringResource(R.string.field_pph), stringResource(R.string.price_dh, formatQuantity(article.pph)))
-                HorizontalDivider(thickness = 1.dp, color = BandDivider)
-                AmountRow(stringResource(R.string.field_tva), article.tva)
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(QuantityBand)
-                    .padding(horizontal = 12.dp, vertical = 9.dp),
-                verticalArrangement = Arrangement.spacedBy(5.dp)
-            ) {
-                AmountRow(stringResource(R.string.field_system_qty), formatQuantity(article.quantiteTheorique))
-                article.quantiteReelle?.let {
-                    AmountRow(stringResource(R.string.field_inventoried_qty), formatQuantity(it), valueColor = BamPrimary)
-                }
-            }
-            Spacer(modifier = Modifier.height(14.dp))
-            SecondaryActionButton(stringResource(R.string.action_close_dialog), onDismiss, Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(12.dp))
+        ArticleDetailContent(article = article, onDismiss = onDismiss)
+    }
+}
+
+/** Contenu de la feuille, sans état : fiche, bandeau prix, bandeau quantités et « Fermer ». */
+@Composable
+private fun ArticleDetailContent(article: StockArticleEntity, onDismiss: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 20.dp)
+            .navigationBarsPadding()
+    ) {
+        Text(
+            article.designation.ifBlank { article.codeArticle },
+            fontSize = 16.sp,
+            lineHeight = 21.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = BamNavy,
+            modifier = Modifier.padding(top = 4.dp, bottom = 6.dp)
+        )
+        FieldRow(stringResource(R.string.field_pid), article.codeArticle)
+        HorizontalDivider(thickness = 1.dp, color = FieldDivider)
+        FieldRow(stringResource(R.string.field_category), article.categorie)
+        HorizontalDivider(thickness = 1.dp, color = FieldDivider)
+        BarcodeField(article.codeBarre1, article.codeBarre2)
+        HorizontalDivider(thickness = 1.dp, color = FieldDivider)
+        FieldRow(stringResource(R.string.field_zone), article.emplacement)
+        Spacer(modifier = Modifier.height(10.dp))
+        PriceSection(article)
+        Spacer(modifier = Modifier.height(8.dp))
+        QuantitySection(article)
+        Spacer(modifier = Modifier.height(14.dp))
+        SecondaryActionButton(stringResource(R.string.action_close_dialog), onDismiss, Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(12.dp))
+    }
+}
+
+/** Bandeau prix : PPV, PPH puis TVA. */
+@Composable
+private fun PriceSection(article: StockArticleEntity) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(PriceBand)
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        AmountRow(stringResource(R.string.field_ppv), stringResource(R.string.price_dh, formatQuantity(article.prixUnitaire)))
+        AmountRow(stringResource(R.string.field_pph), stringResource(R.string.price_dh, formatQuantity(article.pph)))
+        HorizontalDivider(thickness = 1.dp, color = BandDivider)
+        AmountRow(stringResource(R.string.field_tva), article.tva)
+    }
+}
+
+/** Bandeau quantités : système, et inventoriée si l'article a été compté. */
+@Composable
+private fun QuantitySection(article: StockArticleEntity) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(QuantityBand)
+            .padding(horizontal = 12.dp, vertical = 9.dp),
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
+        AmountRow(stringResource(R.string.field_system_qty), formatQuantity(article.quantiteTheorique))
+        article.quantiteReelle?.let {
+            AmountRow(stringResource(R.string.field_inventoried_qty), formatQuantity(it), valueColor = BamPrimary)
+        }
+    }
+}
+
+@LightDarkPreviews
+@Composable
+private fun ArticleDetailContentPreview() {
+    PreviewSurface {
+        Surface(color = CardSurface) {
+            ArticleDetailContent(article = PreviewArticles.all.last(), onDismiss = {})
         }
     }
 }

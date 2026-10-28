@@ -650,17 +650,6 @@
     </issue>
 
     <issue
-        id="ModifierParameter"
-        message="Modifier parameter should be named modifier"
-        errorLine1="    fieldModifier: Modifier = Modifier"
-        errorLine2="    ~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/ma/bam/inventaire/ui/quantityentry/QuantityEntryDialog.kt"
-            line="259"
-            column="5"/>
-    </issue>
-
-    <issue
         id="DiscouragedApi"
         message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
         errorLine1="            android:screenOrientation=&quot;portrait&quot;>"

@@ -57,12 +57,11 @@ object XlsxWriter {
         return sb.toString()
     }
 
-    private fun workbookXml(sheetName: String): String =
-        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
-            "<workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" " +
-            "xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\">" +
-            "<sheets><sheet name=\"${escapeXml(sheetName)}\" sheetId=\"1\" r:id=\"rId1\"/></sheets>" +
-            "</workbook>"
+    private fun workbookXml(sheetName: String): String = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
+        "<workbook xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" " +
+        "xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\">" +
+        "<sheets><sheet name=\"${escapeXml(sheetName)}\" sheetId=\"1\" r:id=\"rId1\"/></sheets>" +
+        "</workbook>"
 
     private fun columnLetters(index: Int): String {
         var i = index
@@ -74,8 +73,7 @@ object XlsxWriter {
         return sb.toString()
     }
 
-    private fun escapeXml(value: String): String =
-        value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    private fun escapeXml(value: String): String = value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
     private const val CONTENT_TYPES =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +

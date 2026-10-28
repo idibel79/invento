@@ -1,7 +1,6 @@
 package ma.bam.inventaire.ui.home
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,16 +18,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.LockOpen
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,14 +31,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import ma.bam.inventaire.R
+import ma.bam.inventaire.data.local.entity.InventorySessionEntity
+import ma.bam.inventaire.data.local.entity.InventoryStatus
+import ma.bam.inventaire.data.repository.SessionCounters
 import ma.bam.inventaire.ui.components.ConfirmDialog
 import ma.bam.inventaire.ui.components.ConfirmTone
 import ma.bam.inventaire.ui.components.InventoLockup
@@ -53,60 +55,122 @@ import ma.bam.inventaire.ui.importinventory.ImportSheet
 import ma.bam.inventaire.ui.inventorylist.InventoryListViewModel
 import ma.bam.inventaire.ui.inventorylist.SessionListItem
 import ma.bam.inventaire.ui.inventorylist.SwipeableSessionCard
-import ma.bam.inventaire.ui.theme.BamNavy
-import ma.bam.inventaire.ui.theme.BamNavyFill
-import ma.bam.inventaire.ui.theme.CardSurface
 import ma.bam.inventaire.ui.theme.BamPrimary
-import ma.bam.inventaire.ui.theme.StatusEcart
-import ma.bam.inventaire.ui.theme.StatusSuccess
-import ma.bam.inventaire.ui.theme.TabularNums
+import ma.bam.inventaire.ui.theme.LightDarkPreviews
+import ma.bam.inventaire.ui.theme.PreviewSurface
 import ma.bam.inventaire.ui.theme.TextMuted
 import ma.bam.inventaire.ui.theme.TextPrimary
-import ma.bam.inventaire.ui.theme.TextSecondary
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreen(
-    onOpenSession: (sessionId: String) -> Unit,
-    viewModel: InventoryListViewModel = hiltViewModel()
+/** Actions sur un inventaire demandées depuis sa carte, chacune confirmée par une popup. */
+private enum class SessionAction(
+    val icon: ImageVector,
+    val tone: ConfirmTone,
+    @StringRes val titleRes: Int,
+    @StringRes val messageRes: Int,
+    @StringRes val confirmRes: Int
 ) {
+    DELETE(Icons.Outlined.Delete, ConfirmTone.DANGER, R.string.home_delete_title, R.string.home_delete_message, R.string.action_delete),
+    CLOSE(Icons.Outlined.Lock, ConfirmTone.NAVY, R.string.home_close_title, R.string.home_close_message, R.string.action_close),
+    REOPEN(
+        Icons.Outlined.LockOpen,
+        ConfirmTone.NAVY,
+        R.string.home_reopen_title,
+        R.string.home_reopen_message,
+        R.string.home_reopen_confirm
+    )
+}
+
+/** Actions de l'accueil, remontées par la partie sans état [HomeContent]. */
+private class HomeActions(
+    val onImport: () -> Unit,
+    val onToggleFilter: (HomeFilter) -> Unit,
+    val onClearFilter: () -> Unit,
+    val onOpen: (SessionListItem) -> Unit,
+    val onRequest: (SessionAction, SessionListItem) -> Unit
+)
+
+@Composable
+fun HomeScreen(onOpenSession: (sessionId: String) -> Unit, viewModel: InventoryListViewModel = hiltViewModel()) {
     val sessions by viewModel.sessions.collectAsStateWithLifecycle()
     var showImport by remember { mutableStateOf(false) }
-    val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRANCE) }
-    var pendingDelete by remember { mutableStateOf<SessionListItem?>(null) }
-    var pendingClose by remember { mutableStateOf<SessionListItem?>(null) }
-    var pendingReopen by remember { mutableStateOf<SessionListItem?>(null) }
-
-    val ongoingCount = sessions.count { it.isOngoing() }
-    val pendingCount = sessions.count { it.isPending() }
-    val ecartsCount = sessions.count { it.hasEcarts() }
-    val finalizedCount = sessions.count { it.isFinalized() }
+    var pending by remember { mutableStateOf<Pair<SessionAction, SessionListItem>?>(null) }
     // Filtre de la liste choisi en touchant une tuile ; toucher la même tuile l'annule.
     var filter by remember { mutableStateOf<HomeFilter?>(null) }
-    val visibleSessions = when (filter) {
-        HomeFilter.ONGOING -> sessions.filter { it.isOngoing() }
-        HomeFilter.PENDING -> sessions.filter { it.isPending() }
-        HomeFilter.ECARTS -> sessions.filter { it.hasEcarts() }
-        HomeFilter.FINALIZED -> sessions.filter { it.isFinalized() }
-        null -> sessions
-    }
     val tapHaptic = rememberTapHaptic()
-    val toggleFilter: (HomeFilter) -> Unit = {
-        tapHaptic()
-        filter = if (filter == it) null else it
+
+    HomeContent(
+        sessions = sessions,
+        filter = filter,
+        actions = HomeActions(
+            onImport = {
+                tapHaptic()
+                showImport = true
+            },
+            onToggleFilter = {
+                tapHaptic()
+                filter = if (filter == it) null else it
+            },
+            onClearFilter = { filter = null },
+            onOpen = {
+                tapHaptic()
+                onOpenSession(it.session.id)
+            },
+            onRequest = { action, item -> pending = action to item }
+        )
+    )
+
+    if (showImport) {
+        ImportSheet(
+            onDismiss = { showImport = false },
+            onOpenSession = onOpenSession
+        )
     }
+    pending?.let { (action, item) ->
+        SessionConfirmDialog(
+            action = action,
+            item = item,
+            onConfirm = {
+                val id = item.session.id
+                when (action) {
+                    SessionAction.DELETE -> viewModel.deleteSession(id)
+                    SessionAction.CLOSE -> viewModel.closeSession(id)
+                    SessionAction.REOPEN -> viewModel.reopenSession(id)
+                }
+                pending = null
+            },
+            onDismiss = { pending = null }
+        )
+    }
+}
+
+/** Confirmation d'une [SessionAction] : « Inventaire N° … » en gras dans le message. */
+@Composable
+private fun SessionConfirmDialog(action: SessionAction, item: SessionListItem, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    ConfirmDialog(
+        icon = action.icon,
+        tone = action.tone,
+        title = stringResource(action.titleRes),
+        message = boldNavy(
+            stringResource(R.string.inventory_prefix),
+            item.session.numero,
+            stringResource(action.messageRes)
+        ),
+        confirmLabel = stringResource(action.confirmRes),
+        onConfirm = onConfirm,
+        onDismiss = onDismiss
+    )
+}
+
+/** Accueil sans état : logo, tuiles de synthèse (filtres), titre de la liste et inventaires. */
+@Composable
+private fun HomeContent(sessions: List<SessionListItem>, filter: HomeFilter?, actions: HomeActions) {
+    val visibleSessions = filter?.let { f -> sessions.filter { f.matches(it) } } ?: sessions
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = {
-                    tapHaptic()
-                    showImport = true
-                },
+                onClick = actions.onImport,
                 shape = RoundedCornerShape(16.dp),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
@@ -126,60 +190,10 @@ fun HomeScreen(
                 gap = 10.dp,
                 modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 18.dp, bottom = 12.dp)
             )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 14.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                HomeFilter.entries.forEach { tile ->
-                    SummaryTile(
-                        label = stringResource(tile.labelRes),
-                        value = when (tile) {
-                            HomeFilter.ONGOING -> ongoingCount
-                            HomeFilter.PENDING -> pendingCount
-                            HomeFilter.ECARTS -> ecartsCount
-                            HomeFilter.FINALIZED -> finalizedCount
-                        },
-                        color = tile.color,
-                        selected = filter == tile,
-                        onClick = { toggleFilter(tile) },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 14.dp, end = 14.dp, top = 14.dp, bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = filter?.let { stringResource(R.string.home_my_inventories_filtered, stringResource(it.labelRes)) }
-                        ?: stringResource(R.string.home_my_inventories),
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary,
-                    maxLines = 1,
-                    modifier = Modifier.weight(1f)
-                )
-                if (filter != null) {
-                    Text(
-                        text = stringResource(R.string.home_show_all),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = BamPrimary,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .clickable { filter = null }
-                    )
-                }
-            }
-
-            if (visibleSessions.isEmpty() && filter != null) {
-                Text(
+            SummaryTiles(sessions = sessions, filter = filter, onToggleFilter = actions.onToggleFilter)
+            ListHeader(filter = filter, onClearFilter = actions.onClearFilter)
+            when {
+                visibleSessions.isEmpty() && filter != null -> Text(
                     text = stringResource(R.string.home_no_inventory),
                     fontSize = 13.sp,
                     color = TextMuted,
@@ -188,167 +202,119 @@ fun HomeScreen(
                         .fillMaxWidth()
                         .padding(top = 24.dp)
                 )
-            } else if (visibleSessions.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                visibleSessions.isEmpty() -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         stringResource(R.string.home_empty),
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    // Marge basse pour que la dernière carte ne reste pas cachée sous le bouton flottant.
-                    contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 96.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(visibleSessions, key = { it.session.id }) { item ->
-                        SwipeableSessionCard(
-                            item = item,
-                            dateLabel = dateFormat.format(Date(item.session.dateCreation)),
-                            onClick = {
-                                tapHaptic()
-                                onOpenSession(item.session.id)
-                            },
-                            onRequestDelete = { pendingDelete = item },
-                            onRequestClose = { pendingClose = item },
-                            onLockClick = { pendingReopen = item },
-                            modifier = Modifier.animateItem()
-                        )
-                    }
-                }
+                else -> SessionList(sessions = visibleSessions, actions = actions)
             }
         }
     }
-
-    if (showImport) {
-        ImportSheet(
-            onDismiss = { showImport = false },
-            onOpenSession = onOpenSession
-        )
-    }
-
-    pendingDelete?.let { item ->
-        ConfirmDialog(
-            icon = Icons.Outlined.Delete,
-            tone = ConfirmTone.DANGER,
-            title = stringResource(R.string.home_delete_title),
-            message = boldNavy(
-                stringResource(R.string.inventory_prefix), item.session.numero,
-                stringResource(R.string.home_delete_message)
-            ),
-            confirmLabel = stringResource(R.string.action_delete),
-            onConfirm = {
-                viewModel.deleteSession(item.session.id)
-                pendingDelete = null
-            },
-            onDismiss = { pendingDelete = null }
-        )
-    }
-
-    pendingClose?.let { item ->
-        ConfirmDialog(
-            icon = Icons.Outlined.Lock,
-            tone = ConfirmTone.NAVY,
-            title = stringResource(R.string.home_close_title),
-            message = boldNavy(
-                stringResource(R.string.inventory_prefix), item.session.numero,
-                stringResource(R.string.home_close_message)
-            ),
-            confirmLabel = stringResource(R.string.action_close),
-            onConfirm = {
-                viewModel.closeSession(item.session.id)
-                pendingClose = null
-            },
-            onDismiss = { pendingClose = null }
-        )
-    }
-
-    pendingReopen?.let { item ->
-        ConfirmDialog(
-            icon = Icons.Outlined.LockOpen,
-            tone = ConfirmTone.NAVY,
-            title = stringResource(R.string.home_reopen_title),
-            message = boldNavy(
-                stringResource(R.string.inventory_prefix), item.session.numero,
-                stringResource(R.string.home_reopen_message)
-            ),
-            confirmLabel = stringResource(R.string.home_reopen_confirm),
-            onConfirm = {
-                viewModel.reopenSession(item.session.id)
-                pendingReopen = null
-            },
-            onDismiss = { pendingReopen = null }
-        )
-    }
 }
 
-/** Filtres de la liste, un par tuile, dans l'ordre d'affichage. */
-private enum class HomeFilter(@StringRes val labelRes: Int) {
-    ONGOING(R.string.status_ongoing),
-    PENDING(R.string.status_pending),
-    ECARTS(R.string.filter_ecarts),
-    FINALIZED(R.string.home_finalized);
-
-    val color: Color
-        @Composable get() = when (this) {
-            ONGOING -> BamPrimary
-            PENDING -> TextSecondary
-            ECARTS -> StatusEcart
-            FINALIZED -> StatusSuccess
+/** « Mes inventaires » (ou filtré) et le lien « Tout afficher » quand un filtre est actif. */
+@Composable
+private fun ListHeader(filter: HomeFilter?, onClearFilter: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 14.dp, end = 14.dp, top = 14.dp, bottom = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = filter?.let { stringResource(R.string.home_my_inventories_filtered, stringResource(it.labelRes)) }
+                ?: stringResource(R.string.home_my_inventories),
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            color = TextPrimary,
+            maxLines = 1,
+            modifier = Modifier.weight(1f)
+        )
+        if (filter != null) {
+            Text(
+                text = stringResource(R.string.home_show_all),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = BamPrimary,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(6.dp))
+                    .clickable(onClick = onClearFilter)
+            )
         }
+    }
 }
-
-/** Finalisé = tous les articles comptés (carte verte) ou clôturé (cadenas fermé). */
-private fun SessionListItem.isFinalized(): Boolean =
-    session.verrouille || (counters.total > 0 && counters.scanned >= counters.total)
-
-/** Non finalisé, au moins un article compté. */
-private fun SessionListItem.isOngoing(): Boolean = !isFinalized() && counters.scanned > 0
-
-/** Non finalisé, aucun article compté. */
-private fun SessionListItem.isPending(): Boolean = !isFinalized() && counters.scanned == 0
-
-/** Au moins un écart (validé ou non), même définition que le filtre « Écarts » de la page produits. */
-private fun SessionListItem.hasEcarts(): Boolean = counters.ecarts > 0
 
 @Composable
-private fun SummaryTile(
-    label: String,
-    value: Int,
-    color: Color,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        onClick = onClick,
-        shape = RoundedCornerShape(14.dp),
-        color = if (selected) BamNavyFill else CardSurface,
-        shadowElevation = if (selected) 0.dp else 1.dp,
-        border = BorderStroke(1.5.dp, if (selected) BamNavyFill else Color.Transparent),
-        modifier = modifier
+private fun SessionList(sessions: List<SessionListItem>, actions: HomeActions) {
+    val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRANCE) }
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        // Marge basse pour que la dernière carte ne reste pas cachée sous le bouton flottant.
+        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 96.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(horizontal = 6.dp, vertical = 9.dp)
-        ) {
-            Text(
-                text = value.toString(),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = if (selected) Color.White else color,
-                style = LocalTextStyle.current.copy(fontFeatureSettings = TabularNums),
-                maxLines = 1
-            )
-            Text(
-                text = label,
-                fontSize = 10.5.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = if (selected) Color.White else TextSecondary,
-                maxLines = 1,
-                softWrap = false
+        items(sessions, key = { it.session.id }) { item ->
+            SwipeableSessionCard(
+                item = item,
+                dateLabel = dateFormat.format(Date(item.session.dateCreation)),
+                onClick = { actions.onOpen(item) },
+                onRequestDelete = { actions.onRequest(SessionAction.DELETE, item) },
+                onRequestClose = { actions.onRequest(SessionAction.CLOSE, item) },
+                onLockClick = { actions.onRequest(SessionAction.REOPEN, item) },
+                modifier = Modifier.animateItem()
             )
         }
+    }
+}
+
+private fun previewSession(id: Int, scanned: Int, ecarts: Int, verrouille: Boolean = false) = SessionListItem(
+    session = InventorySessionEntity(
+        id = "preview-$id",
+        numero = "INV-2026-00$id",
+        dateCreation = 0L,
+        dateFinalisation = null,
+        statut = InventoryStatus.EN_COURS,
+        nomFichierSource = "stock.xlsx",
+        verrouille = verrouille
+    ),
+    counters = SessionCounters(
+        total = PREVIEW_TOTAL,
+        scanned = scanned,
+        ecarts = ecarts,
+        pendingEcarts = ecarts,
+        negativeStock = 0,
+        emptyStock = 0
+    )
+)
+
+private const val PREVIEW_TOTAL = 120
+private val NoHomeActions = HomeActions({}, {}, {}, {}, { _, _ -> })
+
+@LightDarkPreviews
+@Composable
+private fun HomeContentPreview() {
+    PreviewSurface {
+        HomeContent(
+            sessions = listOf(
+                previewSession(id = 1, scanned = 48, ecarts = 3),
+                previewSession(id = 2, scanned = 0, ecarts = 0)
+            ),
+            filter = null,
+            actions = NoHomeActions
+        )
+    }
+}
+
+@LightDarkPreviews
+@Composable
+private fun HomeContentFilteredPreview() {
+    PreviewSurface {
+        HomeContent(
+            sessions = listOf(previewSession(id = 3, scanned = PREVIEW_TOTAL, ecarts = 0, verrouille = true)),
+            filter = HomeFilter.ECARTS,
+            actions = NoHomeActions
+        )
     }
 }

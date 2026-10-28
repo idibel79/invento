@@ -41,13 +41,12 @@ private fun rememberHaptic(heavy: Boolean): () -> Unit {
     }
 }
 
-private fun Context.vibrator(): Vibrator =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
-    } else {
-        @Suppress("DEPRECATION")
-        getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    }
+private fun Context.vibrator(): Vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
+} else {
+    @Suppress("DEPRECATION")
+    getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+}
 
 private fun Vibrator.click(heavy: Boolean) {
     if (!hasVibrator()) return

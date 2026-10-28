@@ -1,10 +1,10 @@
 package ma.bam.inventaire.util.xlsx
 
-import org.junit.Assert.assertEquals
-import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import org.junit.Assert.assertEquals
+import org.junit.Test
 
 class XlsxReaderTest {
 

@@ -1,14 +1,14 @@
 package ma.bam.inventaire.data.repository
 
+import java.io.InputStream
+import java.io.OutputStream
+import javax.inject.Inject
+import javax.inject.Singleton
 import ma.bam.inventaire.data.local.entity.InventorySessionEntity
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.util.ExcelColumnMapper
 import ma.bam.inventaire.util.xlsx.XlsxReader
 import ma.bam.inventaire.util.xlsx.XlsxWriter
-import java.io.InputStream
-import java.io.OutputStream
-import javax.inject.Inject
-import javax.inject.Singleton
 
 data class ImportResult(
     val articles: List<ImportedArticle>,
@@ -81,10 +81,7 @@ class ExcelImportExportRepository @Inject constructor() {
     }
 
     /** Exporte les articles d'une session (ou de plusieurs) vers un fichier .xlsx. */
-    fun exportSessions(
-        outputStream: OutputStream,
-        sessions: List<Pair<InventorySessionEntity, List<StockArticleEntity>>>
-    ) {
+    fun exportSessions(outputStream: OutputStream, sessions: List<Pair<InventorySessionEntity, List<StockArticleEntity>>>) {
         val header = listOf(
             "numero_inventaire", "date_inventaire", "statut", "pid", "produit", "categorie",
             "tva", "zone", "stock", "date_de_peremption", "stock_min", "stock_max",

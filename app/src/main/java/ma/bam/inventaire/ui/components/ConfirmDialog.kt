@@ -1,11 +1,9 @@
 package ma.bam.inventaire.ui.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,18 +12,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -37,28 +34,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.res.stringResource
+import kotlin.math.roundToInt
 import ma.bam.inventaire.R
 import ma.bam.inventaire.ui.theme.BamNavy
 import ma.bam.inventaire.ui.theme.BamNavyFill
-import ma.bam.inventaire.ui.theme.CardSurface
-import ma.bam.inventaire.ui.theme.ControlBorder
-import ma.bam.inventaire.ui.theme.LightInventoPalette
-import ma.bam.inventaire.ui.theme.OnBrand
-import ma.bam.inventaire.ui.theme.TrackColor
-import androidx.compose.runtime.ReadOnlyComposable
 import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.BamPrimaryContainer
+import ma.bam.inventaire.ui.theme.CardSurface
+import ma.bam.inventaire.ui.theme.LightInventoPalette
 import ma.bam.inventaire.ui.theme.StatusEcart
 import ma.bam.inventaire.ui.theme.StatusEcartBg
 import ma.bam.inventaire.ui.theme.TabularNums
 import ma.bam.inventaire.ui.theme.TextPrimary
 import ma.bam.inventaire.ui.theme.TextSecondary
-import kotlin.math.roundToInt
+import ma.bam.inventaire.ui.theme.TrackColor
 
 /** Couleurs d'une popup : marine pour toutes les actions, rouge seulement pour l'irréversible. */
 enum class ConfirmTone {
-    NAVY, DANGER;
+    NAVY,
+    DANGER;
 
     /** Icône (sur [iconBg]). */
     val accent: Color
@@ -71,7 +65,6 @@ enum class ConfirmTone {
     val fill: Color
         @Composable get() = if (this == NAVY) BamNavyFill else LightInventoPalette.ecart
 }
-
 
 /**
  * Popup de confirmation commune (maquette « Popups de confirmation », ligne A) : icône dans un
