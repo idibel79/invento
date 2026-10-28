@@ -101,6 +101,19 @@ class InventoryDaoTest {
     }
 
     @Test
+    fun deleteById_cascades_to_the_session_articles_only() = runTest {
+        sessionDao.insertWithArticles(session("s1"), listOf(article("s1", "A"), article("s1", "B")))
+        sessionDao.insertWithArticles(session("s2"), listOf(article("s2", "C")))
+
+        sessionDao.deleteById("s1")
+
+        assertNull(sessionDao.getById("s1"))
+        assertEquals(emptyList<StockArticleEntity>(), articleDao.observeBySession("s1").first())
+        assertNull(articleDao.findByCode("s1", "A"))
+        assertEquals(listOf("C"), articleDao.observeBySession("s2").first().map { it.codeArticle })
+    }
+
+    @Test
     fun observeCountersForSession_counts_each_category() = runTest {
         sessionDao.insertWithArticles(
             session("s1"),

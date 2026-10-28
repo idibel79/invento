@@ -13,3 +13,8 @@ app/build
 /backups
 /.claude
 /.kotlin
+
+# Clé de publication : jamais dans le dépôt
+keystore.properties
+*.jks
+*.keystore

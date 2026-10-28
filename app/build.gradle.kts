@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,6 +10,13 @@ plugins {
     alias(libs.plugins.detekt)
 }
 
+// Clé de publication (Play Store) : keystore.properties à la racine, jamais commité (voir keystore.properties.example).
+// Sans ce fichier, la release reste signée avec la clé de debug (installable par-dessus le debug, données conservées).
+val keystorePropertiesFile: File = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.isFile) keystorePropertiesFile.inputStream().use { load(it) }
+}
+
 android {
     namespace = "ma.bam.inventaire"
     compileSdk = 35
@@ -16,10 +25,21 @@ android {
         applicationId = "ma.bam.inventaire"
         minSdk = 24
         targetSdk = 35
-        versionCode = 171
-        versionName = "2.6.104"
+        versionCode = 172
+        versionName = "2.6.105"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        if (keystorePropertiesFile.isFile) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
@@ -27,9 +47,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // Pas encore de keystore de publication : la release est signée avec la clé de debug
-            // pour pouvoir être installée et testée. À remplacer par une vraie signingConfig.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
         }
     }
 

@@ -10,12 +10,18 @@ import ma.bam.inventaire.data.local.dao.StockArticleDao
 import ma.bam.inventaire.data.local.entity.InventorySessionEntity
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 
+/**
+ * Règle : les inventaires ne doivent jamais être effacés par une mise à jour (pas de migration destructive).
+ * Toute modification d'entité = [VERSION] + 1, une [Migration] ajoutée à [ALL_MIGRATIONS], le schéma
+ * exporté commité (app/schemas) et un cas dans MigrationTest. DatabaseMigrationsTest fait échouer la CI
+ * s'il manque une migration ou un schéma.
+ */
 @Database(
     entities = [
         InventorySessionEntity::class,
         StockArticleEntity::class
     ],
-    version = 6,
+    version = AppDatabase.VERSION,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -25,6 +31,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         const val DATABASE_NAME = "inventaire-bam.db"
+        const val VERSION = 6
 
         /** v6 : remarque facultative et marqueur « corrigé » (données existantes conservées). */
         val MIGRATION_5_6 = object : Migration(5, 6) {
@@ -33,5 +40,8 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE stock_article ADD COLUMN corrige INTEGER NOT NULL DEFAULT 0")
             }
         }
+
+        /** Toutes les migrations, dans l'ordre : c'est cette liste que le builder Room enregistre. */
+        val ALL_MIGRATIONS: List<Migration> = listOf(MIGRATION_5_6)
     }
 }
