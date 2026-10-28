@@ -27,7 +27,8 @@ Flow for every task:
    auto-close the issue and auto-move the card, bypassing this flow. Mention the issue number in
    prose instead (e.g. "issue #5").
 6. Wait for the user's explicit validation ("valide et push"). Only then run the release steps
-   in "Versioning" (bump, clean build, install, commit, tag, push) and move the card to **Done**.
+   in "Versioning" (bump, clean build, install, commit, PR, merge once CI is green, tag) and move
+   the card to **Done**.
    If the user instead reports a problem, keep the card in Test (or move back to In progress)
    and fix it — expect it to return to Test after the fix.
 
@@ -48,9 +49,15 @@ committed. Only once the user validates explicitly ("valide et push"):
 - Clean build with every check (`gradlew.bat clean testDebugUnitTest lintDebug detekt ktlintCheck
   assembleDebug assembleRelease bundleRelease compileDebugAndroidTestKotlin`), then reinstall the
   validated build on the phone (`adb install -r`, never uninstall).
-- Commit with a message describing the change (UTF-8 **without BOM**: `git commit -F <file>`
-  with a file written without BOM, or several `-m`), then an annotated tag `vX.Y.Z`.
-- `git push origin master`, then `git push origin vX.Y.Z` (tags don't trigger the CI).
+- Commit on a branch `release/vX.Y.Z` created from an up-to-date `master` (never on `master`),
+  with a message describing the change (UTF-8 **without BOM**: `git commit -F <file>` with a file
+  written without BOM, or several `-m`).
+- `git push -u origin release/vX.Y.Z`, then open a PR to `master` (`gh pr create --base master`).
+- `master` is protected by a GitHub ruleset: no direct push, no force push, and the `build` and
+  `instrumented` checks must be green before merging. Wait for the CI, fix it on the branch if it
+  fails, then merge (`gh pr merge --squash --delete-branch`). Never bypass or disable the ruleset.
+- After the merge: `git checkout master && git pull`, then an annotated tag `vX.Y.Z` on that
+  merged commit and `git push origin vX.Y.Z` (tags don't trigger the CI).
 
 ## Build & install
 
@@ -109,7 +116,8 @@ The inventories on the phone must **always** survive an update.
   baselines for the files you touch when practical.
 - GitHub CI (`.github/workflows/android.yml`) runs on push to `master` and on pull requests (one
   run per push, older runs cancelled): build, release build, unit tests, lint, detekt, ktlint,
-  and instrumented tests (`connectedDebugAndroidTest`) on an emulator.
+  and instrumented tests (`connectedDebugAndroidTest`) on an emulator. Both jobs (`build`,
+  `instrumented`) are required checks for merging into `master`.
 
 ## Release / Play Store
 

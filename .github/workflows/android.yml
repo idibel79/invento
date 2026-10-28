@@ -45,6 +45,8 @@ jobs:
   # Tests Room (DAO + migrations) sur émulateur.
   instrumented:
     runs-on: ubuntu-latest
+    # Un émulateur bloqué ne doit pas retenir le merge pendant 6 h.
+    timeout-minutes: 30
     env:
       API_LEVEL: 30
     steps:
@@ -96,7 +98,7 @@ jobs:
           arch: x86_64
           target: default
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           script: ./gradlew connectedDebugAndroidTest --stacktrace
 
