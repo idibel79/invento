@@ -72,12 +72,7 @@ fun DialogButtons(
 
 /** Bouton secondaire : contour gris, fond carte, texte marine. */
 @Composable
-fun SecondaryActionButton(
-    label: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    icon: ImageVector? = null
-) {
+fun SecondaryActionButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier, icon: ImageVector? = null) {
     OutlinedButton(
         onClick = onClick,
         shape = ActionButtonShape,

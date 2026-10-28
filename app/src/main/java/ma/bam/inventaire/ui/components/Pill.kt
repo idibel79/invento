@@ -25,13 +25,7 @@ val PillShape = RoundedCornerShape(percent = 50)
 
 /** Pastille colorée : texte (et icône optionnelle) de couleur [color] sur fond [background]. */
 @Composable
-fun Pill(
-    text: String,
-    color: Color,
-    background: Color,
-    modifier: Modifier = Modifier,
-    icon: ImageVector? = null
-) {
+fun Pill(text: String, color: Color, background: Color, modifier: Modifier = Modifier, icon: ImageVector? = null) {
     Row(
         modifier = modifier
             .clip(PillShape)

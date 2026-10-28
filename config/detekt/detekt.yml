@@ -7,6 +7,11 @@ style:
   # Même limite que max_line_length de .editorconfig (ktlint), pour que les deux outils s'accordent.
   MaxLineLength:
     maxLineLength: 140
+  # Les couleurs et constantes nommées (val / const val, y compris en companion object) ne sont pas des
+  # nombres magiques : c'est justement leur nom qui les explique.
+  MagicNumber:
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
   UnusedPrivateMember:
     ignoreAnnotated: ['Preview', 'LightDarkPreviews']
 complexity:

@@ -4,8 +4,10 @@ import android.util.Size
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
-import java.util.concurrent.Executors
 import androidx.camera.core.Preview
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.animation.core.LinearEasing
@@ -16,13 +18,11 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -41,19 +41,20 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.LifecycleOwner
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 import ma.bam.inventaire.R
 import ma.bam.inventaire.ui.theme.LightInventoPalette
 
 @Composable
-fun CameraPreview(
-    modifier: Modifier = Modifier,
-    torchEnabled: Boolean = false,
-    onBarcodeDetected: (String) -> Unit
-) {
+fun CameraPreview(modifier: Modifier = Modifier, torchEnabled: Boolean = false, onBarcodeDetected: (String) -> Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val previewView = remember(context) { PreviewView(context) }
@@ -67,29 +68,10 @@ fun CameraPreview(
     DisposableEffect(lifecycleOwner) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
         val listener = Runnable {
-            val cameraProvider = cameraProviderFuture.get()
-
-            val preview = Preview.Builder().build().also {
-                it.setSurfaceProvider(previewView.surfaceProvider)
-            }
-
-            val analysis = ImageAnalysis.Builder()
-                .setTargetResolution(Size(1280, 720))
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
-                .also {
-                    it.setAnalyzer(
-                        analysisExecutor,
-                        BarcodeAnalyzer(onBarcodeDetected = onBarcodeDetected)
-                    )
-                }
-
-            cameraProvider.unbindAll()
-            camera = cameraProvider.bindToLifecycle(
-                lifecycleOwner,
-                CameraSelector.DEFAULT_BACK_CAMERA,
-                preview,
-                analysis
+            camera = cameraProviderFuture.get().bindScan(
+                lifecycleOwner = lifecycleOwner,
+                previewView = previewView,
+                analysis = barcodeAnalysis(analysisExecutor, onBarcodeDetected)
             )
         }
         cameraProviderFuture.addListener(listener, ContextCompat.getMainExecutor(context))
@@ -125,6 +107,49 @@ fun CameraPreview(
         )
     }
 }
+
+/** Aperçu + analyse sur la caméra arrière, après avoir libéré les cas d'usage précédents. */
+private fun ProcessCameraProvider.bindScan(lifecycleOwner: LifecycleOwner, previewView: PreviewView, analysis: ImageAnalysis): Camera {
+    val preview = Preview.Builder().build().also {
+        it.setSurfaceProvider(previewView.surfaceProvider)
+    }
+    unbindAll()
+    return bindToLifecycle(
+        lifecycleOwner,
+        CameraSelector.DEFAULT_BACK_CAMERA,
+        preview,
+        analysis
+    )
+}
+
+/** Analyse des images pour la lecture des codes-barres (seule la dernière image est gardée). */
+private fun barcodeAnalysis(executor: Executor, onBarcodeDetected: (String) -> Unit): ImageAnalysis = ImageAnalysis.Builder()
+    .setResolutionSelector(analysisResolutionSelector())
+    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+    .build()
+    .also {
+        it.setAnalyzer(
+            executor,
+            BarcodeAnalyzer(onBarcodeDetected = onBarcodeDetected)
+        )
+    }
+
+private const val ANALYSIS_WIDTH = 1280
+private const val ANALYSIS_HEIGHT = 720
+
+/**
+ * Résolution d'analyse : 1280×720 en 16:9 (comme l'ancien setTargetResolution), sinon la plus proche
+ * au-dessus puis en dessous, pour garder le même cadrage du scan.
+ */
+private fun analysisResolutionSelector(): ResolutionSelector = ResolutionSelector.Builder()
+    .setAspectRatioStrategy(AspectRatioStrategy.RATIO_16_9_FALLBACK_AUTO_STRATEGY)
+    .setResolutionStrategy(
+        ResolutionStrategy(
+            Size(ANALYSIS_WIDTH, ANALYSIS_HEIGHT),
+            ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
+        )
+    )
+    .build()
 
 /**
  * Fenêtre de visée façon scanner natif : zone assombrie tout autour, coins cyan délimitant la

@@ -1,6 +1,5 @@
 package ma.bam.inventaire.ui.inventorydetail
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,13 +16,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -33,26 +28,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import androidx.compose.ui.res.stringResource
 import ma.bam.inventaire.R
+import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.ui.components.DialogButtons
 import ma.bam.inventaire.ui.components.PopupHaptic
-import ma.bam.inventaire.data.repository.ImportedArticle
 import ma.bam.inventaire.ui.theme.BamNavy
-import ma.bam.inventaire.ui.theme.BamNavyFill
+import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.BamPrimaryContainer
 import ma.bam.inventaire.ui.theme.CardSurface
-import ma.bam.inventaire.ui.theme.ControlBorder
 import ma.bam.inventaire.ui.theme.Hairline
-import ma.bam.inventaire.ui.theme.OnBrand
 import ma.bam.inventaire.ui.theme.SoftBand
-import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.StatusSuccess
 import ma.bam.inventaire.ui.theme.StatusSuccessBg
 import ma.bam.inventaire.ui.theme.TextSecondary
@@ -65,11 +57,7 @@ import ma.bam.inventaire.util.formatQuantity
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArticleCreatedSheet(
-    article: ImportedArticle,
-    onCreateAnother: () -> Unit,
-    onDismiss: () -> Unit
-) {
+fun ArticleCreatedSheet(article: ImportedArticle, onCreateAnother: () -> Unit, onDismiss: () -> Unit) {
     PopupHaptic()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()

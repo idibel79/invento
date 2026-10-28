@@ -36,13 +36,12 @@ object ExcelColumnMapper {
         return result
     }
 
-    private fun normalize(value: String): String =
-        value.trim()
-            .lowercase()
-            .replace(Regex("[éèêë]"), "e")
-            .replace(Regex("[àâ]"), "a")
-            .replace(Regex("[îï]"), "i")
-            .replace(Regex("[ûü]"), "u")
-            .replace(Regex("[^a-z0-9]+"), "_")
-            .trim('_')
+    private fun normalize(value: String): String = value.trim()
+        .lowercase()
+        .replace(Regex("[éèêë]"), "e")
+        .replace(Regex("[àâ]"), "a")
+        .replace(Regex("[îï]"), "i")
+        .replace(Regex("[ûü]"), "u")
+        .replace(Regex("[^a-z0-9]+"), "_")
+        .trim('_')
 }

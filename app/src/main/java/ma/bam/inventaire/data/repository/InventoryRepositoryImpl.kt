@@ -1,5 +1,8 @@
 package ma.bam.inventaire.data.repository
 
+import java.util.UUID
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 import ma.bam.inventaire.data.local.dao.InventorySessionDao
 import ma.bam.inventaire.data.local.dao.StockArticleDao
@@ -8,9 +11,6 @@ import ma.bam.inventaire.data.local.entity.InventoryStatus
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
 import ma.bam.inventaire.domain.EcartCalculator
 import ma.bam.inventaire.util.SessionNumberGenerator
-import java.util.UUID
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class InventoryRepositoryImpl @Inject constructor(
@@ -20,16 +20,11 @@ class InventoryRepositoryImpl @Inject constructor(
 
     override fun observeSessions(): Flow<List<InventorySessionEntity>> = sessionDao.observeAll()
 
-    override fun observeSession(sessionId: String): Flow<InventorySessionEntity?> =
-        sessionDao.observeById(sessionId)
+    override fun observeSession(sessionId: String): Flow<InventorySessionEntity?> = sessionDao.observeById(sessionId)
 
-    override fun observeArticles(sessionId: String): Flow<List<StockArticleEntity>> =
-        articleDao.observeBySession(sessionId)
+    override fun observeArticles(sessionId: String): Flow<List<StockArticleEntity>> = articleDao.observeBySession(sessionId)
 
-    override suspend fun createSession(
-        fileName: String,
-        articles: List<ImportedArticle>
-    ): InventorySessionEntity {
+    override suspend fun createSession(fileName: String, articles: List<ImportedArticle>): InventorySessionEntity {
         val now = System.currentTimeMillis()
         val sequence = sessionDao.count() + 1
         val session = InventorySessionEntity(
@@ -73,17 +68,9 @@ class InventoryRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun findArticleByCode(
-        sessionId: String,
-        code: String
-    ): StockArticleEntity? = articleDao.findByCode(sessionId, code)
+    override suspend fun findArticleByCode(sessionId: String, code: String): StockArticleEntity? = articleDao.findByCode(sessionId, code)
 
-    override suspend fun recordCorrection(
-        articleId: Long,
-        quantiteReelle: Double,
-        quantiteSysteme: Double,
-        remarque: String
-    ) {
+    override suspend fun recordCorrection(articleId: Long, quantiteReelle: Double, quantiteSysteme: Double, remarque: String) {
         val article = articleDao.getById(articleId) ?: return
         // On corrige la quantité système (fichier importé). L'écart d'origine (saisie − système
         // avant correction) reste affiché sur la carte, rangée dans « Corrigés » et non « Écarts ».
@@ -98,11 +85,7 @@ class InventoryRepositoryImpl @Inject constructor(
         articleDao.update(withQuantity(article, quantiteReelle, ecartValide))
     }
 
-    private fun withQuantity(
-        article: StockArticleEntity,
-        quantiteReelle: Double,
-        ecartValide: Boolean
-    ): StockArticleEntity {
+    private fun withQuantity(article: StockArticleEntity, quantiteReelle: Double, ecartValide: Boolean): StockArticleEntity {
         val ecart = EcartCalculator.compute(article.quantiteTheorique, quantiteReelle)
         return article.copy(
             quantiteReelle = quantiteReelle,

@@ -3,6 +3,7 @@ package ma.bam.inventaire.ui.inventorylist
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -11,7 +12,6 @@ import kotlinx.coroutines.launch
 import ma.bam.inventaire.data.local.entity.InventorySessionEntity
 import ma.bam.inventaire.data.repository.InventoryRepository
 import ma.bam.inventaire.data.repository.SessionCounters
-import javax.inject.Inject
 
 data class SessionListItem(
     val session: InventorySessionEntity,

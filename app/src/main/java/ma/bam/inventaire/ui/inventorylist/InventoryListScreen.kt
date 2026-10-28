@@ -3,18 +3,6 @@ package ma.bam.inventaire.ui.inventorylist
 import androidx.annotation.PluralsRes
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.offset
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.Stroke
-import ma.bam.inventaire.R
-import ma.bam.inventaire.ui.theme.AppBackground
-import ma.bam.inventaire.ui.theme.BamCyan
-import ma.bam.inventaire.ui.theme.BamNavy
-import ma.bam.inventaire.ui.theme.CardSurface
-import ma.bam.inventaire.ui.theme.LightInventoPalette
-import ma.bam.inventaire.ui.theme.SelectedCardBg
-import ma.bam.inventaire.ui.theme.TextPrimary
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,27 +29,35 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
-import androidx.compose.runtime.remember
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
-import kotlin.math.abs
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.abs
+import ma.bam.inventaire.R
+import ma.bam.inventaire.ui.theme.AppBackground
+import ma.bam.inventaire.ui.theme.BamNavy
 import ma.bam.inventaire.ui.theme.BamPrimary
-import ma.bam.inventaire.ui.theme.BamPrimaryContainer
+import ma.bam.inventaire.ui.theme.CardSurface
+import ma.bam.inventaire.ui.theme.LightInventoPalette
+import ma.bam.inventaire.ui.theme.SelectedCardBg
 import ma.bam.inventaire.ui.theme.StatusEcart
 import ma.bam.inventaire.ui.theme.StatusEcartBg
 import ma.bam.inventaire.ui.theme.StatusNegative
@@ -187,7 +184,6 @@ private fun SwipeActionBackground(
     }
 }
 
-
 /** Couleurs d'une carte d'inventaire selon son état (En cours / Finalisé / En attente). */
 private data class SessionCardColors(
     val background: Color,
@@ -205,12 +201,7 @@ private data class SessionCardColors(
 )
 
 @Composable
-fun InventorySessionCard(
-    item: SessionListItem,
-    dateLabel: String,
-    onClick: () -> Unit,
-    onLockClick: () -> Unit = {}
-) {
+fun InventorySessionCard(item: SessionListItem, dateLabel: String, onClick: () -> Unit, onLockClick: () -> Unit = {}) {
     val closed = item.session.verrouille
     val allScanned = item.counters.total > 0 && item.counters.scanned >= item.counters.total
     val notStarted = item.counters.scanned == 0

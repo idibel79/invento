@@ -1,13 +1,13 @@
 package ma.bam.inventaire.util.xlsx
 
-import org.xml.sax.Attributes
-import org.xml.sax.InputSource
-import org.xml.sax.helpers.DefaultHandler
 import java.io.ByteArrayInputStream
 import java.nio.ByteBuffer
 import java.nio.charset.CodingErrorAction
 import java.util.zip.ZipInputStream
 import javax.xml.parsers.SAXParserFactory
+import org.xml.sax.Attributes
+import org.xml.sax.InputSource
+import org.xml.sax.helpers.DefaultHandler
 
 /**
  * Lecteur .xlsx minimal basé uniquement sur `java.util.zip` et SAX (`javax.xml.parsers`),
@@ -69,25 +69,31 @@ object XlsxReader {
 
     private fun parseFirstSheetRelationshipId(xml: ByteArray): String? {
         var result: String? = null
-        parseXml(xml, object : DefaultHandler() {
-            override fun startElement(uri: String?, localName: String?, qName: String, attributes: Attributes) {
-                if (result == null && qName.substringAfterLast(':') == "sheet") {
-                    result = attributes.getValue("r:id") ?: attributes.getValue("id")
+        parseXml(
+            xml,
+            object : DefaultHandler() {
+                override fun startElement(uri: String?, localName: String?, qName: String, attributes: Attributes) {
+                    if (result == null && qName.substringAfterLast(':') == "sheet") {
+                        result = attributes.getValue("r:id") ?: attributes.getValue("id")
+                    }
                 }
             }
-        })
+        )
         return result
     }
 
     private fun parseRelationshipTarget(xml: ByteArray, relationshipId: String): String? {
         var result: String? = null
-        parseXml(xml, object : DefaultHandler() {
-            override fun startElement(uri: String?, localName: String?, qName: String, attributes: Attributes) {
-                if (qName.substringAfterLast(':') == "Relationship" && attributes.getValue("Id") == relationshipId) {
-                    result = attributes.getValue("Target")
+        parseXml(
+            xml,
+            object : DefaultHandler() {
+                override fun startElement(uri: String?, localName: String?, qName: String, attributes: Attributes) {
+                    if (qName.substringAfterLast(':') == "Relationship" && attributes.getValue("Id") == relationshipId) {
+                        result = attributes.getValue("Target")
+                    }
                 }
             }
-        })
+        )
         return result
     }
 
@@ -96,25 +102,34 @@ object XlsxReader {
         val current = StringBuilder()
         var inSi = false
         var inText = false
-        parseXml(xml, object : DefaultHandler() {
-            override fun startElement(uri: String?, localName: String?, qName: String, attributes: Attributes) {
-                when (qName.substringAfterLast(':')) {
-                    "si" -> { inSi = true; current.setLength(0) }
-                    "t" -> inText = true
+        parseXml(
+            xml,
+            object : DefaultHandler() {
+                override fun startElement(uri: String?, localName: String?, qName: String, attributes: Attributes) {
+                    when (qName.substringAfterLast(':')) {
+                        "si" -> {
+                            inSi = true
+                            current.setLength(0)
+                        }
+                        "t" -> inText = true
+                    }
+                }
+
+                override fun characters(ch: CharArray, start: Int, length: Int) {
+                    if (inSi && inText) current.append(ch, start, length)
+                }
+
+                override fun endElement(uri: String?, localName: String?, qName: String) {
+                    when (qName.substringAfterLast(':')) {
+                        "t" -> inText = false
+                        "si" -> {
+                            strings.add(repairMojibake(current.toString()))
+                            inSi = false
+                        }
+                    }
                 }
             }
-
-            override fun characters(ch: CharArray, start: Int, length: Int) {
-                if (inSi && inText) current.append(ch, start, length)
-            }
-
-            override fun endElement(uri: String?, localName: String?, qName: String) {
-                when (qName.substringAfterLast(':')) {
-                    "t" -> inText = false
-                    "si" -> { strings.add(repairMojibake(current.toString())); inSi = false }
-                }
-            }
-        })
+        )
         return strings
     }
 
@@ -150,43 +165,46 @@ object XlsxReader {
         var capturingValue = false
         var capturingInlineText = false
 
-        parseXml(xml, object : DefaultHandler() {
-            override fun startElement(uri: String?, localName: String?, qName: String, attributes: Attributes) {
-                when (qName.substringAfterLast(':')) {
-                    "row" -> currentRow = mutableListOf()
-                    "c" -> {
-                        cellColIndex = columnIndexFromRef(attributes.getValue("r"))
-                        cellType = attributes.getValue("t") ?: "n"
-                        valueBuffer.setLength(0)
-                        inlineTextBuffer.setLength(0)
-                    }
-                    "v" -> capturingValue = true
-                    "t" -> capturingInlineText = true
-                }
-            }
-
-            override fun characters(ch: CharArray, start: Int, length: Int) {
-                if (capturingValue) valueBuffer.append(ch, start, length)
-                if (capturingInlineText) inlineTextBuffer.append(ch, start, length)
-            }
-
-            override fun endElement(uri: String?, localName: String?, qName: String) {
-                when (qName.substringAfterLast(':')) {
-                    "v" -> capturingValue = false
-                    "t" -> capturingInlineText = false
-                    "c" -> {
-                        val text = when (cellType) {
-                            "s" -> valueBuffer.toString().trim().toIntOrNull()?.let { sharedStrings.getOrNull(it) } ?: ""
-                            "inlineStr" -> repairMojibake(inlineTextBuffer.toString())
-                            else -> valueBuffer.toString()
+        parseXml(
+            xml,
+            object : DefaultHandler() {
+                override fun startElement(uri: String?, localName: String?, qName: String, attributes: Attributes) {
+                    when (qName.substringAfterLast(':')) {
+                        "row" -> currentRow = mutableListOf()
+                        "c" -> {
+                            cellColIndex = columnIndexFromRef(attributes.getValue("r"))
+                            cellType = attributes.getValue("t") ?: "n"
+                            valueBuffer.setLength(0)
+                            inlineTextBuffer.setLength(0)
                         }
-                        while (currentRow.size <= cellColIndex) currentRow.add("")
-                        currentRow[cellColIndex] = text
+                        "v" -> capturingValue = true
+                        "t" -> capturingInlineText = true
                     }
-                    "row" -> rows.add(currentRow)
+                }
+
+                override fun characters(ch: CharArray, start: Int, length: Int) {
+                    if (capturingValue) valueBuffer.append(ch, start, length)
+                    if (capturingInlineText) inlineTextBuffer.append(ch, start, length)
+                }
+
+                override fun endElement(uri: String?, localName: String?, qName: String) {
+                    when (qName.substringAfterLast(':')) {
+                        "v" -> capturingValue = false
+                        "t" -> capturingInlineText = false
+                        "c" -> {
+                            val text = when (cellType) {
+                                "s" -> valueBuffer.toString().trim().toIntOrNull()?.let { sharedStrings.getOrNull(it) } ?: ""
+                                "inlineStr" -> repairMojibake(inlineTextBuffer.toString())
+                                else -> valueBuffer.toString()
+                            }
+                            while (currentRow.size <= cellColIndex) currentRow.add("")
+                            currentRow[cellColIndex] = text
+                        }
+                        "row" -> rows.add(currentRow)
+                    }
                 }
             }
-        })
+        )
         return rows
     }
 

@@ -64,12 +64,7 @@ class BarcodeAnalyzer(
             .addOnCompleteListener { imageProxy.close() }
     }
 
-    private fun handleResults(
-        barcodes: List<Barcode>,
-        rotationDegrees: Int,
-        imageWidth: Int,
-        imageHeight: Int
-    ) {
+    private fun handleResults(barcodes: List<Barcode>, rotationDegrees: Int, imageWidth: Int, imageHeight: Int) {
         val value = barcodes.firstOrNull { barcode ->
             !barcode.rawValue.isNullOrBlank() &&
                 isNearScanLine(barcode.boundingBox, rotationDegrees, imageWidth, imageHeight)
@@ -98,12 +93,7 @@ class BarcodeAnalyzer(
      * toujours au centre affiché à l'écran, quel que soit le ratio d'aspect. On vérifie donc que
      * le centre vertical du code-barres est proche du centre vertical de l'image remise à l'endroit.
      */
-    private fun isNearScanLine(
-        box: Rect?,
-        rotationDegrees: Int,
-        imageWidth: Int,
-        imageHeight: Int
-    ): Boolean {
+    private fun isNearScanLine(box: Rect?, rotationDegrees: Int, imageWidth: Int, imageHeight: Int): Boolean {
         if (box == null) return false
         val uprightHeight = if (rotationDegrees == 90 || rotationDegrees == 270) imageWidth else imageHeight
         val fraction = box.exactCenterY() / uprightHeight

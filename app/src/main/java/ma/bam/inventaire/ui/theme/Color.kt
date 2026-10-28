@@ -14,30 +14,34 @@ import androidx.compose.ui.graphics.Color
 @Immutable
 data class InventoPalette(
     // Marque
-    val navy: Color,            // titres, textes et icônes d'accent
-    val navyFill: Color,        // fonds pleins (boutons, puces sélectionnées) sous texte blanc
-    val primary: Color,         // bleu d'accent (textes, anneaux, focus)
-    val primaryFill: Color,     // pastilles / badges bleus pleins sous texte blanc
+    val navy: Color, // titres, textes et icônes d'accent
+    val navyFill: Color, // fonds pleins (boutons, puces sélectionnées) sous texte blanc
+    val primary: Color, // bleu d'accent (textes, anneaux, focus)
+    val primaryFill: Color, // pastilles / badges bleus pleins sous texte blanc
     val primaryContainer: Color,
-    val selectedCard: Color,    // carte sélectionnée / ligne mise en avant
+    val selectedCard: Color, // carte sélectionnée / ligne mise en avant
     val cyan: Color,
-    val onBrand: Color,         // texte sur navyFill / primaryFill
+    val onBrand: Color, // texte sur navyFill / primaryFill
     // Neutres
     val background: Color,
     val surface: Color,
-    val band: Color,            // bandeaux et cases discrets dans une carte
+    val band: Color, // bandeaux et cases discrets dans une carte
     val textPrimary: Color,
     val textSecondary: Color,
     val textMuted: Color,
     val border: Color,
-    val controlBorder: Color,   // bordure des boutons secondaires / segments
-    val hairline: Color,        // séparateurs fins
-    val track: Color,           // rail des barres de progression
+    val controlBorder: Color, // bordure des boutons secondaires / segments
+    val hairline: Color, // séparateurs fins
+    val track: Color, // rail des barres de progression
     // Statuts
-    val success: Color, val successBg: Color,
-    val ecart: Color, val ecartBg: Color,
-    val negative: Color, val negativeBg: Color,
-    val pending: Color, val pendingBg: Color
+    val success: Color,
+    val successBg: Color,
+    val ecart: Color,
+    val ecartBg: Color,
+    val negative: Color,
+    val negativeBg: Color,
+    val pending: Color,
+    val pendingBg: Color
 )
 
 val LightInventoPalette = InventoPalette(
@@ -94,36 +98,89 @@ val DarkInventoPalette = InventoPalette(
 val LocalInventoPalette = staticCompositionLocalOf { LightInventoPalette }
 
 private inline val p: InventoPalette
-    @Composable @ReadOnlyComposable get() = LocalInventoPalette.current
+    @Composable @ReadOnlyComposable
+    get() = LocalInventoPalette.current
 
 // Palette de marque
-val BamNavy: Color @Composable @ReadOnlyComposable get() = p.navy
-val BamNavyFill: Color @Composable @ReadOnlyComposable get() = p.navyFill
-val BamPrimary: Color @Composable @ReadOnlyComposable get() = p.primary
-val BamPrimaryFill: Color @Composable @ReadOnlyComposable get() = p.primaryFill
-val BamPrimaryContainer: Color @Composable @ReadOnlyComposable get() = p.primaryContainer
-val SelectedCardBg: Color @Composable @ReadOnlyComposable get() = p.selectedCard
-val BamCyan: Color @Composable @ReadOnlyComposable get() = p.cyan
-val OnBrand: Color @Composable @ReadOnlyComposable get() = p.onBrand
+val BamNavy: Color
+    @Composable @ReadOnlyComposable
+    get() = p.navy
+val BamNavyFill: Color
+    @Composable @ReadOnlyComposable
+    get() = p.navyFill
+val BamPrimary: Color
+    @Composable @ReadOnlyComposable
+    get() = p.primary
+val BamPrimaryFill: Color
+    @Composable @ReadOnlyComposable
+    get() = p.primaryFill
+val BamPrimaryContainer: Color
+    @Composable @ReadOnlyComposable
+    get() = p.primaryContainer
+val SelectedCardBg: Color
+    @Composable @ReadOnlyComposable
+    get() = p.selectedCard
+val BamCyan: Color
+    @Composable @ReadOnlyComposable
+    get() = p.cyan
+val OnBrand: Color
+    @Composable @ReadOnlyComposable
+    get() = p.onBrand
 
 // Neutres
-val AppBackground: Color @Composable @ReadOnlyComposable get() = p.background
-val CardSurface: Color @Composable @ReadOnlyComposable get() = p.surface
-val SoftBand: Color @Composable @ReadOnlyComposable get() = p.band
-val TextPrimary: Color @Composable @ReadOnlyComposable get() = p.textPrimary
-val TextSecondary: Color @Composable @ReadOnlyComposable get() = p.textSecondary
-val TextMuted: Color @Composable @ReadOnlyComposable get() = p.textMuted
-val BorderColor: Color @Composable @ReadOnlyComposable get() = p.border
-val ControlBorder: Color @Composable @ReadOnlyComposable get() = p.controlBorder
-val Hairline: Color @Composable @ReadOnlyComposable get() = p.hairline
-val TrackColor: Color @Composable @ReadOnlyComposable get() = p.track
+val AppBackground: Color
+    @Composable @ReadOnlyComposable
+    get() = p.background
+val CardSurface: Color
+    @Composable @ReadOnlyComposable
+    get() = p.surface
+val SoftBand: Color
+    @Composable @ReadOnlyComposable
+    get() = p.band
+val TextPrimary: Color
+    @Composable @ReadOnlyComposable
+    get() = p.textPrimary
+val TextSecondary: Color
+    @Composable @ReadOnlyComposable
+    get() = p.textSecondary
+val TextMuted: Color
+    @Composable @ReadOnlyComposable
+    get() = p.textMuted
+val BorderColor: Color
+    @Composable @ReadOnlyComposable
+    get() = p.border
+val ControlBorder: Color
+    @Composable @ReadOnlyComposable
+    get() = p.controlBorder
+val Hairline: Color
+    @Composable @ReadOnlyComposable
+    get() = p.hairline
+val TrackColor: Color
+    @Composable @ReadOnlyComposable
+    get() = p.track
 
 // Statuts : couleur du texte / de l'icône et fond associé (pastilles, cases)
-val StatusSuccess: Color @Composable @ReadOnlyComposable get() = p.success
-val StatusSuccessBg: Color @Composable @ReadOnlyComposable get() = p.successBg
-val StatusEcart: Color @Composable @ReadOnlyComposable get() = p.ecart
-val StatusEcartBg: Color @Composable @ReadOnlyComposable get() = p.ecartBg
-val StatusNegative: Color @Composable @ReadOnlyComposable get() = p.negative
-val StatusNegativeBg: Color @Composable @ReadOnlyComposable get() = p.negativeBg
-val StatusPending: Color @Composable @ReadOnlyComposable get() = p.pending
-val StatusPendingBg: Color @Composable @ReadOnlyComposable get() = p.pendingBg
+val StatusSuccess: Color
+    @Composable @ReadOnlyComposable
+    get() = p.success
+val StatusSuccessBg: Color
+    @Composable @ReadOnlyComposable
+    get() = p.successBg
+val StatusEcart: Color
+    @Composable @ReadOnlyComposable
+    get() = p.ecart
+val StatusEcartBg: Color
+    @Composable @ReadOnlyComposable
+    get() = p.ecartBg
+val StatusNegative: Color
+    @Composable @ReadOnlyComposable
+    get() = p.negative
+val StatusNegativeBg: Color
+    @Composable @ReadOnlyComposable
+    get() = p.negativeBg
+val StatusPending: Color
+    @Composable @ReadOnlyComposable
+    get() = p.pending
+val StatusPendingBg: Color
+    @Composable @ReadOnlyComposable
+    get() = p.pendingBg
