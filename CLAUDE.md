@@ -18,17 +18,16 @@ Flow for every task:
 1. Only take cards that are in **Todo**. Never start work on a Backlog card on your own
    initiative — it only moves to Todo when the user decides to prioritize it.
 2. When starting work on a card, move it to **In progress**.
-3. Implement the change, following the versioning workflow below.
-4. Build and install the APK on the user's phone (see "Build & install"). Do **not** test or
+3. Implement the change following "Architecture & code conventions" below, run the quality
+   checks (see "Quality checks"), **without** bumping the version.
+4. Install a test build on the user's phone (see "Build & install"). Do **not** test or
    drive the app yourself (see "Testing").
 5. When the implementation is installed, move the card to **Test** and tell the user it's ready
    to verify on-device. Do not put `Closes #N` / `Fixes #N` in commit messages — that would
    auto-close the issue and auto-move the card, bypassing this flow. Mention the issue number in
    prose instead (e.g. "issue #5").
-6. Wait for the user to report back that manual testing passed. Only then:
-   - move the card to **Done**, and
-   - `git push origin master` (and `--tags`) — pushing is automatic at this point, no need to
-     ask separately.
+6. Wait for the user's explicit validation ("valide et push"). Only then run the release steps
+   in "Versioning" (bump, clean build, install, commit, tag, push) and move the card to **Done**.
    If the user instead reports a problem, keep the card in Test (or move back to In progress)
    and fix it — expect it to return to Test after the fix.
 
@@ -41,20 +40,89 @@ Moving cards: `gh project item-list 6 --owner idibel79 --format json` to get the
 
 ## Versioning
 
-After every code change (before considering a task done):
+While the user is trying a change: incremental build + install, **no** version bump, nothing
+committed. Only once the user validates explicitly ("valide et push"):
 - Bump `versionCode` (+1) and `versionName` (semantic patch, e.g. `2.6.29` → `2.6.30`) in
   `app/build.gradle.kts`. Nothing else needs updating — `HomeScreen.kt` reads the version live
   via `BuildConfig.VERSION_NAME`.
-- Commit with a message describing the change, then tag it `vX.Y.Z` (annotated tag).
-- Don't push unless the push step above (user confirmed Test passed) applies, or the user
-  explicitly asks.
+- Clean build with every check (`gradlew.bat clean testDebugUnitTest lintDebug detekt ktlintCheck
+  assembleDebug assembleRelease bundleRelease compileDebugAndroidTestKotlin`), then reinstall the
+  validated build on the phone (`adb install -r`, never uninstall).
+- Commit with a message describing the change (UTF-8 **without BOM**: `git commit -F <file>`
+  with a file written without BOM, or several `-m`), then an annotated tag `vX.Y.Z`.
+- `git push origin master`, then `git push origin vX.Y.Z` (tags don't trigger the CI).
 
 ## Build & install
 
-- Build: `./gradlew.bat assembleDebug` (or `compileDebugKotlin` to just check compilation).
-- Install on the connected phone: `adb install -r <path-to-apk>`.
+- Test build: `./gradlew.bat installDebug` (incremental; or `compileDebugKotlin` to just check
+  compilation). Behind the BAM proxy, add `-Djavax.net.ssl.trustStoreType=Windows-ROOT` when
+  Gradle needs to download something.
+- Install an APK on the connected phone: `adb install -r <path-to-apk>` (adb is in
+  `%LOCALAPPDATA%\Android\Sdk\platform-tools` if not on PATH). Never `adb uninstall`: it wipes
+  the inventories.
 - `.gitignore` already excludes `app/build`, `.gradle`, `local.properties`, `*.apk`, `/backups`,
-  `/.claude`, `/.kotlin` — don't commit build output or the APK.
+  `/.claude`, `/.kotlin`, `keystore.properties`, `*.jks`, `*.keystore` — don't commit build
+  output, the APK or signing material.
+
+## Architecture & code conventions
+
+Rules in force since the refactoring lots 1–5 (v2.6.101–v2.6.105). Follow the existing code as
+the model; `ui/inventorydetail` is the reference screen.
+- **UI**: one Hilt ViewModel per screen exposing a single `StateFlow<…UiState>`, collected with
+  `collectAsStateWithLifecycle`. Each screen is split into a stateful composable (`hiltViewModel()`
+  + collection + one-shot events) and a stateless one (`uiState` + lambdas, e.g.
+  `InventoryDetailActions`). Sub-components live in their own files. Main components get a
+  `@LightDarkPreviews` preview wrapped in `PreviewSurface`.
+- **No `Context` or Android API in ViewModels**: go through injected interfaces
+  (`SessionExporter`, `ImportFileSource`) and injected dispatchers (`@IoDispatcher`,
+  `@DefaultDispatcher` from `di/DispatchersModule.kt`) so ViewModels stay JVM-testable.
+- **Business logic** is pure Kotlin in `domain/` and unit-tested on the JVM: `EcartCalculator`
+  is the only definition of the écart and its thresholds (the SQL counters interpolate
+  `SEUIL_ECART_NUL`), plus `ArticleFilters`, `ArticleSearch`, `ArticleStats`.
+- **Data**: `InventoryRepository` (interface) + `InventoryRepositoryImpl`. Counters and lists are
+  exposed as Room `Flow`s (no manual refresh); several writes that belong together go in one
+  `@Transaction` (e.g. `InventorySessionDao.insertWithArticles` for imports).
+- **Texts** shown to the user live in `res/values/strings.xml` (plurals via `pluralLabel` in
+  `ui/components/Plurals.kt`). Visuals follow the `invento-design` skill.
+- **Tests**: every new piece of logic, ViewModel or DAO comes with tests — JVM tests with
+  `FakeInventoryRepository` and `kotlinx-coroutines-test` (`app/src/test`), DAO and migration
+  tests in `app/src/androidTest` (`InventoryDaoTest`, `MigrationTest`).
+
+## Database
+
+The inventories on the phone must **always** survive an update.
+- Never use `fallbackToDestructiveMigration()`.
+- Any entity change = `AppDatabase.VERSION` + 1, a `Migration` added to
+  `AppDatabase.ALL_MIGRATIONS`, the exported schema committed (`app/schemas/.../<version>.json`)
+  and a migration test following the model of `MigrationTest` (create the DB in the old version,
+  insert data, migrate, check nothing is lost).
+- `DatabaseMigrationsTest` (JVM) fails the CI if a migration step or an exported schema is
+  missing. The 5→6 migration can't be tested (no `5.json` was ever exported — don't fake one).
+
+## Quality checks
+
+- Before every test install: `gradlew.bat testDebugUnitTest detekt ktlintCheck lintDebug`
+  (`-Djavax.net.ssl.trustStoreType=Windows-ROOT` behind the BAM proxy if something must be
+  downloaded). All existing tests stay green.
+- Never add entries to the baselines (`app/config/ktlint/baseline.xml`,
+  `app/config/detekt/baseline.xml`, `app/lint-baseline.xml`): fix the code instead, and shrink the
+  baselines for the files you touch when practical.
+- GitHub CI (`.github/workflows/android.yml`) runs on push to `master` and on pull requests (one
+  run per push, older runs cancelled): build, release build, unit tests, lint, detekt, ktlint,
+  and instrumented tests (`connectedDebugAndroidTest`) on an emulator.
+
+## Release / Play Store
+
+- The release is minified (R8 + `isShrinkResources`); keep rules in `app/proguard-rules.pro`.
+  When touching dependencies, Room entities or reflected models, install and have the user test
+  the release build (`assembleRelease` + `adb install -r`), not only the debug one.
+- Signing: `signingConfigs.release` reads `keystore.properties` at the repo root (never
+  committed; template `keystore.properties.example`). Without it the release is signed with the
+  debug key. The user creates the keystore — never generate keys or passwords.
+- `gradlew.bat bundleRelease` produces the `.aab` for the Play Store (Play App Signing, the
+  keystore is the upload key).
+- Switching the phone from the debug-signed app to the Play-signed one requires an uninstall,
+  which wipes the data: the user must export the inventories first.
 
 ## Testing
 
