@@ -63,6 +63,7 @@ fun ScanScreen(onBack: () -> Unit, onFinished: (sessionId: String) -> Unit, view
             onDismissDialog = viewModel::dismissDialog,
             onConfirmQuantity = viewModel::confirmQuantity,
             onValidateEcart = viewModel::validateEcart,
+            onBackToQuantityEntry = viewModel::backToQuantityEntry,
             onSaveCorrection = viewModel::saveCorrection,
             onFinalize = viewModel::finalizeInventory
         )
@@ -91,10 +92,10 @@ data class ScanActions(
     val onDismissDialog: () -> Unit,
     val onConfirmQuantity: (StockArticleEntity, Double) -> Unit,
     val onValidateEcart: (StockArticleEntity, Double) -> Unit,
+    val onBackToQuantityEntry: (StockArticleEntity, Double) -> Unit,
     val onSaveCorrection: (
         article: StockArticleEntity,
         quantiteReelle: Double,
-        quantiteSysteme: Double,
         remarque: String
     ) -> Unit,
     val onFinalize: () -> Unit
@@ -180,7 +181,8 @@ private val NoScanActions = ScanActions(
     onDismissDialog = {},
     onConfirmQuantity = { _, _ -> },
     onValidateEcart = { _, _ -> },
-    onSaveCorrection = { _, _, _, _ -> },
+    onBackToQuantityEntry = { _, _ -> },
+    onSaveCorrection = { _, _, _ -> },
     onFinalize = {}
 )
 

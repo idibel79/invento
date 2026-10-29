@@ -17,7 +17,10 @@ class FakeInventoryRepository(articles: List<StockArticleEntity> = emptyList()) 
     data class QuantityCall(val articleId: Long, val quantiteReelle: Double, val ecartValide: Boolean)
 
     val articles = MutableStateFlow(articles)
+    data class CorrectionCall(val articleId: Long, val quantiteSaisie: Double, val remarque: String)
+
     val recordedQuantities = mutableListOf<QuantityCall>()
+    val recordedCorrections = mutableListOf<CorrectionCall>()
     val finalizedSessions = mutableListOf<String>()
     val sessions = MutableStateFlow<List<InventorySessionEntity>>(emptyList())
     val session = MutableStateFlow<InventorySessionEntity?>(null)
@@ -58,7 +61,9 @@ class FakeInventoryRepository(articles: List<StockArticleEntity> = emptyList()) 
         }
     }
 
-    override suspend fun recordCorrection(articleId: Long, quantiteReelle: Double, quantiteSysteme: Double, remarque: String) = Unit
+    override suspend fun recordCorrection(articleId: Long, quantiteSaisie: Double, remarque: String) {
+        recordedCorrections += CorrectionCall(articleId, quantiteSaisie, remarque)
+    }
 
     override suspend fun finalizeSession(sessionId: String) {
         finalizedSessions += sessionId

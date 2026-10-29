@@ -39,7 +39,7 @@ internal fun ecartColors(ecart: Double): Pair<Color, Color> = if (EcartCalculato
     StatusNegative to StatusNegativeBg
 }
 
-/** Système / Compté / Écart, avec la quantité système d'avant toute correction. */
+/** Système / Compté / Écart, avec la quantité comptée d'avant correction. */
 @Composable
 internal fun EcartTiles(quantiteSysteme: Double, quantiteReelle: Double, ecart: Double) {
     val (ecartColor, ecartBg) = ecartColors(ecart)

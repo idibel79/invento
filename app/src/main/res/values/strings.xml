@@ -34,6 +34,7 @@
     <string name="home_no_inventory">Aucun inventaire</string>
     <string name="home_empty">Aucun inventaire pour le moment.</string>
     <string name="home_finalized">Finalisés</string>
+    <string name="home_closed">Clôturés</string>
     <string name="status_ongoing">En cours</string>
     <string name="status_pending">En attente</string>
     <string name="status_finalized">Finalisé</string>
@@ -194,9 +195,9 @@
     <string name="qty_ecart_of">Écart de %1$s par rapport au système</string>
     <string name="ecart_detected_title">Écart détecté</string>
     <string name="ecart_validate_without">Valider sans corriger</string>
-    <string name="ecart_correct_then_validate">Corriger puis valider</string>
-    <string name="ecart_correct_title">Corriger la quantité système ?</string>
-    <string name="ecart_new_system_qty">Nouvelle quantité système</string>
+    <string name="ecart_correct_then_validate">Corriger et\nvalider</string>
+    <string name="ecart_correct_title">Corriger la quantité comptée ?</string>
+    <string name="ecart_new_counted_qty">Nouvelle quantité comptée</string>
     <string name="ecart_remark">Remarque (facultatif)</string>
     <string name="ecart_remark_placeholder">Ex. : 2 boîtes abîmées en réserve</string>
     <string name="unknown_article_title">Article non reconnu</string>
@@ -232,7 +233,7 @@
 
     <!-- Carte produit -->
     <string name="article_edit_quantity">Modifier la quantité</string>
-    <string name="article_corrected_note">Quantité système corrigée par l\'inventoriste</string>
+    <string name="article_corrected_note">Quantité comptée corrigée par l\'inventoriste</string>
     <string name="qty_system">Système</string>
     <string name="qty_counted">Compté</string>
     <string name="qty_ecart">Écart</string>

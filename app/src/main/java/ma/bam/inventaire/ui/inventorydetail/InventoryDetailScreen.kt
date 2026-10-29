@@ -97,7 +97,7 @@ data class InventoryDetailActions(
     val previewCount: suspend (ArticleFilter, String?, String?, ClosedFloatingPointRange<Float>?) -> Int,
     /** Enregistre une quantité comptée (écart éventuel validé). */
     val onUpdateQuantity: (articleId: Long, quantite: Double) -> Unit,
-    val onSaveCorrection: (articleId: Long, quantiteReelle: Double, quantiteSysteme: Double, remarque: String) -> Unit,
+    val onSaveCorrection: (articleId: Long, quantiteReelle: Double, remarque: String) -> Unit,
     val onCreateArticle: (ImportedArticle) -> Unit
 )
 
@@ -209,7 +209,7 @@ private val NoActions = InventoryDetailActions(
     onSortChange = {},
     previewCount = { _, _, _, _ -> 0 },
     onUpdateQuantity = { _, _ -> },
-    onSaveCorrection = { _, _, _, _ -> },
+    onSaveCorrection = { _, _, _ -> },
     onCreateArticle = {}
 )
 

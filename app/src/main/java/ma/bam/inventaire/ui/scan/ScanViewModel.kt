@@ -24,7 +24,9 @@ import ma.bam.inventaire.util.ScanFeedback
 
 sealed interface ScanDialogState {
     data object None : ScanDialogState
-    data class QuantityEntry(val article: StockArticleEntity) : ScanDialogState
+
+    /** [quantiteSaisie] : quantité reprise au retour depuis « Écart détecté » (null = quantité comptée). */
+    data class QuantityEntry(val article: StockArticleEntity, val quantiteSaisie: Double? = null) : ScanDialogState
     data class EcartConfirm(
         val article: StockArticleEntity,
         val quantiteReelle: Double,
@@ -103,17 +105,22 @@ class ScanViewModel @Inject constructor(
                 dialog = ScanDialogState.EcartConfirm(article, quantiteReelle, ecart)
             )
         } else {
-            saveQuantity(article.id, quantiteReelle, ecartValide = true)
+            save { repository.updateQuantity(article.id, quantiteReelle, ecartValide = true) }
         }
     }
 
+    /** Retour de « Écart détecté » vers « Saisir quantité », avec la quantité saisie. */
+    fun backToQuantityEntry(article: StockArticleEntity, quantiteReelle: Double) {
+        _uiState.value = _uiState.value.copy(dialog = ScanDialogState.QuantityEntry(article, quantiteReelle))
+    }
+
     fun validateEcart(article: StockArticleEntity, quantiteReelle: Double) {
-        saveQuantity(article.id, quantiteReelle, ecartValide = true)
+        save { repository.updateQuantity(article.id, quantiteReelle, ecartValide = true) }
     }
 
     /** « Enregistrer » de l'étape « Corriger la quantité » : un écart restant est enregistré comme validé. */
-    fun saveCorrection(article: StockArticleEntity, quantiteReelle: Double, quantiteSysteme: Double, remarque: String) {
-        save { repository.recordCorrection(article.id, quantiteReelle, quantiteSysteme, remarque) }
+    fun saveCorrection(article: StockArticleEntity, quantiteReelle: Double, remarque: String) {
+        save { repository.recordCorrection(article.id, quantiteReelle, remarque) }
     }
 
     fun dismissDialog() {
@@ -125,10 +132,6 @@ class ScanViewModel @Inject constructor(
             repository.finalizeSession(sessionId)
             _uiState.value = _uiState.value.copy(finalized = true)
         }
-    }
-
-    private fun saveQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean) {
-        save { repository.updateQuantity(articleId, quantiteReelle, ecartValide) }
     }
 
     private fun save(write: suspend () -> Unit) {

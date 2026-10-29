@@ -33,7 +33,9 @@ import ma.bam.inventaire.data.local.entity.InventorySessionEntity
 import ma.bam.inventaire.ui.components.pluralLabel
 import ma.bam.inventaire.ui.components.rememberTapHaptic
 import ma.bam.inventaire.ui.theme.BamNavy
+import ma.bam.inventaire.ui.theme.BamNavyFill
 import ma.bam.inventaire.ui.theme.LightDarkPreviews
+import ma.bam.inventaire.ui.theme.OnBrand
 import ma.bam.inventaire.ui.theme.PreviewSurface
 
 /** Opacité des icônes de la barre quand l'inventaire est clôturé. */
@@ -134,7 +136,7 @@ internal fun ScanButton(enabled: Boolean, onClick: () -> Unit) {
         },
         enabled = enabled,
         shape = RoundedCornerShape(18.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+        colors = ButtonDefaults.buttonColors(containerColor = BamNavyFill, contentColor = OnBrand),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp, pressedElevation = 8.dp),
         contentPadding = PaddingValues(horizontal = 28.dp),
         modifier = Modifier.height(58.dp)

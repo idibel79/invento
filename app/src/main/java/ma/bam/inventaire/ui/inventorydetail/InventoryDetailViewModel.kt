@@ -155,9 +155,9 @@ class InventoryDetailViewModel @Inject constructor(
     }
 
     /** « Enregistrer » de l'étape « Corriger la quantité » : un écart restant est enregistré comme validé. */
-    fun saveCorrection(articleId: Long, quantiteReelle: Double, quantiteSysteme: Double, remarque: String) {
+    fun saveCorrection(articleId: Long, quantiteReelle: Double, remarque: String) {
         viewModelScope.launch {
-            repository.recordCorrection(articleId, quantiteReelle, quantiteSysteme, remarque)
+            repository.recordCorrection(articleId, quantiteReelle, remarque)
         }
     }
 

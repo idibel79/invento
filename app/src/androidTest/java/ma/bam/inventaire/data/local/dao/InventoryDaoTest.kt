@@ -9,10 +9,12 @@ import ma.bam.inventaire.data.local.AppDatabase
 import ma.bam.inventaire.data.local.entity.InventorySessionEntity
 import ma.bam.inventaire.data.local.entity.InventoryStatus
 import ma.bam.inventaire.data.local.entity.StockArticleEntity
+import ma.bam.inventaire.data.repository.InventoryRepositoryImpl
 import ma.bam.inventaire.data.repository.SessionCounters
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
@@ -150,5 +152,21 @@ class InventoryDaoTest {
         assertEquals(setOf("s1", "s2"), counters.keys) // une session sans article n'a pas de ligne
         assertEquals(SessionCounters(2, 1, 1, 1, 0, 1), counters["s1"])
         assertEquals(SessionCounters(1, 0, 0, 0, 1, 0), counters["s2"])
+    }
+
+    @Test
+    fun recordCorrection_sets_counted_to_system_and_keeps_original_ecart() = runTest {
+        sessionDao.insertWithArticles(session("s1"), listOf(article("s1", "A", quantiteTheorique = 10.0)))
+        val id = articleDao.findByCode("s1", "A")!!.id
+
+        InventoryRepositoryImpl(sessionDao, articleDao).recordCorrection(id, 8.0, "  recompté  ")
+
+        val corrected = articleDao.getById(id)!!
+        assertEquals(10.0, corrected.quantiteTheorique, 0.0)
+        assertEquals(10.0, corrected.quantiteReelle!!, 0.0)
+        assertEquals(-2.0, corrected.ecart!!, 0.0)
+        assertTrue(corrected.ecartValide)
+        assertTrue(corrected.corrige)
+        assertEquals("recompté", corrected.remarque)
     }
 }
