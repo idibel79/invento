@@ -55,8 +55,10 @@ import ma.bam.inventaire.ui.importinventory.ImportSheet
 import ma.bam.inventaire.ui.inventorylist.InventoryListViewModel
 import ma.bam.inventaire.ui.inventorylist.SessionListItem
 import ma.bam.inventaire.ui.inventorylist.SwipeableSessionCard
+import ma.bam.inventaire.ui.theme.BamNavyFill
 import ma.bam.inventaire.ui.theme.BamPrimary
 import ma.bam.inventaire.ui.theme.LightDarkPreviews
+import ma.bam.inventaire.ui.theme.OnBrand
 import ma.bam.inventaire.ui.theme.PreviewSurface
 import ma.bam.inventaire.ui.theme.TextMuted
 import ma.bam.inventaire.ui.theme.TextPrimary
@@ -172,8 +174,8 @@ private fun HomeContent(sessions: List<SessionListItem>, filter: HomeFilter?, ac
             ExtendedFloatingActionButton(
                 onClick = actions.onImport,
                 shape = RoundedCornerShape(16.dp),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+                containerColor = BamNavyFill,
+                contentColor = OnBrand,
                 icon = { Icon(Icons.Filled.Add, contentDescription = null) },
                 text = { Text(stringResource(R.string.import_title), fontWeight = FontWeight.Bold) }
             )

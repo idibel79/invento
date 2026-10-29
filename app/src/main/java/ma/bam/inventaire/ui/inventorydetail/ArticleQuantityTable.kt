@@ -147,7 +147,7 @@ private fun QuantityValue(text: String, color: Color, fontSize: TextUnit = 15.sp
 }
 
 /**
- * Article corrigé : mention « Quantité système corrigée par l'inventoriste » toujours affichée,
+ * Article corrigé : mention « Quantité comptée corrigée par l'inventoriste » toujours affichée,
  * suivie de la remarque éventuelle dans un encadré blanc avec le texte entier.
  */
 @Composable
@@ -167,7 +167,7 @@ internal fun RemarqueNote(remarque: String?, modifier: Modifier = Modifier) {
             stringResource(R.string.article_corrected_note),
             fontSize = 12.sp,
             fontStyle = FontStyle.Italic,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Normal,
             color = TextMuted
         )
     }

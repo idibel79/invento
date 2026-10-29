@@ -143,6 +143,29 @@ class ScanViewModelTest {
     }
 
     @Test
+    fun `retour depuis l'ecart rouvre la saisie avec la quantite saisie sans enregistrer`() = runTest {
+        viewModel.confirmQuantity(article, 12.0)
+
+        viewModel.backToQuantityEntry(article, 12.0)
+
+        assertEquals(ScanDialogState.QuantityEntry(article, 12.0), viewModel.uiState.value.dialog)
+        assertEquals(emptyList<FakeInventoryRepository.QuantityCall>(), repository.recordedQuantities)
+    }
+
+    @Test
+    fun `correction enregistre la quantite saisie et la remarque`() = runTest {
+        viewModel.confirmQuantity(article, 12.0)
+
+        viewModel.saveCorrection(article, 9.0, "recompté")
+
+        assertEquals(
+            listOf(FakeInventoryRepository.CorrectionCall(7, 9.0, "recompté")),
+            repository.recordedCorrections
+        )
+        assertEquals(ScanDialogState.None, viewModel.uiState.value.dialog)
+    }
+
+    @Test
     fun `saisie manuelle filtre par designation, PID ou code-barres`() = runTest {
         repository.articles.value = listOf(
             article,

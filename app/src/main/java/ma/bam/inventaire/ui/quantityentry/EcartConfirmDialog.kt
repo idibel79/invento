@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -45,8 +47,8 @@ import ma.bam.inventaire.util.formatQuantity
 /**
  * Popup « Écart détecté » à 2 étapes (maquette « Écart détecté · 3 propositions », colonnes
  * A · Écart et A · Après « Corriger ») : 1) Système / Compté / Écart avec « Corriger » et
- * « Valider » ; 2) « Corriger la quantité système ? » : la quantité système prend la valeur
- * comptée (lecture seule), avec remarque facultative.
+ * « Valider » ; 2) « Corriger la quantité comptée ? » : la quantité comptée prend la valeur
+ * système (lecture seule), avec remarque facultative. La quantité système n'est jamais modifiée.
  */
 @Composable
 fun EcartConfirmDialog(
@@ -54,8 +56,9 @@ fun EcartConfirmDialog(
     quantiteReelle: Double,
     ecart: Double,
     onDismiss: () -> Unit,
+    onBack: () -> Unit,
     onValidate: () -> Unit,
-    onSaveCorrection: (nouvelleQuantiteSysteme: Double, remarque: String) -> Unit
+    onSaveCorrection: (remarque: String) -> Unit
 ) {
     PopupHaptic()
     var correcting by remember { mutableStateOf(false) }
@@ -74,6 +77,7 @@ fun EcartConfirmDialog(
                 article = article,
                 quantiteReelle = quantiteReelle,
                 ecart = ecart,
+                onBack = onBack,
                 onCorrect = { correcting = true },
                 onValidate = onValidate
             )
@@ -88,24 +92,35 @@ private fun ColumnScope.EcartStep(
     article: StockArticleEntity,
     quantiteReelle: Double,
     ecart: Double,
+    onBack: () -> Unit,
     onCorrect: () -> Unit,
     onValidate: () -> Unit
 ) {
     val (ecartColor, ecartBg) = ecartColors(ecart)
-    Box(
-        modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .size(52.dp)
-            .clip(CircleShape)
-            .background(ecartBg),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            Icons.Outlined.WarningAmber,
-            contentDescription = null,
-            tint = ecartColor,
-            modifier = Modifier.size(26.dp)
-        )
+    // Flèche retour à gauche (vers « Saisir quantité »), icône d'écart centrée.
+    Box(modifier = Modifier.fillMaxWidth()) {
+        IconButton(onClick = onBack, modifier = Modifier.align(Alignment.TopStart)) {
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.common_back),
+                tint = BamNavy
+            )
+        }
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .size(52.dp)
+                .clip(CircleShape)
+                .background(ecartBg),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                Icons.Outlined.WarningAmber,
+                contentDescription = null,
+                tint = ecartColor,
+                modifier = Modifier.size(26.dp)
+            )
+        }
     }
     DialogTitle(stringResource(R.string.ecart_detected_title))
     ProductName(article)
@@ -124,7 +139,7 @@ private fun ColumnScope.CorrectionStep(
     quantiteReelle: Double,
     ecart: Double,
     onCancel: () -> Unit,
-    onSave: (Double, String) -> Unit
+    onSave: (String) -> Unit
 ) {
     // Nouvelle correction : on repart de la remarque existante, que « Enregistrer » remplace.
     var remarque by remember { mutableStateOf(article.remarque.orEmpty()) }
@@ -132,22 +147,22 @@ private fun ColumnScope.CorrectionStep(
     ProductName(article)
     // Rappel de l'écart d'origine, avant correction.
     EcartTiles(article.quantiteTheorique, quantiteReelle, ecart)
-    // La quantité système (fichier importé) prend la quantité saisie, sans ajustement possible.
-    SystemQuantityDisplay(quantiteReelle)
+    // La quantité comptée prend la quantité système (fichier importé, jamais modifiée), sans ajustement possible.
+    CountedQuantityDisplay(article.quantiteTheorique)
     RemarqueField(value = remarque, onValueChange = { remarque = it })
     DialogButtons(
         secondaryLabel = stringResource(R.string.common_cancel),
         onSecondary = onCancel,
         primaryLabel = stringResource(R.string.action_save),
-        onPrimary = { onSave(quantiteReelle, remarque) }
+        onPrimary = { onSave(remarque) }
     )
 }
 
-/** « Nouvelle quantité système » en vert, en lecture seule : elle vaut la quantité saisie. */
+/** « Nouvelle quantité comptée » en vert, en lecture seule : elle vaut la quantité système. */
 @Composable
-private fun SystemQuantityDisplay(quantite: Double) {
+private fun CountedQuantityDisplay(quantite: Double) {
     Column {
-        FieldLabel(stringResource(R.string.ecart_new_system_qty), color = StatusSuccess)
+        FieldLabel(stringResource(R.string.ecart_new_counted_qty), color = StatusSuccess)
         Spacer(modifier = Modifier.height(6.dp))
         Box(
             modifier = Modifier
@@ -205,6 +220,7 @@ private fun EcartStepPreview() {
                 article = article,
                 quantiteReelle = article.quantiteTheorique + PREVIEW_ECART_FORT,
                 ecart = PREVIEW_ECART_FORT,
+                onBack = {},
                 onCorrect = {},
                 onValidate = {}
             )
@@ -223,7 +239,7 @@ private fun CorrectionStepPreview() {
                 quantiteReelle = article.quantiteTheorique - 2,
                 ecart = -2.0,
                 onCancel = {},
-                onSave = { _, _ -> }
+                onSave = {}
             )
         }
     }

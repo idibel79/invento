@@ -60,9 +60,15 @@ internal val Scrim = Color(0xFF0F1A33).copy(alpha = 0.42f)
  * champ avec boutons − et +. Toucher en dehors de la carte ferme la popup (= Annuler).
  */
 @Composable
-fun QuantityEntryDialog(article: StockArticleEntity, onDismiss: () -> Unit, onConfirm: (Double) -> Unit) {
+fun QuantityEntryDialog(
+    article: StockArticleEntity,
+    onDismiss: () -> Unit,
+    onConfirm: (Double) -> Unit,
+    // Quantité à afficher au retour depuis « Écart détecté » ; sinon la quantité déjà comptée.
+    initialQuantity: Double? = article.quantiteReelle
+) {
     var field by remember {
-        val initial = article.quantiteReelle?.let { formatQuantity(it) }.orEmpty()
+        val initial = initialQuantity?.let { formatQuantity(it) }.orEmpty()
         mutableStateOf(TextFieldValue(initial, selection = TextRange(initial.length)))
     }
     val quantite = field.text.replace(",", ".").toDoubleOrNull()

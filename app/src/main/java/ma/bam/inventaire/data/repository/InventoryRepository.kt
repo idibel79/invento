@@ -33,11 +33,12 @@ interface InventoryRepository {
     suspend fun updateQuantity(articleId: Long, quantiteReelle: Double, ecartValide: Boolean)
 
     /**
-     * « Enregistrer » de l'étape « Corriger la quantité » : enregistre la quantité comptée, remplace
-     * la quantité système par [quantiteSysteme], valide l'écart éventuel, marque l'article corrigé et
-     * remplace la remarque précédente par [remarque] (vide ou espaces = null).
+     * « Enregistrer » de l'étape « Corriger la quantité » : la quantité comptée prend la quantité
+     * système, l'écart d'origine ([quantiteSaisie] − système) est conservé et validé, l'article est
+     * marqué corrigé et la remarque précédente est remplacée par [remarque] (vide ou espaces = null).
+     * La quantité système (fichier importé) n'est jamais modifiée.
      */
-    suspend fun recordCorrection(articleId: Long, quantiteReelle: Double, quantiteSysteme: Double, remarque: String)
+    suspend fun recordCorrection(articleId: Long, quantiteSaisie: Double, remarque: String)
 
     /** Marque la session comme finalisée (fin du comptage) — indépendant du verrouillage. */
     suspend fun finalizeSession(sessionId: String)

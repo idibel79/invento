@@ -40,8 +40,18 @@ class HomeFilterTest {
     }
 
     @Test
-    fun `cloture = finalise meme sans comptage`() {
-        assertEquals(setOf(HomeFilter.FINALIZED), filtersOf(item(total = 10, scanned = 0, verrouille = true)))
+    fun `cloture = clotures seulement, meme sans comptage`() {
+        assertEquals(setOf(HomeFilter.CLOSED), filtersOf(item(total = 10, scanned = 0, verrouille = true)))
+    }
+
+    @Test
+    fun `cloture et tout compte = clotures et non finalise`() {
+        assertEquals(setOf(HomeFilter.CLOSED), filtersOf(item(total = 10, scanned = 10, verrouille = true)))
+    }
+
+    @Test
+    fun `cloture avec ecart = clotures et ecarts`() {
+        assertEquals(setOf(HomeFilter.CLOSED, HomeFilter.ECARTS), filtersOf(item(total = 10, scanned = 10, ecarts = 2, verrouille = true)))
     }
 
     @Test

@@ -22,16 +22,18 @@ internal fun ScanDialogHost(dialog: ScanDialogState, actions: ScanActions) {
         is ScanDialogState.QuantityEntry -> QuantityEntryDialog(
             article = dialog.article,
             onDismiss = actions.onDismissDialog,
-            onConfirm = { quantite -> actions.onConfirmQuantity(dialog.article, quantite) }
+            onConfirm = { quantite -> actions.onConfirmQuantity(dialog.article, quantite) },
+            initialQuantity = dialog.quantiteSaisie ?: dialog.article.quantiteReelle
         )
         is ScanDialogState.EcartConfirm -> EcartConfirmDialog(
             article = dialog.article,
             quantiteReelle = dialog.quantiteReelle,
             ecart = dialog.ecart,
             onDismiss = actions.onDismissDialog,
+            onBack = { actions.onBackToQuantityEntry(dialog.article, dialog.quantiteReelle) },
             onValidate = { actions.onValidateEcart(dialog.article, dialog.quantiteReelle) },
-            onSaveCorrection = { quantiteSysteme, remarque ->
-                actions.onSaveCorrection(dialog.article, dialog.quantiteReelle, quantiteSysteme, remarque)
+            onSaveCorrection = { remarque ->
+                actions.onSaveCorrection(dialog.article, dialog.quantiteReelle, remarque)
             }
         )
         is ScanDialogState.UnknownArticle -> UnknownArticleDialog(

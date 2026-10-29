@@ -70,13 +70,19 @@ class InventoryRepositoryImpl @Inject constructor(
 
     override suspend fun findArticleByCode(sessionId: String, code: String): StockArticleEntity? = articleDao.findByCode(sessionId, code)
 
-    override suspend fun recordCorrection(articleId: Long, quantiteReelle: Double, quantiteSysteme: Double, remarque: String) {
+    override suspend fun recordCorrection(articleId: Long, quantiteSaisie: Double, remarque: String) {
         val article = articleDao.getById(articleId) ?: return
-        // On corrige la quantité système (fichier importé). L'écart d'origine (saisie − système
-        // avant correction) reste affiché sur la carte, rangée dans « Corrigés » et non « Écarts ».
+        // La quantité comptée prend la quantité système, qui reste celle du fichier importé.
+        // L'écart d'origine (saisie − système) reste affiché sur la carte, rangée dans « Corrigés ».
         articleDao.update(
-            withQuantity(article, quantiteReelle, ecartValide = true)
-                .copy(quantiteTheorique = quantiteSysteme, corrige = true, remarque = remarque.trim().ifEmpty { null })
+            article.copy(
+                quantiteReelle = article.quantiteTheorique,
+                ecart = EcartCalculator.compute(article.quantiteTheorique, quantiteSaisie),
+                ecartValide = true,
+                dateScan = System.currentTimeMillis(),
+                corrige = true,
+                remarque = remarque.trim().ifEmpty { null }
+            )
         )
     }
 

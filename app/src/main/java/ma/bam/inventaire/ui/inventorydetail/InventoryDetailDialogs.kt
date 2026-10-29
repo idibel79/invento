@@ -20,6 +20,9 @@ internal data class PendingEcart(val article: StockArticleEntity, val quantiteRe
 @Stable
 internal class InventoryDetailDialogs {
     var editingArticle by mutableStateOf<StockArticleEntity?>(null)
+
+    /** Quantité reprise dans « Saisir quantité » au retour depuis « Écart détecté » (null = quantité comptée). */
+    var editingQuantity by mutableStateOf<Double?>(null)
     var pendingEcart by mutableStateOf<PendingEcart?>(null)
     var detailArticle by mutableStateOf<StockArticleEntity?>(null)
     var showFilterSheet by mutableStateOf(false)
@@ -72,7 +75,11 @@ private fun QuantityDialogs(dialogs: InventoryDetailDialogs, actions: InventoryD
     dialogs.editingArticle?.let { article ->
         QuantityEntryDialog(
             article = article,
-            onDismiss = { dialogs.editingArticle = null },
+            initialQuantity = dialogs.editingQuantity ?: article.quantiteReelle,
+            onDismiss = {
+                dialogs.editingArticle = null
+                dialogs.editingQuantity = null
+            },
             onConfirm = { quantite ->
                 val ecart = EcartCalculator.compute(article.quantiteTheorique, quantite)
                 if (EcartCalculator.hasEcart(ecart)) {
@@ -81,6 +88,7 @@ private fun QuantityDialogs(dialogs: InventoryDetailDialogs, actions: InventoryD
                     actions.onUpdateQuantity(article.id, quantite)
                 }
                 dialogs.editingArticle = null
+                dialogs.editingQuantity = null
             }
         )
     }
@@ -91,12 +99,17 @@ private fun QuantityDialogs(dialogs: InventoryDetailDialogs, actions: InventoryD
             quantiteReelle = pending.quantiteReelle,
             ecart = pending.ecart,
             onDismiss = { dialogs.pendingEcart = null },
+            onBack = {
+                dialogs.pendingEcart = null
+                dialogs.editingQuantity = pending.quantiteReelle
+                dialogs.editingArticle = pending.article
+            },
             onValidate = {
                 actions.onUpdateQuantity(pending.article.id, pending.quantiteReelle)
                 dialogs.pendingEcart = null
             },
-            onSaveCorrection = { quantiteSysteme, remarque ->
-                actions.onSaveCorrection(pending.article.id, pending.quantiteReelle, quantiteSysteme, remarque)
+            onSaveCorrection = { remarque ->
+                actions.onSaveCorrection(pending.article.id, pending.quantiteReelle, remarque)
                 dialogs.pendingEcart = null
             }
         )

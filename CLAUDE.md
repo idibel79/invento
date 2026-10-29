@@ -18,17 +18,19 @@ Flow for every task:
 1. Only take cards that are in **Todo**. Never start work on a Backlog card on your own
    initiative — it only moves to Todo when the user decides to prioritize it.
 2. When starting work on a card, move it to **In progress**.
-3. Implement the change following "Architecture & code conventions" below, run the quality
-   checks (see "Quality checks"), **without** bumping the version.
+3. Implement the change following "Architecture & code conventions" below, **without** bumping
+   the version. Only check that it compiles; the quality checks come after the user's validation
+   (see "Quality checks").
 4. Install a test build on the user's phone (see "Build & install"). Do **not** test or
    drive the app yourself (see "Testing").
 5. When the implementation is installed, move the card to **Test** and tell the user it's ready
    to verify on-device. Do not put `Closes #N` / `Fixes #N` in commit messages — that would
    auto-close the issue and auto-move the card, bypassing this flow. Mention the issue number in
    prose instead (e.g. "issue #5").
-6. Wait for the user's explicit validation ("valide et push"). Only then run the release steps
-   in "Versioning" (bump, clean build, install, commit, PR, merge once CI is green, tag) and move
-   the card to **Done**.
+6. Wait for the user's explicit validation ("contrôle qualité, valide et push"). Only then run
+   the quality checks; if one fails, fix it, reinstall and ask the user to re-test before going
+   further. Once they are green, run the release steps in "Versioning" (bump, clean build,
+   install, commit, PR, merge once CI is green, tag) and move the card to **Done**.
    If the user instead reports a problem, keep the card in Test (or move back to In progress)
    and fix it — expect it to return to Test after the fix.
 
@@ -42,7 +44,8 @@ Moving cards: `gh project item-list 6 --owner idibel79 --format json` to get the
 ## Versioning
 
 While the user is trying a change: incremental build + install, **no** version bump, nothing
-committed. Only once the user validates explicitly ("valide et push"):
+committed. Only once the user validates explicitly ("contrôle qualité, valide et push") and the
+quality checks are green:
 - Bump `versionCode` (+1) and `versionName` (semantic patch, e.g. `2.6.29` → `2.6.30`) in
   `app/build.gradle.kts`. Nothing else needs updating — `HomeScreen.kt` reads the version live
   via `BuildConfig.VERSION_NAME`.
@@ -108,7 +111,8 @@ The inventories on the phone must **always** survive an update.
 
 ## Quality checks
 
-- Before every test install: `gradlew.bat testDebugUnitTest detekt ktlintCheck lintDebug`
+- After the user's on-device validation ("contrôle qualité, valide et push"), before the release
+  steps — not before each test install: `gradlew.bat testDebugUnitTest detekt ktlintCheck lintDebug`
   (`-Djavax.net.ssl.trustStoreType=Windows-ROOT` behind the BAM proxy if something must be
   downloaded). All existing tests stay green.
 - Never add entries to the baselines (`app/config/ktlint/baseline.xml`,
